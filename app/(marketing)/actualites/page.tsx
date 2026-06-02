@@ -56,7 +56,7 @@ export default function ActualitesPage() {
                 transition={{ delay: index * 0.1 }}
                 className="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-xl transition-all flex flex-col group border border-gray-100"
               >
-                <div className="h-48 bg-gray-200 relative overflow-hidden">
+                <Link href={`/actualites/${article.id}`} className="block h-48 bg-gray-200 relative overflow-hidden">
                   <Image 
                     src={article.image} 
                     alt={article.title} 
@@ -69,7 +69,7 @@ export default function ActualitesPage() {
                       {article.category}
                     </span>
                   </div>
-                </div>
+                </Link>
                 
                 <div className="p-6 flex-grow flex flex-col">
                   <div className="flex items-center text-xs text-gray-500 mb-3 space-x-4">
@@ -83,17 +83,19 @@ export default function ActualitesPage() {
                     </div>
                   </div>
                   
-                  <h3 className="text-xl font-bold text-[var(--color-primary)] mb-3 group-hover:text-[var(--color-secondary)] transition-colors line-clamp-2">
-                    {article.title}
-                  </h3>
+                  <Link href={`/actualites/${article.id}`}>
+                    <h3 className="text-xl font-bold text-[var(--color-primary)] mb-3 group-hover:text-[var(--color-secondary)] transition-colors line-clamp-2 hover:text-[var(--color-accent)]">
+                      {article.title}
+                    </h3>
+                  </Link>
                   
                   <p className="text-gray-600 text-sm mb-6 flex-grow line-clamp-3">
                     {article.excerpt}
                   </p>
                   
-                  <a href="#" className="inline-flex items-center text-[var(--color-secondary)] font-medium text-sm group-hover:underline mt-auto">
+                  <Link href={`/actualites/${article.id}`} className="inline-flex items-center text-[var(--color-secondary)] font-medium text-sm group-hover:underline mt-auto">
                     Lire l'article <ArrowRight className="w-4 h-4 ml-1" />
-                  </a>
+                  </Link>
                 </div>
               </motion.div>
             ))}
