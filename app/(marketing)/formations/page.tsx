@@ -121,11 +121,10 @@ export default function FormationsPage() {
                   >
                     {/* Image header */}
                     <div className="h-48 relative overflow-hidden">
-                      <Image
+                      <img
                         src={imageSrc}
                         alt={formation.titre}
-                        fill
-                        className="object-cover group-hover:scale-105 transition-transform duration-500"
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                       />
                       <span className="absolute top-0 left-0 bg-[var(--color-primary)] text-white text-[9px] font-bold px-3 py-1.5 uppercase tracking-wider">
                         {formation.categorie}
