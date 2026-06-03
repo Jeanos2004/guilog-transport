@@ -82,6 +82,7 @@ export default function AdminPage() {
   const [newModulePrix, setNewModulePrix] = useState<number | "">("");
   const [newModuleImage, setNewModuleImage] = useState("");
   const [editingModule, setEditingModule] = useState<{ catIndex: number; modIndex: number; oldTitle: string } | null>(null);
+  const [isSavingModule, setIsSavingModule] = useState(false);
 
   const [showAddArticleModal, setShowAddArticleModal] = useState(false);
   const [articleTitle, setArticleTitle] = useState("");
@@ -271,44 +272,53 @@ export default function AdminPage() {
     e.preventDefault();
     if (!newModuleTitle || !newModuleCategory) return;
 
-    const currentFormations = [...formations];
-    const outilsArray = newModuleOutils.split(",").map(o => o.trim()).filter(Boolean);
+    setIsSavingModule(true);
 
-    if (editingModule !== null) {
-      // Edit
-      const { catIndex, modIndex } = editingModule;
-      currentFormations[catIndex].modules[modIndex] = {
-        titre: newModuleTitle,
-        outils: outilsArray,
-        ...(newModulePrix !== "" && { prix: Number(newModulePrix) }),
-        ...(newModuleImage.trim() && { image: newModuleImage.trim() })
-      };
-      setEditingModule(null);
-    } else {
-      // Add
-      let cat = currentFormations.find(c => c.categorie.toLowerCase() === newModuleCategory.trim().toLowerCase());
-      if (!cat) {
-        cat = { categorie: newModuleCategory.trim(), modules: [] };
-        currentFormations.push(cat);
+    try {
+      const currentFormations = [...formations];
+      const outilsArray = newModuleOutils.split(",").map(o => o.trim()).filter(Boolean);
+
+      if (editingModule !== null) {
+        // Edit
+        const { catIndex, modIndex } = editingModule;
+        currentFormations[catIndex].modules[modIndex] = {
+          titre: newModuleTitle,
+          outils: outilsArray,
+          ...(newModulePrix !== "" && { prix: Number(newModulePrix) }),
+          ...(newModuleImage.trim() && { image: newModuleImage.trim() })
+        };
+      } else {
+        // Add
+        let cat = currentFormations.find(c => c.categorie.toLowerCase() === newModuleCategory.trim().toLowerCase());
+        if (!cat) {
+          cat = { categorie: newModuleCategory.trim(), modules: [] };
+          currentFormations.push(cat);
+        }
+        cat.modules.push({
+          titre: newModuleTitle,
+          outils: outilsArray,
+          ...(newModulePrix !== "" && { prix: Number(newModulePrix) }),
+          ...(newModuleImage.trim() && { image: newModuleImage.trim() })
+        });
       }
-      cat.modules.push({
-        titre: newModuleTitle,
-        outils: outilsArray,
-        ...(newModulePrix !== "" && { prix: Number(newModulePrix) }),
-        ...(newModuleImage.trim() && { image: newModuleImage.trim() })
-      });
-    }
 
-    await db.saveFormations(currentFormations);
-    await refreshAllData();
-    
-    // Clear forms
-    setNewModuleTitle("");
-    setNewModuleCategory("");
-    setNewModuleOutils("");
-    setNewModulePrix("");
-    setNewModuleImage("");
-    setShowAddModuleModal(false);
+      await db.saveFormations(currentFormations);
+      await refreshAllData();
+      
+      // Clear forms and close modal
+      setNewModuleTitle("");
+      setNewModuleCategory("");
+      setNewModuleOutils("");
+      setNewModulePrix("");
+      setNewModuleImage("");
+      setShowAddModuleModal(false);
+      setEditingModule(null);
+    } catch (error) {
+      console.error("Error saving module:", error);
+      alert("Une erreur est survenue lors de l'enregistrement.");
+    } finally {
+      setIsSavingModule(false);
+    }
   };
 
   const handleDeleteModule = async (catIndex: number, modIndex: number) => {
@@ -1436,10 +1446,14 @@ export default function AdminPage() {
               <h3 className="text-lg font-heading font-bold text-[var(--color-primary)]">
                 {editingModule !== null ? "Modifier le module" : "Ajouter un module"}
               </h3>
-              <button onClick={() => {
-                setShowAddModuleModal(false);
-                setEditingModule(null);
-              }} className="text-gray-400 hover:text-gray-600">
+              <button 
+                disabled={isSavingModule}
+                onClick={() => {
+                  setShowAddModuleModal(false);
+                  setEditingModule(null);
+                }} 
+                className="text-gray-400 hover:text-gray-600 disabled:opacity-30"
+              >
                 <X className="w-5 h-5" />
               </button>
             </div>
@@ -1450,7 +1464,8 @@ export default function AdminPage() {
                 <input
                   type="text"
                   required
-                  className="w-full bg-gray-50 border border-gray-300 px-4 py-2 text-xs focus:outline-none focus:border-[var(--color-primary)] rounded-none"
+                  disabled={isSavingModule}
+                  className="w-full bg-gray-50 border border-gray-300 px-4 py-2 text-xs focus:outline-none focus:border-[var(--color-primary)] rounded-none disabled:opacity-50"
                   placeholder="Ex: Analyse des Données, Gestion, etc."
                   value={newModuleCategory}
                   onChange={(e) => setNewModuleCategory(e.target.value)}
@@ -1462,7 +1477,8 @@ export default function AdminPage() {
                 <input
                   type="text"
                   required
-                  className="w-full bg-gray-50 border border-gray-300 px-4 py-2 text-xs focus:outline-none focus:border-[var(--color-primary)] rounded-none"
+                  disabled={isSavingModule}
+                  className="w-full bg-gray-50 border border-gray-300 px-4 py-2 text-xs focus:outline-none focus:border-[var(--color-primary)] rounded-none disabled:opacity-50"
                   placeholder="Ex: Initiation à Excel"
                   value={newModuleTitle}
                   onChange={(e) => setNewModuleTitle(e.target.value)}
@@ -1473,7 +1489,8 @@ export default function AdminPage() {
                 <label className="block text-xs font-bold uppercase tracking-wider text-gray-500 mb-1.5">Outils (séparés par virgules)</label>
                 <input
                   type="text"
-                  className="w-full bg-gray-50 border border-gray-300 px-4 py-2 text-xs focus:outline-none focus:border-[var(--color-primary)] rounded-none"
+                  disabled={isSavingModule}
+                  className="w-full bg-gray-50 border border-gray-300 px-4 py-2 text-xs focus:outline-none focus:border-[var(--color-primary)] rounded-none disabled:opacity-50"
                   placeholder="Ex: Excel, PowerBI, Canva"
                   value={newModuleOutils}
                   onChange={(e) => setNewModuleOutils(e.target.value)}
@@ -1489,7 +1506,8 @@ export default function AdminPage() {
                     type="number"
                     min="0"
                     step="1000"
-                    className="w-full bg-gray-50 border border-gray-300 px-4 py-2 text-xs focus:outline-none focus:border-[var(--color-primary)] rounded-none"
+                    disabled={isSavingModule}
+                    className="w-full bg-gray-50 border border-gray-300 px-4 py-2 text-xs focus:outline-none focus:border-[var(--color-primary)] rounded-none disabled:opacity-50"
                     placeholder="Ex: 500000"
                     value={newModulePrix}
                     onChange={(e) => setNewModulePrix(e.target.value === "" ? "" : Number(e.target.value))}
@@ -1501,7 +1519,8 @@ export default function AdminPage() {
                   </label>
                   <input
                     type="url"
-                    className="w-full bg-gray-50 border border-gray-300 px-4 py-2 text-xs focus:outline-none focus:border-[var(--color-primary)] rounded-none"
+                    disabled={isSavingModule}
+                    className="w-full bg-gray-50 border border-gray-300 px-4 py-2 text-xs focus:outline-none focus:border-[var(--color-primary)] rounded-none disabled:opacity-50"
                     placeholder="https://..."
                     value={newModuleImage}
                     onChange={(e) => setNewModuleImage(e.target.value)}
@@ -1525,19 +1544,28 @@ export default function AdminPage() {
               <div className="pt-4 flex justify-end gap-2 border-t border-gray-100 mt-6">
                 <button
                   type="button"
+                  disabled={isSavingModule}
                   onClick={() => {
                     setShowAddModuleModal(false);
                     setEditingModule(null);
                   }}
-                  className="px-4 py-2 border border-gray-300 text-xs font-bold uppercase tracking-wider hover:bg-gray-50 text-gray-600 rounded-none"
+                  className="px-4 py-2 border border-gray-300 text-xs font-bold uppercase tracking-wider hover:bg-gray-50 text-gray-600 rounded-none disabled:opacity-50"
                 >
                   Annuler
                 </button>
                 <button
                   type="submit"
-                  className="px-6 py-2 bg-[var(--color-primary)] text-white text-xs font-bold uppercase tracking-wider hover:bg-[var(--color-accent)] transition-colors rounded-none"
+                  disabled={isSavingModule}
+                  className="px-6 py-2 bg-[var(--color-primary)] text-white text-xs font-bold uppercase tracking-wider hover:bg-[var(--color-accent)] transition-colors rounded-none disabled:opacity-50 flex items-center gap-2"
                 >
-                  {editingModule !== null ? "Enregistrer" : "Créer"}
+                  {isSavingModule ? (
+                    <>
+                      <div className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                      {editingModule !== null ? "Enregistrement..." : "Création..."}
+                    </>
+                  ) : (
+                    editingModule !== null ? "Enregistrer" : "Créer"
+                  )}
                 </button>
               </div>
             </form>
