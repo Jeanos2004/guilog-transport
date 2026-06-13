@@ -46,40 +46,64 @@ function GalleryTitleFolder({
   items,
   onEdit,
   onDelete,
+  onEditAlbum,
+  onDeleteAlbum,
 }: {
   title: string;
   category: string;
   items: GalleryItem[];
   onEdit: (item: GalleryItem) => void;
   onDelete: (id: string) => void;
+  onEditAlbum: (title: string, category: string, items: GalleryItem[]) => void;
+  onDeleteAlbum: (title: string) => void;
 }) {
   const [open, setOpen] = useState(true);
 
   return (
     <div className="bg-white border border-gray-200 shadow-sm overflow-hidden">
       {/* Folder header */}
-      <button
-        type="button"
-        onClick={() => setOpen((o) => !o)}
-        className="w-full flex items-center justify-between px-5 py-4 hover:bg-gray-50 transition-colors"
-      >
-        <div className="flex items-center gap-3">
-          <div className="w-8 h-8 flex items-center justify-center bg-[var(--color-primary)]/10 text-[var(--color-primary)]">
+      <div className="w-full flex items-center justify-between px-5 py-4 bg-white hover:bg-gray-50/50 transition-colors border-b border-gray-100">
+        <button
+          type="button"
+          onClick={() => setOpen((o) => !o)}
+          className="flex-1 flex items-center gap-3 text-left focus:outline-none"
+        >
+          <div className="w-8 h-8 flex items-center justify-center bg-[var(--color-primary)]/10 text-[var(--color-primary)] flex-shrink-0">
             <Layers className="w-4 h-4" />
           </div>
-          <div className="text-left">
+          <div>
             <p className="text-sm font-bold text-[var(--color-primary)]">{title}</p>
             <p className="text-[10px] text-gray-400 uppercase tracking-widest mt-0.5">
               {category} • {items.length} média{items.length > 1 ? "s" : ""}
             </p>
           </div>
+          <div className={`transition-transform duration-200 text-gray-400 ml-2 ${open ? "rotate-90" : ""}`}>
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+            </svg>
+          </div>
+        </button>
+
+        {/* Album Actions */}
+        <div className="flex items-center gap-2 ml-4 flex-shrink-0">
+          <button
+            type="button"
+            onClick={() => onEditAlbum(title, category, items)}
+            className="px-2.5 py-1.5 border border-gray-200 text-[10px] font-bold uppercase tracking-wider text-blue-600 bg-blue-50/30 hover:bg-blue-50 flex items-center gap-1 transition-colors rounded-none"
+            title="Modifier l'album (ajouter/supprimer des images)"
+          >
+            <Edit3 className="w-3.5 h-3.5" /> Modifier l'album
+          </button>
+          <button
+            type="button"
+            onClick={() => onDeleteAlbum(title)}
+            className="px-2.5 py-1.5 border border-gray-200 text-[10px] font-bold uppercase tracking-wider text-red-600 bg-red-50/30 hover:bg-red-50 flex items-center gap-1 transition-colors rounded-none"
+            title="Supprimer tout l'album"
+          >
+            <Trash2 className="w-3.5 h-3.5" /> Supprimer
+          </button>
         </div>
-        <div className={`transition-transform duration-200 text-gray-400 ${open ? "rotate-90" : ""}`}>
-          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-          </svg>
-        </div>
-      </button>
+      </div>
 
       {/* Content */}
       {open && (
@@ -223,6 +247,8 @@ export default function AdminPage() {
   const [galleryCategory, setGalleryCategory] = useState("");
   const [galleryMedia, setGalleryMedia] = useState<MediaItem[]>([]);
   const [editingGalleryId, setEditingGalleryId] = useState<string | null>(null);
+  const [editingAlbumTitle, setEditingAlbumTitle] = useState<string | null>(null);
+  const [isSavingGallery, setIsSavingGallery] = useState(false);
 
   const [selectedRequest, setSelectedRequest] = useState<InscriptionRequest | null>(null);
   const [selectedMessage, setSelectedMessage] = useState<ContactMessage | null>(null);
@@ -467,7 +493,7 @@ export default function AdminPage() {
       }
 
       await db.saveFormations(currentFormations);
-      await refreshAllData();
+      setFormations(currentFormations);
       resetModuleForm();
       setShowAddModuleModal(false);
       setEditingModule(null);
@@ -490,7 +516,7 @@ export default function AdminPage() {
     }
 
     await db.saveFormations(currentFormations);
-    await refreshAllData();
+    setFormations(currentFormations);
   };
 
   const startEditModule = (catIndex: number, modIndex: number) => {
@@ -532,7 +558,7 @@ export default function AdminPage() {
     if (item) {
       item.status = status;
       await db.saveInscriptions(list);
-      await refreshAllData();
+      setInscriptions(list);
     }
   };
 
@@ -567,7 +593,7 @@ export default function AdminPage() {
     }
 
     await db.saveArticles(currentArticles);
-    await refreshAllData();
+    setArticles(currentArticles);
 
     // Clear forms
     setArticleTitle("");
@@ -594,7 +620,7 @@ export default function AdminPage() {
     if (!confirm("Voulez-vous vraiment supprimer cet article de blog ?")) return;
     const currentArticles = articles.filter(a => a.id !== id);
     await db.saveArticles(currentArticles);
-    await refreshAllData();
+    setArticles(currentArticles);
   };
 
   // 4. Galerie CRUD
@@ -602,36 +628,67 @@ export default function AdminPage() {
     e.preventDefault();
     if (!galleryTitle || !galleryCategory || galleryMedia.length === 0) return;
 
-    let currentGallery = [...gallery];
-    if (editingGalleryId) {
-      const firstMedia = galleryMedia[0];
-      currentGallery = currentGallery.map(g =>
-        g.id === editingGalleryId ? { ...g, title: galleryTitle, category: galleryCategory, mediaUrl: firstMedia.url, mediaType: firstMedia.type } : g
-      );
-    } else {
-      const newItems: GalleryItem[] = galleryMedia.map((media, index) => ({
-        id: Date.now().toString() + "-" + index,
-        title: galleryTitle + (galleryMedia.length > 1 ? ` (${index + 1})` : ""),
-        category: galleryCategory,
-        mediaUrl: media.url,
-        mediaType: media.type,
-        dateAdded: new Date().toISOString()
-      }));
-      currentGallery = [...newItems, ...currentGallery];
-    }
+    setIsSavingGallery(true);
 
-    await db.saveGallery(currentGallery);
-    await refreshAllData();
-    setShowAddGalleryModal(false);
-    setEditingGalleryId(null);
-    setGalleryTitle(""); setGalleryCategory(""); setGalleryMedia([]);
+    try {
+      let currentGallery = [...gallery];
+      if (editingAlbumTitle) {
+        // 1. Remove all old items belonging to this album title
+        currentGallery = currentGallery.filter(g => getBaseTitle(g.title) !== editingAlbumTitle);
+        
+        // 2. Add the updated list of items under the new title/category
+        const newItems: GalleryItem[] = galleryMedia.map((media, index) => ({
+          id: Date.now().toString() + "-edit-" + index,
+          title: galleryTitle + (galleryMedia.length > 1 ? ` (${index + 1})` : ""),
+          category: galleryCategory,
+          mediaUrl: media.url,
+          mediaType: media.type,
+          dateAdded: new Date().toISOString()
+        }));
+        currentGallery = [...newItems, ...currentGallery];
+      } else if (editingGalleryId) {
+        const firstMedia = galleryMedia[0];
+        currentGallery = currentGallery.map(g =>
+          g.id === editingGalleryId ? { ...g, title: galleryTitle, category: galleryCategory, mediaUrl: firstMedia.url, mediaType: firstMedia.type } : g
+        );
+      } else {
+        const newItems: GalleryItem[] = galleryMedia.map((media, index) => ({
+          id: Date.now().toString() + "-" + index,
+          title: galleryTitle + (galleryMedia.length > 1 ? ` (${index + 1})` : ""),
+          category: galleryCategory,
+          mediaUrl: media.url,
+          mediaType: media.type,
+          dateAdded: new Date().toISOString()
+        }));
+        currentGallery = [...newItems, ...currentGallery];
+      }
+
+      await db.saveGallery(currentGallery);
+      setGallery(currentGallery);
+      setShowAddGalleryModal(false);
+      setEditingGalleryId(null);
+      setEditingAlbumTitle(null);
+      setGalleryTitle(""); setGalleryCategory(""); setGalleryMedia([]);
+    } catch (error) {
+      console.error("Error saving gallery:", error);
+      alert("Une erreur est survenue lors de l'enregistrement de la galerie.");
+    } finally {
+      setIsSavingGallery(false);
+    }
   };
 
   const handleDeleteGallery = async (id: string) => {
     if (!confirm("Voulez-vous vraiment supprimer ce média de la galerie ?")) return;
     const current = gallery.filter(g => g.id !== id);
     await db.saveGallery(current);
-    await refreshAllData();
+    setGallery(current);
+  };
+
+  const handleDeleteAlbum = async (albumTitle: string) => {
+    if (!confirm(`Voulez-vous vraiment supprimer l'album "${albumTitle}" et tous ses médias ?`)) return;
+    const current = gallery.filter(g => getBaseTitle(g.title) !== albumTitle);
+    await db.saveGallery(current);
+    setGallery(current);
   };
 
   // 5. Testimonials toggle active
@@ -639,7 +696,7 @@ export default function AdminPage() {
     const list = [...testimonials];
     list[index].active = !list[index].active;
     await db.saveTestimonials(list);
-    await refreshAllData();
+    setTestimonials(list);
   };
 
   // 5. Contact Messages mark as read
@@ -649,7 +706,7 @@ export default function AdminPage() {
     if (msg) {
       msg.status = "Lu";
       await db.saveMessages(list);
-      await refreshAllData();
+      setMessages(list);
     }
   };
 
@@ -657,7 +714,7 @@ export default function AdminPage() {
     if (!confirm("Voulez-vous vraiment supprimer ce message ?")) return;
     const list = messages.filter(m => m.id !== id);
     await db.saveMessages(list);
-    await refreshAllData();
+    setMessages(list);
   };
 
   // === RENDERING UTILITIES ===
@@ -1437,6 +1494,14 @@ export default function AdminPage() {
                             setShowAddGalleryModal(true);
                           }}
                           onDelete={handleDeleteGallery}
+                          onEditAlbum={(albumTitle, category, items) => {
+                            setEditingAlbumTitle(albumTitle);
+                            setGalleryTitle(albumTitle);
+                            setGalleryCategory(category);
+                            setGalleryMedia(items.map(item => ({ url: item.mediaUrl, type: item.mediaType })));
+                            setShowAddGalleryModal(true);
+                          }}
+                          onDeleteAlbum={handleDeleteAlbum}
                         />
                       ));
                     })()}
@@ -2174,9 +2239,19 @@ export default function AdminPage() {
           >
             <div className="flex justify-between items-center mb-6 border-b border-gray-100 pb-3">
               <h3 className="text-lg font-heading font-bold text-[var(--color-primary)]">
-                {editingGalleryId !== null ? "Modifier le média" : "Ajouter un média"}
+                {editingAlbumTitle !== null ? `Modifier l'album : ${editingAlbumTitle}` : editingGalleryId !== null ? "Modifier le média" : "Ajouter des médias"}
               </h3>
-              <button onClick={() => setShowAddGalleryModal(false)} className="text-gray-400 hover:text-gray-600">
+              <button 
+                onClick={() => {
+                  setShowAddGalleryModal(false);
+                  setEditingGalleryId(null);
+                  setEditingAlbumTitle(null);
+                  setGalleryTitle("");
+                  setGalleryCategory("");
+                  setGalleryMedia([]);
+                }} 
+                className="text-gray-400 hover:text-gray-600"
+              >
                 <X className="w-5 h-5" />
               </button>
             </div>
@@ -2219,19 +2294,33 @@ export default function AdminPage() {
                     newMedia.splice(index, 1);
                     return newMedia;
                   })}
-                  label={editingGalleryId ? "Remplacer le média" : "Uploader un ou plusieurs médias"}
-                  maxFiles={editingGalleryId ? 1 : 10}
+                  label={editingGalleryId ? "Remplacer le média" : editingAlbumTitle ? "Ajouter d'autres médias à l'album" : "Uploader un ou plusieurs médias"}
+                  maxFiles={editingGalleryId ? 1 : 15}
                 />
               </div>
 
               <div className="pt-4 flex justify-end gap-2 border-t border-gray-100 mt-6">
-                <button type="button" onClick={() => setShowAddGalleryModal(false)}
-                  className="px-4 py-2 border border-gray-300 text-xs font-bold uppercase tracking-wider hover:bg-gray-50 text-gray-600 rounded-none">
+                <button 
+                  type="button" 
+                  onClick={() => {
+                    setShowAddGalleryModal(false);
+                    setEditingGalleryId(null);
+                    setEditingAlbumTitle(null);
+                    setGalleryTitle("");
+                    setGalleryCategory("");
+                    setGalleryMedia([]);
+                  }}
+                  className="px-4 py-2 border border-gray-300 text-xs font-bold uppercase tracking-wider hover:bg-gray-50 text-gray-600 rounded-none"
+                >
                   Annuler
                 </button>
-                <button type="submit"
-                  className="px-6 py-2 bg-[var(--color-primary)] text-white text-xs font-bold uppercase tracking-wider hover:bg-[var(--color-accent)] transition-colors rounded-none">
-                  Enregistrer
+                <button type="submit" disabled={isSavingGallery}
+                  className="px-6 py-2 bg-[var(--color-primary)] text-white text-xs font-bold uppercase tracking-wider hover:bg-[var(--color-accent)] transition-colors rounded-none disabled:opacity-50 flex items-center gap-2">
+                  {isSavingGallery ? (
+                    <><div className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin"></div> Enregistrement...</>
+                  ) : (
+                    "Enregistrer"
+                  )}
                 </button>
               </div>
             </form>
