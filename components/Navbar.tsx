@@ -119,7 +119,7 @@ export function Navbar() {
             </Link>
 
             {/* Desktop menu */}
-            <div className="hidden md:flex items-center gap-1">
+            <div className="hidden lg:flex items-center gap-1">
               {navLinks.map((link) => {
                 const isActive = pathname === link.href;
                 return (
@@ -143,7 +143,7 @@ export function Navbar() {
             </div>
 
             {/* CTA button */}
-            <div className="hidden md:block">
+            <div className="hidden lg:block">
               <Link
                 href="/student/login"
                 className="px-6 py-3 bg-[var(--color-accent)] hover:bg-[var(--color-primary)] text-white font-sans font-bold text-xs uppercase tracking-wider transition-colors animate-pulse"
@@ -155,7 +155,7 @@ export function Navbar() {
             {/* Mobile hamburger */}
             <button
               onClick={() => setIsOpen(!isOpen)}
-              className="md:hidden w-10 h-10 flex items-center justify-center text-gray-600 hover:text-[var(--color-primary)] border border-gray-200 hover:border-[var(--color-accent)] transition-colors"
+              className="lg:hidden w-10 h-10 flex items-center justify-center text-gray-600 hover:text-[var(--color-primary)] border border-gray-200 hover:border-[var(--color-accent)] transition-colors"
               aria-label="Menu"
             >
               {isOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
@@ -165,7 +165,7 @@ export function Navbar() {
 
         {/* Mobile menu */}
         {isOpen && (
-          <div className="md:hidden bg-white border-t border-gray-100 shadow-lg">
+          <div className="lg:hidden bg-white border-t border-gray-100 shadow-lg">
             <div className="px-4 py-4 space-y-1">
               {navLinks.map((link) => {
                 const isActive = pathname === link.href;

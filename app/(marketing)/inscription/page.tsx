@@ -221,35 +221,45 @@ function InscriptionForm() {
 
 export default function InscriptionPage() {
   return (
-    <>
-      <section className="bg-[var(--color-primary)] py-20 relative overflow-hidden">
+    <div className="flex min-h-[calc(100vh-72px)] bg-white">
+      {/* Left panel: Image */}
+      <div className="hidden lg:flex lg:w-5/12 relative bg-[var(--color-primary)] overflow-hidden">
         <Image
           src="/images/inscription_hero.png"
           alt="Inscription CFIG Guinée"
           fill
-          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+          sizes="50vw"
           priority
-          className="object-cover opacity-20"
+          className="object-cover opacity-30 mix-blend-luminosity"
         />
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+        <div className="absolute inset-0 bg-gradient-to-t from-[var(--color-primary)] via-transparent to-transparent opacity-90" />
+        
+        <div className="relative z-10 flex flex-col justify-end p-12 lg:p-16 text-white pb-24">
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
-            <h1 className="text-4xl md:text-5xl font-heading font-bold text-white mb-4">Inscription & Devis</h1>
-            <div className="flex items-center text-sm text-gray-300">
-              <Link href="/" className="hover:text-white transition-colors">Accueil</Link>
-              <ChevronRight className="w-4 h-4 mx-2" />
-              <span className="text-[var(--color-accent)]">Inscription</span>
-            </div>
+            <span className="inline-block px-3 py-1 bg-white/10 backdrop-blur-sm text-[var(--color-accent)] text-xs font-bold uppercase tracking-wider mb-4 rounded-none border border-[var(--color-accent)]/30">
+              Formations & Devis
+            </span>
+            <h1 className="text-4xl md:text-5xl font-heading font-extrabold mb-4 leading-tight">
+              Démarrez votre aventure
+            </h1>
+            <p className="text-lg text-white/80 max-w-md">
+              Que ce soit pour une formation individuelle ou pour booster les compétences de vos équipes, nous avons la solution.
+            </p>
           </motion.div>
         </div>
-      </section>
+      </div>
 
-      <section className="py-20 bg-[var(--color-surface)]">
-        <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
-          
+      {/* Right panel: Form */}
+      <div className="w-full lg:w-7/12 flex flex-col items-center p-6 sm:p-12 lg:py-16 bg-gray-50 overflow-y-auto">
+        <div className="w-full max-w-2xl">
+          <div className="lg:hidden mb-8 text-center sm:text-left">
+            <h1 className="text-3xl font-heading font-extrabold text-[var(--color-primary)] mb-2">Inscription & Devis</h1>
+          </div>
+
           <Suspense fallback={
-            <div className="bg-white border border-gray-150 p-12 text-center shadow-sm">
+            <div className="bg-white border border-gray-200 p-12 text-center shadow-sm rounded-2xl">
               <div className="w-8 h-8 border-4 border-[var(--color-accent)] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-              <p className="text-gray-500 text-sm">Chargement du formulaire d'inscription...</p>
+              <p className="text-gray-500 text-sm">Chargement du formulaire...</p>
             </div>
           }>
             <InscriptionForm />
@@ -268,7 +278,7 @@ export default function InscriptionPage() {
             </a>
           </div>
         </div>
-      </section>
-    </>
+      </div>
+    </div>
   );
 }

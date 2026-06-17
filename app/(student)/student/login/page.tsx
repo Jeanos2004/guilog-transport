@@ -7,7 +7,7 @@ import { auth } from "@/lib/firebase";
 import { signInWithEmailAndPassword, createUserWithEmailAndPassword } from "firebase/auth";
 import { studentDb } from "@/lib/studentDb";
 import { motion } from "framer-motion";
-import { User, Lock, Mail, ArrowRight, Eye, EyeOff, Phone, Briefcase } from "lucide-react";
+import { User, Lock, Mail, ArrowRight, ArrowLeft, Eye, EyeOff, Phone, Briefcase } from "lucide-react";
 
 export default function StudentLoginPage() {
   const router = useRouter();
@@ -110,8 +110,14 @@ export default function StudentLoginPage() {
       </div>
 
       {/* Right panel: Form */}
-      <div className="w-full lg:w-1/2 flex items-center justify-center p-8 sm:p-12 bg-white">
-        <div className="w-full max-w-md">
+      <div className="w-full lg:w-1/2 flex items-center justify-center p-8 sm:p-12 bg-white relative">
+        <Link 
+          href="/" 
+          className="absolute top-6 right-6 lg:top-8 lg:right-8 flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-gray-400 hover:text-[var(--color-primary)] transition-colors bg-gray-50 px-3 py-1.5 rounded-full lg:rounded-none lg:bg-transparent lg:px-0 lg:py-0 shadow-sm lg:shadow-none"
+        >
+          <ArrowLeft className="w-4 h-4" /> Retour
+        </Link>
+        <div className="w-full max-w-md pt-8 lg:pt-0">
           <div className="mb-8 text-center lg:text-left">
             <div className="lg:hidden inline-flex items-center gap-3 mb-6">
               <img src="/logo.jpeg" alt="CFIG Guinée Logo" className="h-10 w-auto object-contain bg-white rounded-none border border-gray-200 shadow-sm" />
