@@ -29,7 +29,10 @@ export default function StudentDashboardPage() {
   }>({ answered: false, selected: null, isCorrect: null });
   const [xp, setXp] = useState(750);
 
+  const [isMounted, setIsMounted] = useState(false);
+
   useEffect(() => {
+    setIsMounted(true);
     const unsub = auth.onAuthStateChanged(async (currentUser) => {
       if (currentUser) {
         setUser(currentUser);
@@ -51,7 +54,7 @@ export default function StudentDashboardPage() {
     return () => unsub();
   }, [router]);
 
-  if (loading) {
+  if (!isMounted || loading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center font-sans">
         <div className="flex flex-col items-center gap-3">

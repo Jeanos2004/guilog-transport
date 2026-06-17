@@ -57,8 +57,6 @@ export default function StudentSidebar() {
 
   return (
     <>
-
-
       {/* Backdrop overlay for mobile menu */}
       {isOpen && (
         <div 
