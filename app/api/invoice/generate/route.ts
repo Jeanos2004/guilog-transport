@@ -1,6 +1,9 @@
 import { NextResponse } from 'next/server';
-import puppeteer from 'puppeteer';
+import puppeteer from 'puppeteer-core';
+import chromium from '@sparticuz/chromium';
 import { generateInvoiceHtml, InvoiceData } from '@/lib/invoiceTemplate';
+
+export const maxDuration = 30; // Max duration for Vercel Hobby
 
 export async function POST(req: Request) {
   try {
@@ -11,11 +14,20 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Missing required invoice data.' }, { status: 400 });
     }
 
-    // Launch puppeteer
-    // Note: for production on Vercel, this usually requires puppeteer-core and @sparticuz/chromium
+    // Configure Sparticuz Chromium for Vercel Serverless Environments
+    // Using default configurations tailored for AWS Lambda / Vercel Serverless
+    const isDev = process.env.NODE_ENV === 'development';
+    const executablePath = isDev 
+      ? 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe' 
+      : await chromium.executablePath();
+    
+    // Fallback to local Chrome for local development
     const browser = await puppeteer.launch({
+      args: chromium.args,
+      defaultViewport: { width: 1920, height: 1080 },
+      executablePath: executablePath || 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe', // Fallback for Windows local test
       headless: true,
-      args: ['--no-sandbox', '--disable-setuid-sandbox'],
+      
     });
     
     const page = await browser.newPage();
@@ -48,7 +60,7 @@ export async function POST(req: Request) {
     });
 
   } catch (error: any) {
-    console.error('Invoice Generation Error:', error); require('fs').writeFileSync('invoice-error.txt', error.stack || error.message || String(error));
+    console.error('Invoice Generation Error:', error); 
     return NextResponse.json(
       { error: 'Failed to generate invoice.', details: error.message },
       { status: 500 }
