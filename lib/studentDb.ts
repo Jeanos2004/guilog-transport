@@ -257,8 +257,15 @@ export const studentDb = {
   /** Buy course and add it to student profile */
   async enrollInCourse(uid: string, courseId: string): Promise<void> {
     try {
-      const profile = await this.getProfile(uid);
-      if (!profile) return;
+      let profile = await this.getProfile(uid);
+      if (!profile) {
+        // Create basic profile if missing
+        profile = await this.createProfile(uid, auth.currentUser?.email || "", auth.currentUser?.displayName || "");
+      }
+
+      if (!profile.enrolledCourses) {
+        profile.enrolledCourses = [];
+      }
 
       if (!profile.enrolledCourses.includes(courseId)) {
         profile.enrolledCourses.push(courseId);

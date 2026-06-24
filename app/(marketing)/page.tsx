@@ -394,7 +394,7 @@ export default function Home() {
               className="relative h-[480px] overflow-hidden"
             >
               <Image
-                src="/images/section-about.png"
+                src="/images/section-about.jpeg"
                 alt="Équipe CFIG Guinée"
                 fill
                 sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
@@ -487,11 +487,11 @@ export default function Home() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: index * 0.1 }}
-                className="bg-white/5 border border-white/10 p-8 hover:border-[var(--color-accent)] transition-colors"
+                className="bg-white rounded-xl shadow-lg border border-gray-100 p-8 hover:shadow-xl hover:border-[var(--color-accent)] transition-all duration-300"
               >
                 {/* Video if exists */}
                 {testimonial.videoUrl ? (
-                  <div className="mb-6 rounded-sm overflow-hidden bg-black/20 aspect-video relative">
+                  <div className="mb-6 rounded-sm overflow-hidden bg-black/5 aspect-video relative">
                     <video src={testimonial.videoUrl} controls preload="metadata" className="w-full h-full object-cover" />
                   </div>
                 ) : (
@@ -507,28 +507,28 @@ export default function Home() {
                       key={i}
                       className={`w-4 h-4 ${
                         i < testimonial.rating
-                          ? "fill-[var(--color-accent)] text-[var(--color-accent)]"
-                          : "text-white/20"
+                          ? "fill-[#F59E0B] text-[#F59E0B]"
+                          : "text-gray-300"
                       }`}
                     />
                   ))}
                 </div>
 
-                <p className="text-white/80 text-sm leading-relaxed mb-6 italic">
+                <p className="text-gray-700 text-sm leading-relaxed mb-6 italic">
                   {testimonial.text}
                 </p>
 
-                <div className="flex items-center pt-4 border-t border-white/10">
+                <div className="flex items-center pt-4 border-t border-gray-100">
                   {testimonial.image ? (
-                    <img src={testimonial.image} alt={testimonial.name} className="w-10 h-10 rounded-full object-cover mr-3 bg-white/10" />
+                    <img src={testimonial.image} alt={testimonial.name} className="w-10 h-10 rounded-full object-cover mr-3 bg-gray-100" />
                   ) : (
-                    <div className={`w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm mr-3 ${testimonial.color}`}>
+                    <div className={`w-10 h-10 rounded-full flex items-center justify-center font-bold text-white text-sm mr-3 ${testimonial.color || 'bg-[var(--color-primary)]'}`}>
                       {testimonial.initials}
                     </div>
                   )}
                   <div>
-                    <div className="font-bold text-white text-sm">{testimonial.name}</div>
-                    <div className="text-white/50 text-xs">{testimonial.role}</div>
+                    <div className="font-bold text-[var(--color-primary)] text-sm">{testimonial.name}</div>
+                    <div className="text-gray-500 text-xs">{testimonial.role}</div>
                   </div>
                 </div>
               </motion.div>

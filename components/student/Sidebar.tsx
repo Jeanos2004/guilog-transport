@@ -50,7 +50,8 @@ export default function StudentSidebar() {
 
   const navItems = [
     { name: "Dashboard", href: "/student/dashboard", icon: LayoutDashboard },
-    { name: "Cours & Catalogue", href: "/student/courses", icon: BookOpen },
+    { name: "Mes Formations", href: "/student/courses", icon: BookOpen },
+    { name: "Catalogue", href: "/student/catalog", icon: BookOpen },
     { name: "Certificats", href: "/student/certificates", icon: Award },
     { name: "Paiements", href: "/student/billing", icon: CreditCard },
   ];

@@ -18,8 +18,6 @@ export default function StudentCoursesPage() {
   const [user, setUser] = useState<User | null>(null);
   const [profile, setProfile] = useState<StudentProfile | null>(null);
   const [loading, setLoading] = useState(true);
-  const [selectedCourse, setSelectedCourse] = useState<StudentCourse | null>(null);
-  const [paymentOpen, setPaymentOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [courses, setCourses] = useState<StudentCourse[]>([]);
 
@@ -62,7 +60,7 @@ export default function StudentCoursesPage() {
   }
 
   const getCompletedCount = (courseId: string) => {
-    return profile?.progress[courseId]?.length || 0;
+    return profile?.progress?.[courseId]?.length || 0;
   };
 
   const getTotalCount = (course: StudentCourse) => {
@@ -73,15 +71,8 @@ export default function StudentCoursesPage() {
     return count;
   };
 
-  const handleEnrollSuccess = async () => {
-    if (user && selectedCourse) {
-      await studentDb.enrollInCourse(user.uid, selectedCourse.id);
-      await fetchProfile(user.uid);
-    }
-  };
-
   const isEnrolled = (courseId: string) => {
-    return profile?.enrolledCourses.includes(courseId) || false;
+    return profile?.enrolledCourses?.includes(courseId) || false;
   };
 
   // Filter based on search query
@@ -92,7 +83,6 @@ export default function StudentCoursesPage() {
   );
 
   const enrolledCourses = filteredCourses.filter(c => isEnrolled(c.id));
-  const availableCourses = filteredCourses.filter(c => !isEnrolled(c.id));
 
   // Determine the "Recent Activity" course (the first enrolled course that isn't fully completed, or just the first enrolled course)
   let recentCourse: StudentCourse | null = null;
@@ -129,10 +119,10 @@ export default function StudentCoursesPage() {
           {/* Welcome/Page Intro */}
           <div className="mb-8">
             <h1 className="text-2xl font-heading font-black text-gray-900">
-              Formations &amp; Catalogue
+              Mes Formations
             </h1>
             <p className="text-xs text-gray-400 mt-1 uppercase tracking-wider font-semibold">
-              Développez vos compétences avec nos formations certifiantes.
+              Poursuivez votre apprentissage et suivez votre progression.
             </p>
           </div>
 
@@ -214,46 +204,8 @@ export default function StudentCoursesPage() {
             </div>
           )}
 
-          {/* Available courses grid */}
-          <div>
-            <h2 className="text-xs font-extrabold uppercase tracking-wider text-gray-400 mb-4">Formations Disponibles au Catalogue</h2>
-            {availableCourses.length === 0 ? (
-              <div className="p-10 bg-white border border-gray-200 rounded-none text-center shadow-sm">
-                <p className="text-xs text-gray-500 font-semibold">
-                  Félicitations ! Vous possédez ou avez débloqué toutes les formations disponibles.
-                </p>
-              </div>
-            ) : (
-              <div className="flex flex-col gap-4">
-                {availableCourses.map((course) => (
-                  <CourseProgressCard
-                    key={course.id}
-                    course={course}
-                    isEnrolled={false}
-                    completedCount={0}
-                    totalCount={getTotalCount(course)}
-                    variant="list"
-                    onAction={() => {
-                      setSelectedCourse(course);
-                      setPaymentOpen(true);
-                    }}
-                  />
-                ))}
-              </div>
-            )}
-          </div>
         </main>
       </div>
-
-      {/* Payment Modal */}
-      {selectedCourse && (
-        <PaymentModal
-          course={selectedCourse}
-          isOpen={paymentOpen}
-          onClose={() => setPaymentOpen(false)}
-          onSuccess={handleEnrollSuccess}
-        />
-      )}
     </div>
   );
 }
