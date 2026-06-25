@@ -5,6 +5,17 @@ import { onAuthStateChanged, User } from "firebase/auth";
 
 // === TYPES ===
 
+export interface PaymentRecord {
+  id: string;
+  studentId: string;
+  studentName: string;
+  courseId: string;
+  courseName: string;
+  amount: number;
+  paymentMethod: "cash" | "online";
+  date: string;
+}
+
 export interface StudentProfile {
   uid: string;
   email: string;
@@ -181,6 +192,16 @@ export const AVAILABLE_COURSES: StudentCourse[] = [
 // === STUDENT DATABASE ACTIONS ===
 
 export const studentDb = {
+  async getPayments(): Promise<PaymentRecord[]> {
+    const snap = await getDocs(collection(firestore, "payments"));
+    return snap.docs.map(doc => doc.data() as PaymentRecord).sort((a,b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+  },
+  async addPayment(payment: Omit<PaymentRecord, "id">): Promise<PaymentRecord> {
+    const id = Date.now().toString() + Math.floor(Math.random() * 1000);
+    const newPayment = { ...payment, id };
+    await setDoc(doc(firestore, "payments", id), newPayment);
+    return newPayment as PaymentRecord;
+  },
   /** Check Auth status and return user profile */
   async getProfile(uid: string): Promise<StudentProfile | null> {
     try {

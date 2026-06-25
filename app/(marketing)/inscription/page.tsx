@@ -75,6 +75,20 @@ function InscriptionForm() {
       message: data.message,
     });
     setIsSubmitted(true);
+    
+    // Trigger Email Notification in background
+    fetch('/api/email', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        type: 'devis',
+        data: {
+          email: data.email,
+          name: data.fullName,
+          courseName: data.domain,
+        }
+      })
+    }).catch(console.error);
   };
 
   return (

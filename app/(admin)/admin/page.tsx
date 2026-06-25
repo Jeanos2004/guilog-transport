@@ -42,7 +42,8 @@ import { motion, AnimatePresence } from "framer-motion";
 import { db, CategorieFormations, ModuleItem, Article, InscriptionRequest, ContactMessage, Testimonial, SiteSettings, AdminUser, GalleryItem } from "@/lib/db";
 import { auth } from "@/lib/firebase";
 import { signInWithEmailAndPassword, signOut, onAuthStateChanged, createUserWithEmailAndPassword } from "firebase/auth";
-import { studentDb, StudentProfile, StudentCourse, CourseModule, CourseSession } from "@/lib/studentDb";
+import { studentDb, StudentProfile, StudentCourse, CourseModule, CourseSession, PaymentRecord } from "@/lib/studentDb";
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, Legend, ResponsiveContainer, LineChart, Line } from "recharts";
 
 // ============================================================
 // GALLERY TITLE FOLDER — collapsible folder-style section by title
@@ -178,7 +179,7 @@ export default function AdminPage() {
   const [authError, setAuthError] = useState("");
   
   // === ACTIVE TAB STATE ===
-  const [activeTab, setActiveTab] = useState<"overview" | "inscriptions" | "formations" | "actualites" | "testimonials" | "galerie" | "messages" | "settings" | "users" | "students">("overview");
+  const [activeTab, setActiveTab] = useState<"overview" | "inscriptions" | "formations" | "actualites" | "testimonials" | "galerie" | "messages" | "settings" | "users" | "students" | "analytics">("overview");
 
   // === DATA STATES ===
   const [formations, setFormations] = useState<CategorieFormations[]>([]);
@@ -188,6 +189,15 @@ export default function AdminPage() {
   const [testimonials, setTestimonials] = useState<Testimonial[]>([]);
   const [gallery, setGallery] = useState<GalleryItem[]>([]);
   const [students, setStudents] = useState<StudentProfile[]>([]);
+  const [payments, setPayments] = useState<PaymentRecord[]>([]);
+
+  // State for Conversion Modal
+  const [showConvertModal, setShowConvertModal] = useState(false);
+  const [leadToConvert, setLeadToConvert] = useState<any | null>(null);
+  const [leadPassword, setLeadPassword] = useState("");
+  const [leadCourseId, setLeadCourseId] = useState("");
+  const [leadCashAmount, setLeadCashAmount] = useState<number | "">("");
+  const [isConvertingLead, setIsConvertingLead] = useState(false);
   const [selectedStudent, setSelectedStudent] = useState<StudentProfile | null>(null);
   const [studentSearchQuery, setStudentSearchQuery] = useState("");
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -306,7 +316,8 @@ export default function AdminPage() {
     setMessages(await db.getMessages());
     setTestimonials(await db.getTestimonials());
     setGallery(await db.getGallery());
-    setStudents(await db.getStudents());
+      setStudents(await db.getStudents());
+      setPayments(await studentDb.getPayments());
     
     
     
@@ -479,16 +490,119 @@ export default function AdminPage() {
 
   const handleEnrollStudent = async (studentUid: string, courseId: string) => {
     try {
-      await db.enrollStudent(studentUid, courseId);
-      const updatedStudents = await db.getStudents();
-      setStudents(updatedStudents);
-      const updatedProfile = updatedStudents.find(s => s.uid === studentUid);
-      if (updatedProfile) {
-        setSelectedStudent(updatedProfile);
-      }
+      await studentDb.enrollInCourse(studentUid, courseId);
+      // Refresh students
+      setStudents(await db.getStudents());
+      alert("Étudiant inscrit avec succès !");
     } catch (error) {
-      console.error("Error enrolling student in course:", error);
+      console.error(error);
+      alert("Erreur lors de l'inscription de l'étudiant.");
     }
+  };
+
+  const handleConvertLead = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!leadToConvert || !leadPassword || !leadCourseId) return;
+    setIsConvertingLead(true);
+    try {
+      // 1. Create Auth Account via API
+      const res = await fetch('/api/admin/create-student', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: leadToConvert.email, password: leadPassword })
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Failed to create student');
+      
+      const uid = data.uid;
+
+      // 2. Create Student Profile
+      const profileData: StudentProfile = {
+        uid,
+        email: leadToConvert.email,
+        fullName: leadToConvert.fullName,
+        phone: leadToConvert.phone,
+        profession: leadToConvert.company || 'other',
+        enrolledCourses: [leadCourseId],
+        progress: {},
+        createdAt: new Date().toISOString()
+      };
+      
+      const { setDoc, doc } = require('firebase/firestore');
+      const { firestore } = require('@/lib/firebase');
+      await setDoc(doc(firestore, "students", uid), profileData);
+
+      // 3. Register Cash Payment if defined
+      const course = formations.flatMap(f => f.modules).find(m => m.id === leadCourseId || m.titre === leadCourseId);
+      if (leadCashAmount !== "") {
+        await studentDb.addPayment({
+          studentId: uid,
+          studentName: profileData.fullName,
+          courseId: leadCourseId,
+          courseName: course ? course.titre : "Formation inconnue",
+          amount: Number(leadCashAmount),
+          paymentMethod: "cash",
+          date: new Date().toISOString()
+        });
+      }
+
+      // 4. Mark request as converted
+      await handleUpdateInscriptionStatus(leadToConvert.id, "Validé");
+
+      // 5. Trigger Email Notification (Conversion)
+      fetch('/api/email', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          type: 'conversion',
+          data: {
+            email: leadToConvert.email,
+            name: leadToConvert.fullName,
+            tempPassword: leadPassword,
+            courseName: course ? course.titre : "Formation inconnue"
+          }
+        })
+      }).catch(console.error);
+
+      // 6. Trigger Invoice Email if cash payment was made
+      if (leadCashAmount !== "") {
+        fetch('/api/email', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            type: 'invoice',
+            data: {
+              email: leadToConvert.email,
+              name: leadToConvert.fullName,
+              courseName: course ? course.titre : "Formation inconnue",
+              amount: Number(leadCashAmount)
+            }
+          })
+        }).catch(console.error);
+      }
+
+      // 7. Refresh data
+      await refreshAllData();
+      
+      alert("Étudiant créé avec succès !\\nUID: " + uid);
+      setShowConvertModal(false);
+      setLeadToConvert(null);
+      setLeadPassword("");
+      setLeadCourseId("");
+      setLeadCashAmount("");
+    } catch (error: any) {
+      console.error(error);
+      alert("Erreur lors de la conversion : " + error.message);
+    } finally {
+      setIsConvertingLead(false);
+    }
+  };
+
+  const openConvertModal = (req: InscriptionRequest) => {
+    setLeadToConvert(req);
+    const courseMatch = formations.flatMap(f => f.modules).find(m => m.titre.toLowerCase() === req.domain?.toLowerCase());
+    if (courseMatch) setLeadCourseId(courseMatch.id || courseMatch.titre);
+    setShowConvertModal(true);
   };
 
   // Helper to reset all module form fields
@@ -979,7 +1093,7 @@ export default function AdminPage() {
 
           <div className="mt-8 text-center pt-6 border-t border-white/10">
             <p className="text-xs text-gray-400">
-              ðŸ”’ Sécurisé par Firebase Authentication
+              🔒 Sécurisé par Firebase Authentication
             </p>
           </div>
         </motion.div>
@@ -1040,6 +1154,7 @@ export default function AdminPage() {
                     title: "Pilotage",
                     items: [
                       { id: "overview", label: "Vue d'ensemble", icon: <LayoutDashboard className="w-4 h-4" /> },
+                      { id: "analytics", label: "Statistiques", icon: <TrendingUp className="w-4 h-4" /> },
                       { id: "inscriptions", label: "Inscriptions & Devis", icon: <ClipboardList className="w-4 h-4" />, badge: pendingInscriptionsCount },
                       { id: "students", label: "Gestion des Étudiants", icon: <GraduationCap className="w-4 h-4" /> },
                     ]
@@ -1146,6 +1261,7 @@ export default function AdminPage() {
               title: "Pilotage",
               items: [
                 { id: "overview", label: "Vue d'ensemble", icon: <LayoutDashboard className="w-4 h-4" /> },
+                { id: "analytics", label: "Statistiques", icon: <TrendingUp className="w-4 h-4" /> },
                 { id: "inscriptions", label: "Inscriptions & Devis", icon: <ClipboardList className="w-4 h-4" />, badge: pendingInscriptionsCount },
                 { id: "students", label: "Gestion des Étudiants", icon: <GraduationCap className="w-4 h-4" /> },
               ]
@@ -1244,6 +1360,7 @@ export default function AdminPage() {
             <div>
               <h2 className="text-lg lg:text-xl font-heading font-bold text-[var(--color-primary)] capitalize leading-tight">
                 {activeTab === "overview" && "Vue d'ensemble"}
+                {activeTab === "analytics" && "Statistiques & Revenus"}
                 {activeTab === "inscriptions" && "Suivi des Inscriptions & Devis"}
                 {activeTab === "students" && "Gestion des Comptes Étudiants"}
                 {activeTab === "formations" && "Gestion des Formations"}
@@ -1272,8 +1389,74 @@ export default function AdminPage() {
           <AnimatePresence mode="wait">
             
             {/* ====================================
-                TAB: OVERVIEW
+                TAB: ANALYTICS
             ==================================== */}
+            {activeTab === "analytics" && (
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="space-y-6"
+              >
+                <div className="flex justify-between items-center bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+                  <div>
+                    <h2 className="text-2xl font-bold text-gray-900">Tableau de bord : Statistiques</h2>
+                    <p className="text-gray-500 text-sm mt-1">Analyse des revenus et inscriptions.</p>
+                  </div>
+                </div>
+                
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm flex items-center gap-4">
+                    <div className="w-12 h-12 rounded-full bg-green-100 text-green-600 flex items-center justify-center">
+                      <TrendingUp className="w-6 h-6" />
+                    </div>
+                    <div>
+                      <p className="text-sm text-gray-500 font-medium">Revenus Totaux</p>
+                      <p className="text-2xl font-bold text-gray-900">{payments.reduce((acc, p) => acc + (p.amount || 0), 0).toLocaleString()} GNF</p>
+                    </div>
+                  </div>
+                  <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm flex items-center gap-4">
+                    <div className="w-12 h-12 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center">
+                      <Users className="w-6 h-6" />
+                    </div>
+                    <div>
+                      <p className="text-sm text-gray-500 font-medium">Inscriptions Totales</p>
+                      <p className="text-2xl font-bold text-gray-900">{students.reduce((acc, s) => acc + (s.enrolledCourses?.length || 0), 0)}</p>
+                    </div>
+                  </div>
+                  <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm flex items-center gap-4">
+                    <div className="w-12 h-12 rounded-full bg-purple-100 text-purple-600 flex items-center justify-center">
+                      <Award className="w-6 h-6" />
+                    </div>
+                    <div>
+                      <p className="text-sm text-gray-500 font-medium">Paiements Enregistrés</p>
+                      <p className="text-2xl font-bold text-gray-900">{payments.length}</p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
+                  <h3 className="text-lg font-bold text-gray-900 mb-6">Évolution des paiements (Dernières transactions)</h3>
+                  <div className="h-80">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <BarChart data={
+                        payments.slice(0, 10).reverse().map(p => ({
+                          name: new Date(p.date).toLocaleDateString(),
+                          amount: p.amount,
+                          student: p.studentName
+                        }))
+                      }>
+                        <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E5E7EB" />
+                        <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{fill: '#6B7280', fontSize: 12}} dy={10} />
+                        <YAxis axisLine={false} tickLine={false} tick={{fill: '#6B7280', fontSize: 12}} tickFormatter={(value) => `${(value/1000).toFixed(0)}k`} />
+                        <RechartsTooltip cursor={{fill: '#F3F4F6'}} contentStyle={{borderRadius: '12px', border: 'none', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'}} />
+                        <Bar dataKey="amount" fill="var(--color-primary)" radius={[4, 4, 0, 0]} name="Revenu (GNF)" />
+                      </BarChart>
+                    </ResponsiveContainer>
+                  </div>
+                </div>
+              </motion.div>
+            )}
+
             {activeTab === "overview" && (
               <motion.div
                 key="overview"
@@ -1607,10 +1790,16 @@ export default function AdminPage() {
                             >
                               <Eye className="w-3.5 h-3.5" />
                             </button>
-                            {ins.status === "En attente" && (
-                              <>
-                                <button
-                                  onClick={() => handleUpdateInscriptionStatus(ins.id, "Validé")}
+                            <div className="flex justify-end gap-2">
+                          <button
+                            onClick={() => openConvertModal(ins)}
+                            className="p-2 bg-purple-50 text-purple-600 rounded-lg hover:bg-purple-100 transition-colors"
+                            title="Convertir en Étudiant"
+                          >
+                            <Award className="w-4 h-4" />
+                          </button>
+                          <button
+                            onClick={() => handleUpdateInscriptionStatus(ins.id, "Validé")}
                                   className="p-1.5 bg-green-50 border border-green-200 text-green-700 hover:bg-green-100"
                                   title="Valider"
                                 >
@@ -1623,8 +1812,7 @@ export default function AdminPage() {
                                 >
                                   <X className="w-3.5 h-3.5" />
                                 </button>
-                              </>
-                            )}
+                            </div>
                           </td>
                         </tr>
                       ))}
@@ -1653,27 +1841,28 @@ export default function AdminPage() {
                 className="space-y-6"
               >
                 {/* Search and filters bar */}
-                <div className="bg-white border border-gray-200 p-4 shadow-sm flex flex-col sm:flex-row gap-4 justify-between items-center">
+                <div className="bg-white rounded-2xl p-4 shadow-sm flex flex-col sm:flex-row gap-4 justify-between items-center">
                   <div className="relative w-full sm:max-w-xs">
                     <input
                       type="text"
-                      className="w-full pl-9 pr-4 py-2 border border-gray-300 text-xs font-medium focus:outline-none focus:ring-1 focus:ring-[var(--color-primary)] bg-gray-50"
+                      className="w-full pl-9 pr-4 py-2.5 rounded-xl border-none text-xs font-medium focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] bg-gray-50"
                       placeholder="Rechercher par nom ou e-mail..."
                       value={studentSearchQuery}
                       onChange={(e) => setStudentSearchQuery(e.target.value)}
                     />
-                    <Search className="w-4 h-4 text-gray-400 absolute left-3 top-2.5" />
+                    <Search className="w-4 h-4 text-gray-400 absolute left-3 top-3" />
                   </div>
-                  <span className="text-xs font-bold text-gray-500 uppercase tracking-widest">
+                  <span className="text-xs font-bold text-gray-500 uppercase tracking-widest px-4 py-2 bg-gray-50 rounded-xl">
                     {students.length} Étudiant{students.length > 1 ? "s" : ""} Inscrit{students.length > 1 ? "s" : ""}
                   </span>
                 </div>
 
                 {/* Table */}
-                <div className="bg-white border border-gray-200 shadow-sm overflow-x-auto">
-                  <table className="w-full text-left border-collapse">
-                    <thead>
-                      <tr className="bg-gray-50 border-b border-gray-200 text-[10px] font-bold uppercase tracking-wider text-gray-400">
+                <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-left border-collapse">
+                      <thead>
+                        <tr className="bg-gray-50/50 border-b border-gray-100 text-[10px] font-bold uppercase tracking-wider text-gray-500">
                         <th className="py-4 px-6">Étudiant</th>
                         <th className="py-4 px-6">Profession / Statut</th>
                         <th className="py-4 px-6">Cours Actifs</th>
@@ -1752,12 +1941,13 @@ export default function AdminPage() {
                       )}
                     </tbody>
                   </table>
+                  </div>
                 </div>
 
                 {/* Student Details Modal Dialog */}
                 {selectedStudent && (
                   <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-in fade-in duration-200">
-                    <div className="bg-white rounded-[2rem] border border-gray-100 shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto flex flex-col p-6 md:p-8 animate-in zoom-in-95 duration-200 relative text-gray-800">
+                    <div className="bg-white rounded-none border border-gray-100 shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto flex flex-col p-6 md:p-8 animate-in zoom-in-95 duration-200 relative text-gray-800">
                       
                       {/* Close button */}
                       <button
@@ -1893,7 +2083,7 @@ export default function AdminPage() {
                               </select>
                             </div>
                           ) : (
-                            <p className="text-xs text-green-700 bg-green-50/50 p-4 rounded-xl border border-green-150/40">
+                            <p className="text-xs text-green-700 bg-green-50/50 p-4 rounded-none border border-green-150/40">
                               L'étudiant est déjà inscrit à l'intégralité du catalogue.
                             </p>
                           )}
@@ -1904,7 +2094,7 @@ export default function AdminPage() {
                       <div className="pt-4 border-t border-gray-100 flex justify-end">
                         <button
                           onClick={() => setSelectedStudent(null)}
-                          className="px-6 py-2.5 border border-gray-200 text-[10px] font-bold uppercase tracking-widest rounded-xl hover:bg-slate-50 transition-all"
+                          className="px-6 py-2.5 border border-gray-200 text-[10px] font-bold uppercase tracking-widest rounded-none hover:bg-slate-50 transition-all"
                         >
                           Fermer la fiche
                         </button>
@@ -2020,11 +2210,6 @@ export default function AdminPage() {
                 </div>
               </motion.div>
             )}
-
-            {/* ====================================
-                TAB: COURS ESPACE ETUDIANT
-            ==================================== */}
-            
 
             {/* ====================================
                 TAB: ACTUALITES (BLOG)
@@ -2336,7 +2521,7 @@ export default function AdminPage() {
                             </button>
                             <button
                               onClick={() => handleDeleteMessage(msg.id)}
-                              className="p-1.5 bg-red-50 border border-red-200 text-red-700 hover:bg-red-100"
+                              className="p-1.5 rounded bg-red-50 text-red-700 hover:bg-red-100"
                               title="Supprimer"
                             >
                               <Trash2 className="w-3.5 h-3.5" />
@@ -2565,6 +2750,97 @@ export default function AdminPage() {
       {/* Modal: Add/Edit Module Multi-Tab */}
       {/* Modal: Add/Edit Student Course */}
       
+      {/* === MODAL : AJOUT/ÉDITION MODULE === */}
+      {showConvertModal && leadToConvert && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[100] flex items-center justify-center p-4">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="bg-white rounded-2xl w-full max-w-lg overflow-hidden shadow-2xl"
+          >
+            <div className="px-6 py-4 border-b border-gray-100 flex justify-between items-center bg-gray-50/50">
+              <h3 className="text-xl font-bold text-gray-900 flex items-center gap-2">
+                <Award className="w-5 h-5 text-[var(--color-primary)]" />
+                Convertir en Étudiant
+              </h3>
+              <button onClick={() => setShowConvertModal(false)} className="text-gray-400 hover:text-gray-600">
+                <X className="w-6 h-6" />
+              </button>
+            </div>
+            
+            <form onSubmit={handleConvertLead} className="p-6 space-y-5">
+              <div className="bg-blue-50 p-4 rounded-xl border border-blue-100">
+                <p className="text-sm text-blue-800">
+                  <strong>Candidat :</strong> {leadToConvert.fullName} <br />
+                  <strong>Email :</strong> {leadToConvert.email}
+                </p>
+              </div>
+
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-1">Mot de passe temporaire <span className="text-red-500">*</span></label>
+                <input
+                  type="text"
+                  required
+                  value={leadPassword}
+                  onChange={(e) => setLeadPassword(e.target.value)}
+                  className="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:ring-2 focus:ring-[var(--color-primary)]"
+                  placeholder="ex: cfig2026!"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-1">Formation choisie <span className="text-red-500">*</span></label>
+                <select
+                  required
+                  value={leadCourseId}
+                  onChange={(e) => setLeadCourseId(e.target.value)}
+                  className="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:ring-2 focus:ring-[var(--color-primary)]"
+                >
+                  <option value="">Sélectionner une formation</option>
+                  {formations.map((cat) => (
+                    <optgroup key={cat.categorie} label={cat.categorie}>
+                      {cat.modules.map((mod) => (
+                        <option key={mod.id || mod.titre} value={mod.id || mod.titre}>
+                          {mod.titre}
+                        </option>
+                      ))}
+                    </optgroup>
+                  ))}
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-1">Paiement Cash (GNF) - Optionnel</label>
+                <input
+                  type="number"
+                  value={leadCashAmount}
+                  onChange={(e) => setLeadCashAmount(e.target.value === "" ? "" : Number(e.target.value))}
+                  className="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:ring-2 focus:ring-[var(--color-primary)]"
+                  placeholder="ex: 500000"
+                />
+                <p className="text-xs text-gray-500 mt-1">Si défini, cela ajoutera automatiquement un enregistrement de paiement.</p>
+              </div>
+
+              <div className="pt-4 flex justify-end gap-3 border-t border-gray-100">
+                <button
+                  type="button"
+                  onClick={() => setShowConvertModal(false)}
+                  className="px-5 py-2.5 text-gray-600 font-medium hover:bg-gray-100 rounded-xl"
+                >
+                  Annuler
+                </button>
+                <button
+                  type="submit"
+                  disabled={isConvertingLead}
+                  className="px-6 py-2.5 bg-gradient-to-r from-[var(--color-primary)] to-[var(--color-accent)] text-white font-bold rounded-xl shadow-md hover:shadow-lg disabled:opacity-50"
+                >
+                  {isConvertingLead ? "Création..." : "Confirmer et Créer"}
+                </button>
+              </div>
+            </form>
+          </motion.div>
+        </div>
+      )}
 
       {showAddModuleModal && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">

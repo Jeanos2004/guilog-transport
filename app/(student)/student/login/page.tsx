@@ -45,6 +45,17 @@ export default function StudentLoginPage() {
         }
         const userCredential = await createUserWithEmailAndPassword(auth, email, password);
         await studentDb.createProfile(userCredential.user.uid, email, fullName, phone, profession);
+        
+        // Trigger Welcome Email
+        fetch('/api/email', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            type: 'welcome',
+            data: { email, name: fullName }
+          })
+        }).catch(console.error);
+
         router.push("/student/dashboard");
       }
     } catch (err: any) {
