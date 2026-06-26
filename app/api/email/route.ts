@@ -12,6 +12,16 @@ export async function POST(req: Request) {
 
     let result;
 
+    if (process.env.NODE_ENV !== "production") {
+      console.log(`\n================================`);
+      console.log(`📧 [EMAIL INTERCEPTÉ EN LOCAL]`);
+      console.log(`Type: ${type}`);
+      console.log(`Destinataire: ${data.email}`);
+      if (data.tempPassword) console.log(`Mot de passe généré: ${data.tempPassword}`);
+      if (data.courseName) console.log(`Formation: ${data.courseName}`);
+      console.log(`================================\n`);
+    }
+
     switch (type) {
       case "welcome":
         if (!data.name) return NextResponse.json({ error: "Missing name" }, { status: 400 });
@@ -35,6 +45,13 @@ export async function POST(req: Request) {
           return NextResponse.json({ error: "Missing invoice data" }, { status: 400 });
         }
         result = await emailHelper.sendInvoiceEmail(data.email, data.name, data.courseName, data.amount);
+        break;
+
+      case "new_admin":
+        if (!data.tempPassword) {
+          return NextResponse.json({ error: "Missing new_admin data" }, { status: 400 });
+        }
+        result = await emailHelper.sendNewAdminCredentials(data.email, data.tempPassword);
         break;
 
       default:

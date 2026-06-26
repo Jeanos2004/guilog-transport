@@ -449,32 +449,47 @@ export default function AdminPage() {
     }
 
     try {
-      const userCredential = await createUserWithEmailAndPassword(auth, newAdminEmail, newAdminPassword);
-      const user = userCredential.user;
+      // 1. Create user in Firebase Auth via Backend API
+      const res = await fetch("/api/admin/create-admin", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: newAdminEmail, password: newAdminPassword })
+      });
+      const data = await res.json();
       
+      if (!res.ok) {
+        throw new Error(data.error || "Erreur lors de la création de l'administrateur");
+      }
+
+      // 2. Save Admin profile in Firestore
       const newAdmin: AdminUser = {
-        uid: user.uid,
+        uid: data.uid,
         email: newAdminEmail,
         createdAt: new Date().toISOString(),
         status: "actif"
       };
       await db.saveAdmin(newAdmin);
+
+      // 3. Send Credentials Email
+      await fetch("/api/email", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          type: "new_admin",
+          data: {
+            email: newAdminEmail,
+            tempPassword: newAdminPassword
+          }
+        })
+      });
+
       setAdmins(await db.getAdmins());
-      
       setNewAdminEmail("");
       setNewAdminPassword("");
-      setUserSuccessMsg("Compte administrateur créé avec succès !");
+      setUserSuccessMsg(`Compte administrateur créé avec succès. Un e-mail contenant les identifiants a été envoyé à ${newAdminEmail}.`);
     } catch (error: any) {
-      console.error("Error creating admin:", error);
-      let errorMsg = "Erreur lors de la création du compte.";
-      if (error.code === "auth/email-already-in-use") {
-        errorMsg = "Cette adresse email est déjà utilisée.";
-      } else if (error.code === "auth/invalid-email") {
-        errorMsg = "Adresse email invalide.";
-      } else if (error.code === "auth/weak-password") {
-        errorMsg = "Le mot de passe est trop faible.";
-      }
-      setUserErrorMsg(errorMsg);
+      console.error("Create admin error:", error);
+      setUserErrorMsg("Erreur lors de la création : " + error.message);
     }
   };
 

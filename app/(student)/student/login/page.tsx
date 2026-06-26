@@ -29,7 +29,17 @@ export default function StudentLoginPage() {
     try {
       if (isLogin) {
         // Log in
-        await signInWithEmailAndPassword(auth, email, password);
+        const userCredential = await signInWithEmailAndPassword(auth, email, password);
+        const profile = await studentDb.getProfile(userCredential.user.uid);
+        
+        if (!profile) {
+          // Pas un étudiant (peut-être un admin)
+          await auth.signOut();
+          setError("Accès refusé : Ce compte n'est pas un compte étudiant.");
+          setLoading(false);
+          return;
+        }
+        
         router.push("/student/dashboard");
       } else {
         // Sign up

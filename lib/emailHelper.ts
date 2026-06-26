@@ -25,12 +25,16 @@ export const emailHelper = {
     }
     
     try {
-      const data = await resend.emails.send({
+      const { data, error } = await resend.emails.send({
         from: `${BRAND_NAME} <${FROM_EMAIL}>`,
-        to,
+        to: Array.isArray(to) ? to : [to],
         subject,
         html,
       });
+      if (error) {
+        console.error("Resend API returned an error:", error);
+        throw new Error(error.message);
+      }
       return data;
     } catch (error) {
       console.error("Error sending email via Resend:", error);
@@ -122,6 +126,34 @@ export const emailHelper = {
 
         <p>Vous pouvez retrouver votre facture officielle ainsi que l'historique complet de vos paiements en vous connectant à votre espace étudiant.</p>
         <p style="font-size: 14px; color: #666; margin-top: 30px;">Merci pour votre paiement.</p>
+        <p>L'équipe ${BRAND_NAME}</p>
+      </div>
+    `;
+    return this.sendEmail({ to, subject, html });
+  },
+  
+  /**
+   * 5. New Admin Credentials Email
+   */
+  async sendNewAdminCredentials(to: string, tempPassword: string) {
+    const subject = `Vos identifiants d'administration`;
+    const html = `
+      <div style="font-family: Arial, sans-serif; color: #333; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #eaeaea; border-radius: 10px;">
+        <h2 style="color: #4F46E5;">Bienvenue dans l'équipe ${BRAND_NAME} ! 🛡️</h2>
+        <p>Un compte administrateur a été créé pour vous.</p>
+        <p>Voici vos identifiants temporaires de connexion :</p>
+        
+        <div style="background-color: #F3F4F6; padding: 15px; border-radius: 5px; margin: 20px 0;">
+          <p style="margin: 5px 0;"><strong>E-mail :</strong> ${to}</p>
+          <p style="margin: 5px 0;"><strong>Mot de passe :</strong> <code>${tempPassword}</code></p>
+        </div>
+
+        <p style="color: #DC2626; font-size: 13px;"><em>Veuillez modifier votre mot de passe dès que possible.</em></p>
+        
+        <div style="text-align: center; margin: 30px 0;">
+          <a href="https://cfig-guinee.com/admin" style="background-color: #4F46E5; color: white; padding: 12px 24px; text-decoration: none; border-radius: 5px; font-weight: bold;">Accéder au Tableau de Bord</a>
+        </div>
+        
         <p>L'équipe ${BRAND_NAME}</p>
       </div>
     `;
