@@ -340,5 +340,27 @@ export const studentDb = {
     } catch (e) {
       console.error("Error deleting course from Firestore:", e);
     }
+  },
+
+  /** Delete a student and their auth account */
+  async deleteStudent(uid: string): Promise<void> {
+    try {
+      // 1. Delete from Firestore
+      await deleteDoc(doc(firestore, "students", uid));
+      
+      // 2. Delete from Auth via API
+      const res = await fetch("/api/admin/delete-user", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ uid })
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.error || "Failed to delete student from Auth");
+      }
+    } catch (error) {
+      console.error("Error deleting student:", error);
+      throw error;
+    }
   }
 };

@@ -54,20 +54,19 @@ export default function StudentLoginPage() {
             type: 'welcome',
             data: { email, name: fullName }
           })
-        }).catch(console.error);
+        }).catch(() => {});
 
         router.push("/student/dashboard");
       }
     } catch (err: any) {
-      console.error(err);
       if (err.code === "auth/email-already-in-use") {
         setError("Cet e-mail est déjà utilisé par un autre compte.");
       } else if (err.code === "auth/weak-password") {
         setError("Le mot de passe doit contenir au moins 6 caractères.");
       } else if (err.code === "auth/invalid-credential" || err.code === "auth/user-not-found" || err.code === "auth/wrong-password") {
-        setError("Identifiants incorrects. Veuillez réessayer.");
+        setError("Email ou mot de passe incorrect.");
       } else {
-        setError("Une erreur est survenue lors de l'authentification.");
+        setError("Une erreur est survenue. Veuillez réessayer.");
       }
     } finally {
       setLoading(false);

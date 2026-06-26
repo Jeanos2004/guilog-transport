@@ -355,11 +355,18 @@ export default function AdminPage() {
     // Check Firebase Auth state
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
       if (user) {
-        setIsLoggedIn(true);
         if (user.email) {
-          await db.syncAdmin(user.uid, user.email);
+          try {
+            await db.verifyAdmin(user.uid);
+            setIsLoggedIn(true);
+            await refreshAllData();
+          } catch (error) {
+            console.error("Not an admin:", error);
+            await signOut(auth);
+            setIsLoggedIn(false);
+            setAuthError("Accès refusé. Vous n'êtes pas administrateur.");
+          }
         }
-        await refreshAllData();
       } else {
         setIsLoggedIn(false);
       }
@@ -377,18 +384,22 @@ export default function AdminPage() {
       const userCredential = await signInWithEmailAndPassword(auth, username, password);
       const user = userCredential.user;
       if (user.email) {
-        await db.syncAdmin(user.uid, user.email);
+        try {
+          await db.verifyAdmin(user.uid);
+          setIsLoggedIn(true);
+        } catch (error) {
+          await signOut(auth);
+          throw new Error("Accès refusé. Vous n'êtes pas administrateur.");
+        }
       }
-      setIsLoggedIn(true);
     } catch (error: any) {
-      console.error("Login error:", error);
       let errorMsg = "Identifiants ou mot de passe incorrects.";
       if (error.code === "auth/invalid-email") {
         errorMsg = "Format d'adresse email invalide.";
-      } else if (error.code === "auth/user-not-found" || error.code === "auth/wrong-password") {
+      } else if (error.code === "auth/user-not-found" || error.code === "auth/wrong-password" || error.code === "auth/invalid-credential") {
         errorMsg = "Email ou mot de passe incorrect.";
       } else if (error.code === "auth/too-many-requests") {
-        errorMsg = "Trop de tentatives de connexion echouees. Compte temporairement bloque.";
+        errorMsg = "Trop de tentatives de connexion échouées. Compte temporairement bloqué.";
       } else if (error.message) {
         errorMsg = `Erreur de connexion : ${error.message}`;
       }
@@ -485,6 +496,38 @@ export default function AdminPage() {
       setAdmins(await db.getAdmins());
     } catch (error) {
       console.error("Error updating admin status:", error);
+    }
+  };
+
+  const handleDeleteAdmin = async (uid: string) => {
+    if (auth.currentUser && auth.currentUser.uid === uid) {
+      alert("Vous ne pouvez pas supprimer votre propre compte !");
+      return;
+    }
+
+    if (!confirm("⚠️ ATTENTION : Êtes-vous sûr de vouloir supprimer définitivement cet administrateur (Base de données + Auth) ? Cette action est irréversible.")) return;
+
+    try {
+      await db.deleteAdmin(uid);
+      setAdmins(await db.getAdmins());
+      alert("L'administrateur a été supprimé avec succès.");
+    } catch (error: any) {
+      console.error("Erreur suppression admin:", error);
+      alert("Erreur lors de la suppression de l'administrateur: " + error.message);
+    }
+  };
+
+  const handleDeleteStudent = async (uid: string) => {
+    if (!confirm("⚠️ ATTENTION : Êtes-vous sûr de vouloir supprimer définitivement cet étudiant (Base de données + Auth) ? Cette action est irréversible.")) return;
+
+    try {
+      await studentDb.deleteStudent(uid);
+      setStudents(await db.getStudents());
+      if (selectedStudent?.uid === uid) setSelectedStudent(null);
+      alert("L'étudiant a été supprimé avec succès.");
+    } catch (error: any) {
+      console.error("Erreur suppression étudiant:", error);
+      alert("Erreur lors de la suppression de l'étudiant: " + error.message);
     }
   };
 
@@ -1918,12 +1961,21 @@ export default function AdminPage() {
                               </td>
                               <td className="py-4 px-6 text-gray-500">{joinedDate}</td>
                               <td className="py-4 px-6 text-right">
-                                <button
-                                  onClick={() => setSelectedStudent(student)}
-                                  className="px-3 py-1.5 border border-gray-200 text-[10px] font-bold uppercase tracking-wider text-blue-600 bg-blue-50/30 hover:bg-blue-50 transition-colors"
-                                >
-                                  Voir la fiche
-                                </button>
+                                <div className="flex items-center justify-end gap-2">
+                                  <button
+                                    onClick={() => setSelectedStudent(student)}
+                                    className="px-3 py-1.5 border border-gray-200 text-[10px] font-bold uppercase tracking-wider text-blue-600 bg-blue-50/30 hover:bg-blue-50 transition-colors"
+                                  >
+                                    Voir la fiche
+                                  </button>
+                                  <button
+                                    onClick={() => handleDeleteStudent(student.uid)}
+                                    title="Supprimer définitivement"
+                                    className="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded transition-colors"
+                                  >
+                                    <Trash2 className="w-4 h-4" />
+                                  </button>
+                                </div>
                               </td>
                             </tr>
                           );
@@ -2715,18 +2767,27 @@ export default function AdminPage() {
                               </td>
                               <td className="py-3 px-4 text-right">
                                 {auth.currentUser?.uid !== adm.uid ? (
-                                  <button
-                                    onClick={() => handleToggleAdminStatus(adm.uid)}
-                                    className={`px-2.5 py-1 text-[9px] font-bold uppercase tracking-wider border ${
-                                      adm.status === "actif" 
-                                        ? "bg-red-50 text-red-700 border-red-200 hover:bg-red-100" 
-                                        : "bg-green-50 text-green-700 border-green-200 hover:bg-green-100"
-                                    }`}
-                                  >
-                                    {adm.status === "actif" ? "Suspendre" : "Activer"}
-                                  </button>
+                                  <div className="flex items-center justify-end gap-2">
+                                    <button
+                                      onClick={() => handleToggleAdminStatus(adm.uid)}
+                                      className={`px-2.5 py-1 text-[9px] font-bold uppercase tracking-wider border ${
+                                        adm.status === "actif" 
+                                          ? "bg-red-50 text-red-700 border-red-200 hover:bg-red-100" 
+                                          : "bg-green-50 text-green-700 border-green-200 hover:bg-green-100"
+                                      }`}
+                                    >
+                                      {adm.status === "actif" ? "Suspendre" : "Réactiver"}
+                                    </button>
+                                    <button
+                                      onClick={() => handleDeleteAdmin(adm.uid)}
+                                      title="Supprimer définitivement"
+                                      className="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded transition-colors"
+                                    >
+                                      <Trash2 className="w-4 h-4" />
+                                    </button>
+                                  </div>
                                 ) : (
-                                  <span className="text-[10px] text-gray-400 italic">Mon compte</span>
+                                  <span className="text-[10px] text-gray-400 italic">Vous-même</span>
                                 )}
                               </td>
                             </tr>

@@ -421,20 +421,37 @@ export const db = {
       console.error("Error saving admin to Firestore:", error);
     }
   },
-  async syncAdmin(uid: string, email: string): Promise<void> {
+  async verifyAdmin(uid: string): Promise<void> {
     try {
       const docRef = doc(firestore, "admins", uid);
       const docSnap = await getDoc(docRef);
       if (!docSnap.exists()) {
-        await setDoc(docRef, {
-          uid,
-          email,
-          createdAt: new Date().toISOString(),
-          status: "actif"
-        });
+        throw new Error("not-an-admin");
       }
     } catch (error) {
-      console.error("Error syncing admin in Firestore:", error);
+      console.error("Error verifying admin in Firestore:", error);
+      throw error;
+    }
+  },
+
+  async deleteAdmin(uid: string): Promise<void> {
+    try {
+      // 1. Delete from Firestore
+      await deleteDoc(doc(firestore, "admins", uid));
+      
+      // 2. Delete from Auth via API
+      const res = await fetch("/api/admin/delete-user", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ uid })
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.error || "Failed to delete admin from Auth");
+      }
+    } catch (error) {
+      console.error("Error deleting admin:", error);
+      throw error;
     }
   },
   // Gallery
