@@ -13,6 +13,7 @@ export interface PaymentRecord {
   courseName: string;
   amount: number;
   paymentMethod: "cash" | "online";
+  paymentType?: "integral" | "tranche" | string;
   date: string;
 }
 

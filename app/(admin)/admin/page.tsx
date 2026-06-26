@@ -180,11 +180,13 @@ export default function AdminPage() {
   
   // === ACTIVE TAB STATE ===
   const [activeTab, setActiveTab] = useState<"overview" | "inscriptions" | "formations" | "actualites" | "testimonials" | "galerie" | "messages" | "settings" | "users" | "students" | "analytics">("overview");
+  const [overviewFilter, setOverviewFilter] = useState<"all" | "month" | "quarter" | "year">("all");
 
   // === DATA STATES ===
   const [formations, setFormations] = useState<CategorieFormations[]>([]);
   const [articles, setArticles] = useState<Article[]>([]);
-  const [inscriptions, setInscriptions] = useState<InscriptionRequest[]>([]);
+    const [inscriptions, setInscriptions] = useState<InscriptionRequest[]>([]);
+  const [smsBalance, setSmsBalance] = useState<number | null>(null);
   const [messages, setMessages] = useState<ContactMessage[]>([]);
   const [testimonials, setTestimonials] = useState<Testimonial[]>([]);
   const [gallery, setGallery] = useState<GalleryItem[]>([]);
@@ -546,15 +548,93 @@ export default function AdminPage() {
     }
   };
 
-  const handleEnrollStudent = async (studentUid: string, courseId: string) => {
+  const handleEnrollStudent = async (e: React.FormEvent<HTMLFormElement>, studentUid: string) => {
+    e.preventDefault();
+    const formData = new FormData(e.currentTarget);
+    const courseId = formData.get('courseId') as string;
+    const amountStr = formData.get('amount') as string;
+    const paymentType = formData.get('paymentType') as string;
+    if (!courseId) return;
+
     try {
       await studentDb.enrollInCourse(studentUid, courseId);
-      // Refresh students
-      setStudents(await db.getStudents());
-      alert("Étudiant inscrit avec succès !");
+      
+      let amount = Number(amountStr);
+      let courseName = courseId;
+      let coursePrice = 0;
+      formations.forEach(cat => {
+        const mod = cat.modules.find(m => m.id === courseId);
+        if (mod) {
+           courseName = mod.titre;
+           coursePrice = mod.prix || 0;
+        }
+      });
+
+      if (paymentType === 'integral') {
+         amount = coursePrice;
+      }
+
+      if (amount && !isNaN(amount) && amount > 0) {
+        const student = students.find(s => s.uid === studentUid);
+        await studentDb.addPayment({
+          studentId: studentUid,
+          studentName: student?.fullName || "Inconnu",
+          courseId: courseId,
+          courseName: courseName,
+          amount: amount,
+          paymentMethod: "cash",
+          paymentType: paymentType || "integral",
+          date: new Date().toISOString()
+        });
+        setPayments(await studentDb.getPayments());
+      }
+      
+      const updatedStudents = await db.getStudents();
+      setStudents(updatedStudents);
+      const updatedSelectedStudent = updatedStudents.find(s => s.uid === studentUid);
+      if (updatedSelectedStudent) {
+        setSelectedStudent(updatedSelectedStudent);
+      }
+      
+      alert("Étudiant inscrit" + (amount > 0 ? " et paiement enregistré" : "") + " avec succès !");
+      (e.target as HTMLFormElement).reset();
     } catch (error) {
       console.error(error);
       alert("Erreur lors de l'inscription de l'étudiant.");
+    }
+  };
+
+  
+  const handleSendSms = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    if(!selectedStudent) return;
+    const formData = new FormData(e.currentTarget);
+    const message = formData.get('message') as string;
+    const contact = selectedStudent.phone;
+    if (!message || !contact) {
+      alert("Message ou numéro de téléphone manquant (l'étudiant n'a peut-être pas fourni de numéro).");
+      return;
+    }
+    const btn = e.currentTarget.querySelector('button[type="submit"]') as HTMLButtonElement;
+    const originalText = btn.innerHTML;
+    btn.innerHTML = "Envoi...";
+    btn.disabled = true;
+    
+    try {
+      const res = await fetch('/api/sms/send', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ contact, message })
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Erreur lors de l'envoi du SMS");
+      alert("SMS envoyé avec succès !");
+      (e.target as HTMLFormElement).reset();
+    } catch(err: any) {
+      alert(err.message);
+    } finally {
+      btn.innerHTML = originalText;
+      btn.disabled = false;
     }
   };
 
@@ -1079,6 +1159,40 @@ export default function AdminPage() {
     return upcoming;
   }, [formations]);
 
+  const overviewStats = useMemo(() => {
+    const now = new Date();
+    
+    const filterByDate = (dateStr: string) => {
+      if (overviewFilter === "all") return true;
+      const d = new Date(dateStr);
+      if (isNaN(d.getTime())) return false;
+      const diffTime = Math.abs(now.getTime() - d.getTime());
+      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+      
+      if (overviewFilter === "month") return diffDays <= 30;
+      if (overviewFilter === "quarter") return diffDays <= 90;
+      if (overviewFilter === "year") return diffDays <= 365;
+      return true;
+    };
+
+    const fPayments = payments.filter(p => filterByDate(p.date));
+    const fStudents = students.filter(s => filterByDate(s.createdAt));
+    const fInscriptions = inscriptions.filter(i => filterByDate(i.date || new Date().toISOString()));
+    
+    const revenue = fPayments.reduce((acc, p) => acc + (p.amount || 0), 0);
+    const newStudentsCount = fStudents.length;
+    const enrollmentsCount = fStudents.reduce((acc, s) => acc + (s.enrolledCourses?.length || 0), 0);
+    
+    // Chart data based on filtered payments
+    const chartData = fPayments.slice(0, 15).reverse().map(p => ({
+      name: new Date(p.date).toLocaleDateString("fr-FR", { day: "2-digit", month: "short" }),
+      amount: p.amount,
+      student: p.studentName
+    }));
+
+    return { revenue, newStudentsCount, enrollmentsCount, chartData, fPayments };
+  }, [payments, students, inscriptions, overviewFilter]);
+
   if (isAuthChecking) {
     return (
       <div className="min-h-screen bg-[var(--color-primary)] flex items-center justify-center p-4 font-sans text-white">
@@ -1212,7 +1326,7 @@ export default function AdminPage() {
                     title: "Pilotage",
                     items: [
                       { id: "overview", label: "Vue d'ensemble", icon: <LayoutDashboard className="w-4 h-4" /> },
-                      { id: "analytics", label: "Statistiques", icon: <TrendingUp className="w-4 h-4" /> },
+                      
                       { id: "inscriptions", label: "Inscriptions & Devis", icon: <ClipboardList className="w-4 h-4" />, badge: pendingInscriptionsCount },
                       { id: "students", label: "Gestion des Étudiants", icon: <GraduationCap className="w-4 h-4" /> },
                     ]
@@ -1319,7 +1433,7 @@ export default function AdminPage() {
               title: "Pilotage",
               items: [
                 { id: "overview", label: "Vue d'ensemble", icon: <LayoutDashboard className="w-4 h-4" /> },
-                { id: "analytics", label: "Statistiques", icon: <TrendingUp className="w-4 h-4" /> },
+                
                 { id: "inscriptions", label: "Inscriptions & Devis", icon: <ClipboardList className="w-4 h-4" />, badge: pendingInscriptionsCount },
                 { id: "students", label: "Gestion des Étudiants", icon: <GraduationCap className="w-4 h-4" /> },
               ]
@@ -1418,7 +1532,7 @@ export default function AdminPage() {
             <div>
               <h2 className="text-lg lg:text-xl font-heading font-bold text-[var(--color-primary)] capitalize leading-tight">
                 {activeTab === "overview" && "Vue d'ensemble"}
-                {activeTab === "analytics" && "Statistiques & Revenus"}
+                
                 {activeTab === "inscriptions" && "Suivi des Inscriptions & Devis"}
                 {activeTab === "students" && "Gestion des Comptes Étudiants"}
                 {activeTab === "formations" && "Gestion des Formations"}
@@ -1432,14 +1546,31 @@ export default function AdminPage() {
               <p className="hidden md:block text-xs text-gray-500 mt-0.5">Bienvenue dans l'interface de contrôle du cabinet CFIG Guinée.</p>
             </div>
           </div>
-          <Link
-            href="/"
-            title="Voir le site public"
-            className="group flex items-center justify-center p-2 lg:px-4 lg:py-2 border-2 border-[var(--color-primary)] text-[var(--color-primary)] text-xs font-bold uppercase tracking-wider hover:bg-[var(--color-primary)] hover:text-white transition-colors shrink-0"
-          >
-            <Eye className="w-5 h-5 lg:hidden" />
-            <span className="hidden lg:inline">Voir le site public</span>
-          </Link>
+          
+          <div className="flex items-center gap-4">
+            <div className="hidden md:flex items-center gap-3 pr-4 border-r border-gray-200">
+              <div className="w-8 h-8 rounded-none bg-[var(--color-primary)]/10 text-[var(--color-primary)] flex items-center justify-center font-bold text-xs">
+                {auth.currentUser?.email?.substring(0, 2).toUpperCase() || 'AD'}
+              </div>
+              <div className="flex flex-col">
+                <span className="text-xs font-bold text-gray-900 leading-none mb-1">
+                  {auth.currentUser?.displayName || auth.currentUser?.email?.split('@')[0] || 'Administrateur'}
+                </span>
+                <span className="text-[9px] uppercase tracking-wider text-[var(--color-primary)] font-extrabold leading-none">
+                  Admin
+                </span>
+              </div>
+            </div>
+            
+            <Link
+              href="/"
+              title="Voir le site public"
+              className="group flex items-center justify-center p-2 lg:px-4 lg:py-2 border-2 border-[var(--color-primary)] text-[var(--color-primary)] text-xs font-bold uppercase tracking-wider hover:bg-[var(--color-primary)] hover:text-white transition-colors shrink-0"
+            >
+              <Eye className="w-5 h-5 lg:hidden" />
+              <span className="hidden lg:inline">Voir le site public</span>
+            </Link>
+          </div>
         </header>
 
         {/* Body content */}
@@ -1455,7 +1586,7 @@ export default function AdminPage() {
                 animate={{ opacity: 1, y: 0 }}
                 className="space-y-6"
               >
-                <div className="flex justify-between items-center bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+                <div className="flex justify-between items-center bg-white p-6 rounded-none shadow-sm border border-gray-100">
                   <div>
                     <h2 className="text-2xl font-bold text-gray-900">Tableau de bord : Statistiques</h2>
                     <p className="text-gray-500 text-sm mt-1">Analyse des revenus et inscriptions.</p>
@@ -1463,7 +1594,7 @@ export default function AdminPage() {
                 </div>
                 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                  <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm flex items-center gap-4">
+                  <div className="bg-white p-6 rounded-none border border-gray-100 shadow-sm flex items-center gap-4">
                     <div className="w-12 h-12 rounded-full bg-green-100 text-green-600 flex items-center justify-center">
                       <TrendingUp className="w-6 h-6" />
                     </div>
@@ -1472,7 +1603,7 @@ export default function AdminPage() {
                       <p className="text-2xl font-bold text-gray-900">{payments.reduce((acc, p) => acc + (p.amount || 0), 0).toLocaleString()} GNF</p>
                     </div>
                   </div>
-                  <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm flex items-center gap-4">
+                  <div className="bg-white p-6 rounded-none border border-gray-100 shadow-sm flex items-center gap-4">
                     <div className="w-12 h-12 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center">
                       <Users className="w-6 h-6" />
                     </div>
@@ -1481,7 +1612,7 @@ export default function AdminPage() {
                       <p className="text-2xl font-bold text-gray-900">{students.reduce((acc, s) => acc + (s.enrolledCourses?.length || 0), 0)}</p>
                     </div>
                   </div>
-                  <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm flex items-center gap-4">
+                  <div className="bg-white p-6 rounded-none border border-gray-100 shadow-sm flex items-center gap-4">
                     <div className="w-12 h-12 rounded-full bg-purple-100 text-purple-600 flex items-center justify-center">
                       <Award className="w-6 h-6" />
                     </div>
@@ -1492,7 +1623,7 @@ export default function AdminPage() {
                   </div>
                 </div>
 
-                <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
+                <div className="bg-white p-6 rounded-none border border-gray-100 shadow-sm">
                   <h3 className="text-lg font-bold text-gray-900 mb-6">Évolution des paiements (Dernières transactions)</h3>
                   <div className="h-80">
                     <ResponsiveContainer width="100%" height="100%">
@@ -1559,49 +1690,96 @@ export default function AdminPage() {
                   </div>
                 )}
 
-                {/* Stats Grid */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                  {[
-                    { title: "Apprenants Formés", val: ((settings?.apprenantsForme || 540) + validatedInscriptionsCount).toString(), desc: "Total cumulé", trend: "+12% ce mois", icon: <Users className="w-5 h-5 text-[var(--color-primary)]" />, bg: "bg-[var(--color-primary)]/5" },
-                    { title: "Modules de Formation", val: modulesCount.toString(), desc: "Catalogue actif", trend: "Mis à jour", icon: <BookOpen className="w-5 h-5 text-[var(--color-accent)]" />, bg: "bg-[var(--color-accent)]/5" },
-                    { title: "Inscriptions en Attente", val: pendingInscriptionsCount.toString(), desc: "Dossiers à traiter", trend: pendingInscriptionsCount > 0 ? "Action requise" : "À jour", icon: <ClipboardList className={`w-5 h-5 ${pendingInscriptionsCount > 0 ? "text-amber-600" : "text-gray-400"}`} />, bg: pendingInscriptionsCount > 0 ? "bg-amber-50" : "bg-gray-50", warning: pendingInscriptionsCount > 0 },
-                    { title: "Nouveaux Messages", val: unreadMessagesCount.toString(), desc: "Boîte de réception", trend: unreadMessagesCount > 0 ? "Non lus" : "Aucun", icon: <Mail className={`w-5 h-5 ${unreadMessagesCount > 0 ? "text-red-600" : "text-gray-400"}`} />, bg: unreadMessagesCount > 0 ? "bg-red-50" : "bg-gray-50", alert: unreadMessagesCount > 0 }
-                  ].map((card, i) => (
-                    <div 
-                      key={i} 
-                      className={`bg-white border p-6 flex items-start justify-between shadow-sm hover:shadow-lg transition-all duration-300 relative overflow-hidden group ${
-                        card.warning ? "border-l-4 border-l-amber-500 border-gray-200" : 
-                        card.alert ? "border-l-4 border-l-red-500 border-gray-200" : "border-gray-200"
-                      }`}
-                    >
-                      <div className="space-y-3">
-                        <span className="text-[10px] uppercase tracking-wider font-extrabold text-gray-400 block">{card.title}</span>
-                        <span className="text-3xl font-heading font-black text-[var(--color-primary)] block leading-none">{card.val}</span>
-                        <div className="flex items-center gap-1.5 mt-2">
-                          <span className={`text-[9px] font-extrabold uppercase px-1.5 py-0.5 leading-none ${
-                            card.warning ? "bg-amber-100 text-amber-800" :
-                            card.alert ? "bg-red-100 text-red-800" :
-                            "bg-green-100 text-green-800"
-                          }`}>
-                            {card.trend}
-                          </span>
-                          <span className="text-[9px] text-gray-400 font-semibold">{card.desc}</span>
+                
+                  
+                  {/* --- STATS GLOBALES (ORIGINAL) --- */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6">
+                    {[
+                      { title: "Apprenants Formés", val: ((settings?.apprenantsForme || 540) + validatedInscriptionsCount).toString(), desc: "Total cumulé", trend: "+12% ce mois", icon: <Users className="w-5 h-5 text-[var(--color-primary)]" />, bg: "bg-[var(--color-primary)]/5" },
+                      { title: "Modules de Formation", val: modulesCount.toString(), desc: "Catalogue actif", trend: "Mis à jour", icon: <BookOpen className="w-5 h-5 text-[var(--color-accent)]" />, bg: "bg-[var(--color-accent)]/5" },
+                      { title: "Inscriptions en Attente", val: pendingInscriptionsCount.toString(), desc: "Dossiers à traiter", trend: pendingInscriptionsCount > 0 ? "Action requise" : "À jour", icon: <ClipboardList className={`w-5 h-5 ${pendingInscriptionsCount > 0 ? "text-amber-600" : "text-gray-400"}`} />, bg: pendingInscriptionsCount > 0 ? "bg-amber-50" : "bg-gray-50", warning: pendingInscriptionsCount > 0 },
+                      { title: "Nouveaux Messages", val: unreadMessagesCount.toString(), desc: "Boîte de réception", trend: unreadMessagesCount > 0 ? "Non lus" : "Aucun", icon: <Mail className={`w-5 h-5 ${unreadMessagesCount > 0 ? "text-red-600" : "text-gray-400"}`} />, bg: unreadMessagesCount > 0 ? "bg-red-50" : "bg-gray-50", alert: unreadMessagesCount > 0 }
+                    ].map((stat, i) => (
+                      <div key={i} className={`p-6 rounded-none shadow-sm border border-gray-100 ${stat.bg} relative overflow-hidden group hover:shadow-md transition-all`}>
+                        {stat.warning && <div className="absolute top-0 right-0 w-3 h-3 bg-amber-500 rounded-bl-lg"></div>}
+                        {stat.alert && <div className="absolute top-0 right-0 w-3 h-3 bg-red-500 rounded-bl-lg animate-pulse"></div>}
+                        <div className="flex justify-between items-start mb-4">
+                          <div className="p-3 bg-white/60 rounded-none shadow-sm">{stat.icon}</div>
+                          <span className={`text-[10px] font-bold uppercase tracking-wider px-2 py-1 rounded-full ${stat.warning ? "bg-amber-100 text-amber-800" : stat.alert ? "bg-red-100 text-red-800" : "bg-white text-gray-500"}`}>{stat.trend}</span>
+                        </div>
+                        <div>
+                          <h3 className="text-3xl font-heading font-black text-gray-900 mb-1">{stat.val}</h3>
+                          <p className="text-sm font-bold text-gray-700">{stat.title}</p>
+                          <p className="text-xs text-gray-500 mt-1">{stat.desc}</p>
                         </div>
                       </div>
-                      <div className={`p-3.5 border border-transparent transition-all duration-300 group-hover:border-gray-200 ${card.bg}`}>
-                        {card.icon}
+                    ))}
+                  </div>
+
+                  {/* --- FILTRES DE PROGRESSION --- */}
+
+                  <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center bg-white p-4 lg:p-6 rounded-none shadow-sm border border-gray-100">
+                    <div>
+                      <h3 className="text-lg font-bold text-gray-900">Progression & Statistiques</h3>
+                      <p className="text-sm text-gray-500">Filtrer les données pour évaluer vos performances.</p>
+                    </div>
+                    <select
+                      value={overviewFilter}
+                      onChange={(e) => setOverviewFilter(e.target.value as any)}
+                      className="mt-4 sm:mt-0 bg-gray-50 border border-gray-300 text-gray-900 text-sm font-bold uppercase tracking-wider py-2 px-4 focus:ring-[var(--color-primary)] focus:border-[var(--color-primary)] outline-none cursor-pointer"
+                    >
+                      <option value="all">Depuis le début (Global)</option>
+                      <option value="month">Ce Mois-ci (30 j)</option>
+                      <option value="quarter">Ce Trimestre (90 j)</option>
+                      <option value="year">Cette Année (365 j)</option>
+                    </select>
+                  </div>
+
+                  {/* Stats Grid avec données filtrées */}
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-8">
+                    {[
+                      { title: "Revenus (Période)", val: overviewStats.revenue.toLocaleString() + " GNF", desc: "Total encaissé", trend: overviewFilter === "all" ? "Global" : "Période", icon: <TrendingUp className="w-5 h-5 text-green-600" />, bg: "bg-green-50" },
+                      { title: "Comptes Étudiants", val: overviewStats.newStudentsCount.toString(), desc: "Nouveaux inscrits", trend: "Créés", icon: <Users className="w-5 h-5 text-[var(--color-primary)]" />, bg: "bg-[var(--color-primary)]/5" },
+                      { title: "Dossiers Validés", val: overviewStats.enrollmentsCount.toString(), desc: "Inscriptions confirmées", trend: "Validés", icon: <ClipboardList className="w-5 h-5 text-[var(--color-accent)]" />, bg: "bg-[var(--color-accent)]/5" },
+                    ].map((stat, i) => (
+                      <div key={i} className={`p-6 rounded-none shadow-sm border border-gray-100 ${stat.bg} relative overflow-hidden group hover:shadow-md transition-all`}>
+                        <div className="flex justify-between items-start mb-4">
+                          <div className="p-3 bg-white/60 rounded-none shadow-sm">{stat.icon}</div>
+                          <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-1 rounded-full bg-white text-gray-500">{stat.trend}</span>
+                        </div>
+                        <div>
+                          <h3 className="text-3xl font-heading font-black text-gray-900 mb-1">{stat.val}</h3>
+                          <p className="text-sm font-bold text-gray-700">{stat.title}</p>
+                          <p className="text-xs text-gray-500 mt-1">{stat.desc}</p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Graphe des revenus */}
+                  {overviewStats.chartData.length > 0 && (
+                    <div className="bg-white p-6 rounded-none border border-gray-100 shadow-sm">
+                      <h3 className="text-lg font-bold text-gray-900 mb-6">Évolution des paiements encaissés</h3>
+                      <div className="h-80">
+                        <ResponsiveContainer width="100%" height="100%">
+                          <BarChart data={overviewStats.chartData}>
+                            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E5E7EB" />
+                            <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{fill: '#6B7280', fontSize: 12}} dy={10} />
+                            <YAxis axisLine={false} tickLine={false} tick={{fill: '#6B7280', fontSize: 12}} tickFormatter={(value) => `${(value/1000).toFixed(0)}k`} />
+                            <RechartsTooltip cursor={{fill: '#F3F4F6'}} contentStyle={{borderRadius: '12px', border: 'none', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'}} />
+                            <Bar dataKey="amount" fill="var(--color-primary)" radius={[4, 4, 0, 0]} name="Revenu (GNF)" />
+                          </BarChart>
+                        </ResponsiveContainer>
                       </div>
                     </div>
-                  ))}
-                </div>
+                  )}
 
-                {/* Charts & Analytics */}
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                  {/* Monthly Trend Card */}
-                  <div className="bg-white border border-gray-200 p-6 lg:col-span-2 shadow-sm flex flex-col justify-between">
-                    <div>
-                      <div className="flex justify-between items-center mb-6">
-                        <h3 className="text-xs font-bold uppercase tracking-wider text-[var(--color-primary)]">Suivi Mensuel des Inscriptions (2026)</h3>
+                  {/* Chart and Stats separator */}
+                  <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <div className="bg-white border border-gray-200 p-6 lg:col-span-2 shadow-sm flex flex-col justify-between">
+                      <div>
+                        <div className="flex justify-between items-center mb-6">
+                          <h3 className="text-xs font-bold uppercase tracking-wider text-[var(--color-primary)]">Suivi Mensuel des Inscriptions (2026)</h3>
                         <span className="flex items-center gap-1 text-[10px] text-green-600 font-extrabold uppercase">
                           <TrendingUp className="w-3.5 h-3.5" /> +28% Croissance
                         </span>
@@ -1899,24 +2077,24 @@ export default function AdminPage() {
                 className="space-y-6"
               >
                 {/* Search and filters bar */}
-                <div className="bg-white rounded-2xl p-4 shadow-sm flex flex-col sm:flex-row gap-4 justify-between items-center">
+                <div className="bg-white rounded-none p-4 shadow-sm flex flex-col sm:flex-row gap-4 justify-between items-center">
                   <div className="relative w-full sm:max-w-xs">
                     <input
                       type="text"
-                      className="w-full pl-9 pr-4 py-2.5 rounded-xl border-none text-xs font-medium focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] bg-gray-50"
+                      className="w-full pl-9 pr-4 py-2.5 rounded-none border-none text-xs font-medium focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] bg-gray-50"
                       placeholder="Rechercher par nom ou e-mail..."
                       value={studentSearchQuery}
                       onChange={(e) => setStudentSearchQuery(e.target.value)}
                     />
                     <Search className="w-4 h-4 text-gray-400 absolute left-3 top-3" />
                   </div>
-                  <span className="text-xs font-bold text-gray-500 uppercase tracking-widest px-4 py-2 bg-gray-50 rounded-xl">
+                  <span className="text-xs font-bold text-gray-500 uppercase tracking-widest px-4 py-2 bg-gray-50 rounded-none">
                     {students.length} Étudiant{students.length > 1 ? "s" : ""} Inscrit{students.length > 1 ? "s" : ""}
                   </span>
                 </div>
 
                 {/* Table */}
-                <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
+                <div className="bg-white rounded-none shadow-sm overflow-hidden">
                   <div className="overflow-x-auto">
                     <table className="w-full text-left border-collapse">
                       <thead>
@@ -2019,7 +2197,7 @@ export default function AdminPage() {
                       {/* Close button */}
                       <button
                         onClick={() => setSelectedStudent(null)}
-                        className="absolute right-6 top-6 p-1.5 text-gray-400 hover:text-gray-600 hover:bg-gray-50 rounded-xl transition-all"
+                        className="absolute right-6 top-6 p-1.5 text-gray-400 hover:text-gray-600 hover:bg-gray-50 rounded-none transition-all"
                       >
                         <X className="w-5 h-5" />
                       </button>
@@ -2042,7 +2220,7 @@ export default function AdminPage() {
                       <div className="py-6 space-y-6 flex-grow">
                         {/* Status/Profession details */}
                         <div className="grid grid-cols-2 gap-4">
-                          <div className="bg-slate-50 p-4.5 rounded-2xl border border-slate-100">
+                          <div className="bg-slate-50 p-4.5 rounded-none border border-slate-100">
                             <span className="block text-[8px] font-bold text-gray-400 uppercase tracking-widest">Statut Professionnel</span>
                             <span className="block text-xs font-bold text-gray-800 mt-1.5">
                               {selectedStudent.profession === "student" && "Étudiant / Élève"}
@@ -2051,7 +2229,7 @@ export default function AdminPage() {
                               {selectedStudent.profession === "other" && "Autre"}
                             </span>
                           </div>
-                          <div className="bg-slate-50 p-4.5 rounded-2xl border border-slate-100">
+                          <div className="bg-slate-50 p-4.5 rounded-none border border-slate-100">
                             <span className="block text-[8px] font-bold text-gray-400 uppercase tracking-widest">Date d'inscription</span>
                             <span className="block text-xs font-bold text-gray-800 mt-1.5">
                               {selectedStudent.createdAt 
@@ -2062,102 +2240,241 @@ export default function AdminPage() {
                         </div>
 
                         {/* Enrolled Courses and Progress */}
-                        <div className="space-y-3">
-                          <h4 className="text-[10px] font-extrabold uppercase tracking-wider text-gray-400">Formations & Progression</h4>
-                          
-                          {selectedStudent.enrolledCourses && selectedStudent.enrolledCourses.length > 0 ? (
-                            <div className="space-y-3">
-                              {selectedStudent.enrolledCourses.map((courseId) => {
-                                const matchedCourse = ([] as any[]).find((c: any) => c.id === courseId);
-                                if (!matchedCourse) return null;
+                          <div className="space-y-3">
+                            <h4 className="text-[10px] font-extrabold uppercase tracking-wider text-gray-400">Formations & Progression</h4>
+                            
+                            {selectedStudent.enrolledCourses && selectedStudent.enrolledCourses.length > 0 ? (
+                              <div className="space-y-3">
+                                {selectedStudent.enrolledCourses.map((courseId) => {
+                                  const matchedCourse = formations.flatMap(f => f.modules.map(m => ({ id: m.id, title: m.titre, category: f.categorie, sessions: m.sessions, prix: m.prix }))).find(c => c.id === courseId);
+                                  if (!matchedCourse) return null;
+  
+                                  // Calculate progress
+                                  let totalLectures = matchedCourse.sessions?.length || 0;
+                                  const completedCount = selectedStudent.progress?.[courseId]?.length || 0;
+                                  const progressPct = totalLectures > 0 ? Math.round((completedCount / totalLectures) * 100) : 0;
+  
+                                  // Calculate payments
+                                  const coursePayments = payments.filter(p => p.studentId === selectedStudent.uid && p.courseId === courseId);
+                                  const totalPaid = coursePayments.reduce((acc, p) => acc + (p.amount || 0), 0);
 
-                                // Calculate progress
-                                let totalLectures = 0;
-                                matchedCourse.modules.forEach((m: CourseModule) => totalLectures += m.sessions.length);
-                                const completedCount = selectedStudent.progress[courseId]?.length || 0;
-                                const progressPct = totalLectures > 0 ? Math.round((completedCount / totalLectures) * 100) : 0;
-
-                                return (
-                                  <div key={courseId} className="p-4 bg-white border border-gray-150 rounded-2xl space-y-3 shadow-sm">
-                                    <div className="flex justify-between items-start">
-                                      <div>
-                                        <h5 className="text-xs font-extrabold text-gray-900 leading-snug">{matchedCourse.title}</h5>
-                                        <span className="text-[9px] text-gray-400 font-bold uppercase tracking-wider">{matchedCourse.category}</span>
+                                  return (
+                                    <div key={courseId} className="p-4 bg-white border border-gray-150 rounded-none space-y-3 shadow-sm">
+                                      <div className="flex justify-between items-start">
+                                        <div>
+                                          <h5 className="text-xs font-extrabold text-gray-900 leading-snug">{matchedCourse.title}</h5>
+                                          <span className="text-[9px] text-gray-400 font-bold uppercase tracking-wider">{matchedCourse.category}</span>
+                                        </div>
+                                        <span className={`text-[9px] font-bold px-2 py-0.5 rounded-md uppercase tracking-wider ${
+                                          progressPct === 100 
+                                            ? "bg-green-50 text-green-700 border border-green-150" 
+                                            : "bg-blue-50 text-blue-700 border border-blue-150"
+                                        }`}>
+                                          {progressPct === 100 ? "Validé ✅" : "En cours"}
+                                        </span>
                                       </div>
-                                      <span className={`text-[9px] font-bold px-2 py-0.5 rounded-md uppercase tracking-wider ${
-                                        progressPct === 100 
-                                          ? "bg-green-50 text-green-700 border border-green-150" 
-                                          : "bg-blue-50 text-blue-700 border border-blue-150"
-                                      }`}>
-                                        {progressPct === 100 ? "Validé ✓" : "En cours"}
-                                      </span>
+  
+                                      {/* Progress indicator */}
+                                      <div className="space-y-1.5">
+                                        <div className="flex justify-between items-center text-[9px] font-bold text-gray-400">
+                                          <span>Leçons validées : {completedCount} / {totalLectures}</span>
+                                          <span className="text-blue-600">{progressPct}%</span>
+                                        </div>
+                                        <div className="w-full h-1.5 bg-slate-100 rounded-full overflow-hidden">
+                                          <div 
+                                            className={`h-full rounded-full transition-all duration-300 ${
+                                              progressPct === 100 ? "bg-green-500" : "bg-blue-600"
+                                            }`} 
+                                            style={{ width: `${progressPct}%` }} 
+                                          />
+                                        </div>
+                                      </div>
+
+                                      {/* Payment section */}
+                                      <div className="pt-3 border-t border-gray-100">
+                                        <div className="flex justify-between items-center mb-2">
+                                          <span className="text-[9px] font-bold text-gray-500 uppercase tracking-wider">Total versé:</span>
+                                          <span className="text-xs font-black text-green-700">{totalPaid.toLocaleString()} GNF</span>
+                                        </div>
+                                        
+                                        <form onSubmit={async (e) => {
+                                          e.preventDefault();
+                                          const form = e.currentTarget;
+                                          const formData = new FormData(form);
+                                          let amount = Number(formData.get('amount'));
+                                          const paymentType = formData.get('paymentType') as string;
+                                          if (paymentType === 'integral') {
+                                            amount = (matchedCourse.prix || 0) - totalPaid;
+                                          }
+                                          if (amount > 0) {
+                                            try {
+                                              await studentDb.addPayment({
+                                                studentId: selectedStudent.uid,
+                                                studentName: selectedStudent.fullName,
+                                                courseId: courseId,
+                                                courseName: matchedCourse.title,
+                                                amount: amount,
+                                                paymentMethod: "cash",
+                                                paymentType: paymentType || "tranche",
+                                                date: new Date().toISOString()
+                                              });
+                                              const newPayments = await studentDb.getPayments();
+                                              setPayments(newPayments);
+                                              
+                                              alert("Nouveau versement enregistré avec succès !");
+                                              form.reset();
+                                            } catch (err) {
+                                              console.error(err);
+                                              alert("Erreur lors de l'enregistrement du paiement.");
+                                            }
+                                          }
+                                        }} className="flex flex-col sm:flex-row gap-2">
+                                          <div className="flex-grow flex gap-2">
+                                            <select 
+                                              name="paymentType" 
+                                              className="bg-slate-50 border border-gray-250 px-2 py-1.5 text-[10px] rounded-none focus:outline-none focus:border-[var(--color-primary)] transition-all"
+                                              onChange={(e) => {
+                                                const target = e.target as HTMLSelectElement;
+                                                const input = target.parentElement?.querySelector('input[name="amount"]') as HTMLInputElement | null;
+                                                if (input) {
+                                                  if (target.value === 'integral') {
+                                                    input.style.display = 'none';
+                                                    input.required = false;
+                                                    input.value = '';
+                                                  } else {
+                                                    input.style.display = 'block';
+                                                    input.required = true;
+                                                  }
+                                                }
+                                              }}
+                                            >
+                                              <option value="tranche">Par tranche</option>
+                                              <option value="integral">Intégral (Solde)</option>
+                                            </select>
+                                            <input 
+                                              type="number" 
+                                              name="amount" 
+                                              placeholder="Montant (GNF)" 
+                                              required 
+                                              className="w-full bg-slate-50 border border-gray-250 px-2 py-1.5 text-[10px] rounded-none focus:outline-none focus:border-[var(--color-primary)] transition-all" 
+                                            />
+                                          </div>
+                                          <button 
+                                            type="submit" 
+                                            className="px-3 py-1.5 bg-green-600 hover:bg-green-700 text-white text-[9px] font-bold uppercase tracking-wider rounded-none transition-colors whitespace-nowrap"
+                                          >
+                                            Verser
+                                          </button>
+                                        </form>
+                                      </div>
                                     </div>
+                                  );
+                                })}
+                              </div>
+                            ) : (
+                              <p className="text-xs text-gray-500 bg-gray-50 p-4 rounded-none border border-gray-150">
+                                Aucune formation en cours.
+                              </p>
+                            )}
+                          </div>
 
-                                    {/* Progress indicator */}
-                                    <div className="space-y-1.5">
-                                      <div className="flex justify-between items-center text-[9px] font-bold text-gray-400">
-                                        <span>Leçons validées : {completedCount} / {totalLectures}</span>
-                                        <span className="text-blue-600">{progressPct}%</span>
-                                      </div>
-                                      <div className="w-full h-1.5 bg-slate-100 rounded-full overflow-hidden">
-                                        <div 
-                                          className={`h-full rounded-full transition-all duration-300 ${
-                                            progressPct === 100 ? "bg-green-500" : "bg-blue-600"
-                                          }`} 
-                                          style={{ width: `${progressPct}%` }} 
-                                        />
-                                      </div>
-                                    </div>
+                          {/* Manual Enrollment Selector */}
+                          <div className="pt-4 border-t border-gray-150 space-y-3">
+                            <h4 className="text-[10px] font-extrabold uppercase tracking-wider text-gray-400">Inscrire manuellement à un cours & Ajouter un paiement</h4>
+                            
+                            {formations.flatMap(f => f.modules.map(m => ({ id: m.id, title: m.titre, category: f.categorie, prix: m.prix }))).filter(c => !selectedStudent.enrolledCourses?.includes(c.id!)).length > 0 ? (
+                              <form onSubmit={(e) => handleEnrollStudent(e, selectedStudent.uid)} className="space-y-3">
+                                <div>
+                                  <label className="block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1">Sélectionner la formation *</label>
+                                  <select
+                                    name="courseId"
+                                    required
+                                    size={5}
+                                    className="w-full bg-slate-50 border border-gray-250 px-4 py-2.5 text-xs rounded-none focus:outline-none focus:border-[var(--color-primary)] focus:bg-white transition-all text-gray-800"
+                                    defaultValue=""
+                                  >
+                                    <option value="" disabled>Sélectionner un cours du catalogue...</option>
+                                    {formations.flatMap(f => f.modules.map(m => ({ id: m.id, title: m.titre, category: f.categorie, prix: m.prix })))
+                                      .filter(c => !selectedStudent.enrolledCourses?.includes(c.id!))
+                                      .map(c => (
+                                        <option key={`${c.category}-${c.id || c.title}`} value={c.id}>
+                                          {c.title} ({c.category})
+                                        </option>
+                                      ))}
+                                  </select>
+                                </div>
+                                <div>
+                                  <label className="block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1">Paiement Cash (GNF) - Optionnel</label>
+                                  <div className="flex gap-2">
+                                    <select 
+                                        name="paymentType" 
+                                        className="bg-slate-50 border border-gray-250 px-3 py-2.5 text-xs rounded-none focus:outline-none focus:border-[var(--color-primary)] transition-all"
+                                        onChange={(e) => {
+                                          const target = e.target as HTMLSelectElement;
+                                          const input = target.parentElement?.querySelector('input[name="amount"]') as HTMLInputElement | null;
+                                          if (input) {
+                                            if (target.value === 'integral') {
+                                              input.style.display = 'none';
+                                              input.required = false;
+                                              input.value = '';
+                                            } else {
+                                              input.style.display = 'block';
+                                              input.required = true;
+                                            }
+                                          }
+                                        }}
+                                      >
+                                      <option value="integral">Intégral</option>
+                                      <option value="tranche">1ère tranche</option>
+                                    </select>
+                                    <input
+                                      type="number"
+                                      name="amount"
+                                      placeholder="ex: 500000"
+                                      style={{ display: 'none' }}
+                                      className="w-full bg-slate-50 border border-gray-250 px-4 py-2.5 text-xs rounded-none focus:outline-none focus:border-[var(--color-primary)] focus:bg-white transition-all text-gray-800"
+                                    />
                                   </div>
-                                );
-                              })}
-                            </div>
-                          ) : (
-                            <p className="text-xs text-gray-400 italic bg-slate-50/50 p-4 rounded-xl border border-dashed border-gray-200">
-                              Cet étudiant n'est inscrit à aucun cours pour le moment.
-                            </p>
-                          )}
+                                </div>
+                                <button type="submit" className="w-full py-2.5 bg-[var(--color-primary)] hover:opacity-90 text-white text-[10px] font-bold uppercase tracking-wider rounded-none transition-opacity">
+                                  Inscrire & Enregistrer Paiement
+                                </button>
+                              </form>
+                            ) : (
+                              <p className="text-xs text-green-700 bg-green-50/50 p-4 rounded-none border border-green-150/40">
+                                L'étudiant est déjà inscrit à l'intégralité du catalogue.
+                              </p>
+                            )}
+                          </div>
                         </div>
 
-                        {/* Manual Enrollment Selector */}
-                        <div className="pt-4 border-t border-gray-150 space-y-3">
-                          <h4 className="text-[10px] font-extrabold uppercase tracking-wider text-gray-400">Inscrire manuellement à un cours</h4>
-                          
-                          {([ ] as any[]).filter((c: StudentCourse) => !selectedStudent.enrolledCourses?.includes(c.id)).length > 0 ? (
-                            <div className="flex gap-3">
-                              <select
-                                id="admin-enroll-course-select"
-                                className="flex-grow bg-slate-50 border border-gray-250 px-4 py-2.5 text-xs rounded-xl focus:outline-none focus:border-blue-600 focus:bg-white transition-all text-gray-800"
-                                defaultValue=""
-                                onChange={async (e) => {
-                                  const courseId = e.target.value;
-                                  if (courseId) {
-                                    await handleEnrollStudent(selectedStudent.uid, courseId);
-                                    // Reset select value
-                                    e.target.value = "";
-                                    alert("Étudiant inscrit au cours avec succès !");
-                                  }
-                                }}
-                              >
-                                <option value="" disabled>Sélectionner un cours du catalogue...</option>
-                                {([ ] as any[])
-                                  .filter((c: StudentCourse) => !selectedStudent.enrolledCourses?.includes(c.id))
-                                  .map((c: StudentCourse) => (
-                                    <option key={c.id} value={c.id}>
-                                      {c.title} ({c.category})
-                                    </option>
-                                  ))}
-                              </select>
+                                                    <div className="pt-4 border-t border-gray-150 space-y-3">
+                              <h4 className="text-[10px] font-extrabold uppercase tracking-wider text-blue-500">Communiquer par SMS</h4>
+                              {selectedStudent.phone ? (
+                                <form onSubmit={handleSendSms} className="space-y-3">
+                                  <textarea 
+                                    name="message" 
+                                    rows={3} 
+                                    required
+                                    placeholder="Tapez votre message ici... (ex: Bonjour, n'oubliez pas votre cours demain.)"
+                                    className="w-full bg-slate-50 border border-blue-200 px-4 py-2.5 text-xs rounded-none focus:outline-none focus:border-blue-500 focus:bg-white transition-all text-gray-800 resize-none"
+                                  ></textarea>
+                                  <div className="flex justify-between items-center">
+                                    <span className="text-[10px] text-gray-400">Envoi vers : {selectedStudent.phone}</span>
+                                    <button type="submit" className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-[10px] font-bold uppercase tracking-wider rounded-none transition-colors">
+                                      Envoyer le SMS
+                                    </button>
+                                  </div>
+                                </form>
+                              ) : (
+                                <p className="text-xs text-amber-700 bg-amber-50 p-4 border border-amber-200">
+                                  Impossible d'envoyer un SMS, cet étudiant n'a pas renseigné de numéro de téléphone.
+                                </p>
+                              )}
                             </div>
-                          ) : (
-                            <p className="text-xs text-green-700 bg-green-50/50 p-4 rounded-none border border-green-150/40">
-                              L'étudiant est déjà inscrit à l'intégralité du catalogue.
-                            </p>
-                          )}
-                        </div>
-                      </div>
+                            
+                            {/* Footer Actions */}
 
-                      {/* Footer Actions */}
                       <div className="pt-4 border-t border-gray-100 flex justify-end">
                         <button
                           onClick={() => setSelectedStudent(null)}
@@ -2832,7 +3149,7 @@ export default function AdminPage() {
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="bg-white rounded-2xl w-full max-w-lg overflow-hidden shadow-2xl"
+            className="bg-white rounded-none w-full max-w-lg overflow-hidden shadow-2xl"
           >
             <div className="px-6 py-4 border-b border-gray-100 flex justify-between items-center bg-gray-50/50">
               <h3 className="text-xl font-bold text-gray-900 flex items-center gap-2">
@@ -2845,7 +3162,7 @@ export default function AdminPage() {
             </div>
             
             <form onSubmit={handleConvertLead} className="p-6 space-y-5">
-              <div className="bg-blue-50 p-4 rounded-xl border border-blue-100">
+              <div className="bg-blue-50 p-4 rounded-none border border-blue-100">
                 <p className="text-sm text-blue-800">
                   <strong>Candidat :</strong> {leadToConvert.fullName} <br />
                   <strong>Email :</strong> {leadToConvert.email}
@@ -2859,7 +3176,7 @@ export default function AdminPage() {
                   required
                   value={leadPassword}
                   onChange={(e) => setLeadPassword(e.target.value)}
-                  className="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:ring-2 focus:ring-[var(--color-primary)]"
+                  className="w-full px-4 py-2.5 rounded-none border border-gray-200 focus:ring-2 focus:ring-[var(--color-primary)]"
                   placeholder="ex: cfig2026!"
                 />
               </div>
@@ -2870,7 +3187,7 @@ export default function AdminPage() {
                   required
                   value={leadCourseId}
                   onChange={(e) => setLeadCourseId(e.target.value)}
-                  className="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:ring-2 focus:ring-[var(--color-primary)]"
+                  className="w-full px-4 py-2.5 rounded-none border border-gray-200 focus:ring-2 focus:ring-[var(--color-primary)]"
                 >
                   <option value="">Sélectionner une formation</option>
                   {formations.map((cat) => (
@@ -2891,7 +3208,7 @@ export default function AdminPage() {
                   type="number"
                   value={leadCashAmount}
                   onChange={(e) => setLeadCashAmount(e.target.value === "" ? "" : Number(e.target.value))}
-                  className="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:ring-2 focus:ring-[var(--color-primary)]"
+                  className="w-full px-4 py-2.5 rounded-none border border-gray-200 focus:ring-2 focus:ring-[var(--color-primary)]"
                   placeholder="ex: 500000"
                 />
                 <p className="text-xs text-gray-500 mt-1">Si défini, cela ajoutera automatiquement un enregistrement de paiement.</p>
@@ -2901,14 +3218,14 @@ export default function AdminPage() {
                 <button
                   type="button"
                   onClick={() => setShowConvertModal(false)}
-                  className="px-5 py-2.5 text-gray-600 font-medium hover:bg-gray-100 rounded-xl"
+                  className="px-5 py-2.5 text-gray-600 font-medium hover:bg-gray-100 rounded-none"
                 >
                   Annuler
                 </button>
                 <button
                   type="submit"
                   disabled={isConvertingLead}
-                  className="px-6 py-2.5 bg-gradient-to-r from-[var(--color-primary)] to-[var(--color-accent)] text-white font-bold rounded-xl shadow-md hover:shadow-lg disabled:opacity-50"
+                  className="px-6 py-2.5 bg-gradient-to-r from-[var(--color-primary)] to-[var(--color-accent)] text-white font-bold rounded-none shadow-md hover:shadow-lg disabled:opacity-50"
                 >
                   {isConvertingLead ? "Création..." : "Confirmer et Créer"}
                 </button>
