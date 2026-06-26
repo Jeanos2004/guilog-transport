@@ -105,31 +105,34 @@ export const testimonialsData = [
 
 export const teamData = [
   {
-    name: "Ousmane Condé",
-    role: "Directeur & Formateur Gestion",
-    initials: "OC",
-    image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop&crop=face",
+    name: "Mamadou cellou Diallo",
+    role: "Consultant-Formateur",
+    initials: "MD",
+    image: "/images/cellou.jpeg",
+    linkedin: "#",
+    zoom: 1.8,
+    offsetX: "20px",
+    offsetY: "-20px"
+  },
+  {
+    name: "Ousmane Diallo",
+    role: "Responsable pédagogique-Formateur",
+    initials: "OD",
+    image: "/images/ousmane.jpeg",
     linkedin: "#"
   },
   {
-    name: "Aissatou Sylla",
-    role: "Formatrice Communication",
-    initials: "AS",
-    image: "https://images.unsplash.com/photo-1531123897727-8f129e1688ce?w=400&h=400&fit=crop&crop=face",
+    name: "Adama Bah",
+    role: "Responsable Commerciale et Finances",
+    initials: "AB",
+    image: "/images/adama.jpeg",
     linkedin: "#"
   },
   {
-    name: "Ibrahima Keita",
-    role: "Expert Logistique",
-    initials: "IK",
-    image: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400&h=400&fit=crop&crop=face",
-    linkedin: "#"
-  },
-  {
-    name: "Mariam Sow",
-    role: "Consultante RH",
-    initials: "MS",
-    image: "https://images.unsplash.com/photo-1488426862026-3ee34a7d66df?w=400&h=400&fit=crop&crop=face",
+    name: "Mohamed Bangoura",
+    role: "Infographe-Formateur",
+    initials: "MB",
+    image: "/images/mohamed.jpeg",
     linkedin: "#"
   }
 ];

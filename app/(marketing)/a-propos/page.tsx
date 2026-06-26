@@ -217,6 +217,9 @@ export default function AboutPage() {
                         src={member.image}
                         alt={member.name}
                         className="w-full h-full object-cover object-top grayscale group-hover:grayscale-0 transition-all duration-500"
+                        style={{ 
+                          transform: `scale(${(member as any).zoom || 1}) translate(${(member as any).offsetX || '0px'}, ${(member as any).offsetY || '0px'})` 
+                        }}
                       />
                     </div>
                   </div>

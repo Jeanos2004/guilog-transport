@@ -47,7 +47,7 @@ export default function StudentLoginPage() {
         await studentDb.createProfile(userCredential.user.uid, email, fullName, phone, profession);
         
         // Trigger Welcome Email
-        fetch('/api/email', {
+        await fetch('/api/email', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({

@@ -221,7 +221,7 @@ export function generateInvoiceHtml(data: InvoiceData): string {
             <h4>Facturé à</h4>
             <p>
               <strong>${data.billToName}</strong><br>
-              ${data.billToAddress.replace(/\n/g, '<br>')}<br>
+              ${data.billToAddress ? data.billToAddress.replace(/\n/g, '<br>') : ''}<br>
               ${data.billToVAT ? `NIF: ${data.billToVAT}` : ''}
             </p>
           </div>
@@ -252,7 +252,7 @@ export function generateInvoiceHtml(data: InvoiceData): string {
           </tbody>
         </table>
 
-        <div class="footer">
+        <div class="footer">  
           <div class="notes">
             <h4>Notes</h4>
             <p>${data.notes || "Le règlement de cette facture a été effectué par paiement électronique sécurisé (Mobile Money ou Carte Visa)."}</p>

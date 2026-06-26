@@ -15,9 +15,8 @@ export async function POST(req: Request) {
     }
 
     // Configure Sparticuz Chromium for Vercel Serverless Environments
-    // Using default configurations tailored for AWS Lambda / Vercel Serverless
-    const isDev = process.env.NODE_ENV === 'development';
-    const executablePath = isDev 
+    const isLocal = process.platform === "win32" || process.env.NODE_ENV === 'development';
+    const executablePath = isLocal 
       ? 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe' 
       : await chromium.executablePath();
     
