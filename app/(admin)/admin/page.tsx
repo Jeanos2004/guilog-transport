@@ -320,6 +320,20 @@ export default function AdminPage() {
     setGallery(await db.getGallery());
       setStudents(await db.getStudents());
       setPayments(await studentDb.getPayments());
+
+    try {
+      const res = await fetch('/api/sms/balance');
+      if (res.ok) {
+        const data = await res.json();
+        setSmsBalance(data.solde);
+      }
+    } catch (e) {
+      console.error('Failed to load SMS balance', e);
+    }
+
+
+
+
     
     
     
@@ -588,6 +602,19 @@ export default function AdminPage() {
         });
         setPayments(await studentDb.getPayments());
       }
+
+          // [Automated SMS for Payment]
+          if (student?.phone) {
+            fetch('/api/sms/send', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                contact: student.phone,
+                message: `CFIG - Nous avons bien reçu votre paiement de ${amount.toLocaleString()} GNF pour la formation ${courseName}. Merci !`
+              })
+            }).catch(e => console.error("SMS Payment Error:", e));
+          }
+
       
       const updatedStudents = await db.getStudents();
       setStudents(updatedStudents);
@@ -687,7 +714,19 @@ export default function AdminPage() {
       // 4. Mark request as converted
       await handleUpdateInscriptionStatus(leadToConvert.id, "Validé");
 
-      // 5. Trigger Email Notification (Conversion)
+      
+        // [Automated SMS for Conversion]
+        if (leadToConvert.phone) {
+          fetch('/api/sms/send', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              contact: leadToConvert.phone,
+              message: `Félicitations ${leadToConvert.fullName}, votre inscription est validée ! Consultez vos emails pour vos identifiants d'accès. - CFIG`
+            })
+          }).catch(e => console.error("SMS Conversion Error:", e));
+        }
+        // 5. Trigger Email Notification (Conversion)
       fetch('/api/email', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -1698,7 +1737,8 @@ export default function AdminPage() {
                       { title: "Apprenants Formés", val: ((settings?.apprenantsForme || 540) + validatedInscriptionsCount).toString(), desc: "Total cumulé", trend: "+12% ce mois", icon: <Users className="w-5 h-5 text-[var(--color-primary)]" />, bg: "bg-[var(--color-primary)]/5" },
                       { title: "Modules de Formation", val: modulesCount.toString(), desc: "Catalogue actif", trend: "Mis à jour", icon: <BookOpen className="w-5 h-5 text-[var(--color-accent)]" />, bg: "bg-[var(--color-accent)]/5" },
                       { title: "Inscriptions en Attente", val: pendingInscriptionsCount.toString(), desc: "Dossiers à traiter", trend: pendingInscriptionsCount > 0 ? "Action requise" : "À jour", icon: <ClipboardList className={`w-5 h-5 ${pendingInscriptionsCount > 0 ? "text-amber-600" : "text-gray-400"}`} />, bg: pendingInscriptionsCount > 0 ? "bg-amber-50" : "bg-gray-50", warning: pendingInscriptionsCount > 0 },
-                      { title: "Nouveaux Messages", val: unreadMessagesCount.toString(), desc: "Boîte de réception", trend: unreadMessagesCount > 0 ? "Non lus" : "Aucun", icon: <Mail className={`w-5 h-5 ${unreadMessagesCount > 0 ? "text-red-600" : "text-gray-400"}`} />, bg: unreadMessagesCount > 0 ? "bg-red-50" : "bg-gray-50", alert: unreadMessagesCount > 0 }
+                      { title: "Nouveaux Messages", val: unreadMessagesCount.toString(), desc: "Boîte de réception", trend: unreadMessagesCount > 0 ? "Non lus" : "Aucun", icon: <Mail className={`w-5 h-5 ${unreadMessagesCount > 0 ? "text-red-600" : "text-gray-400"}`} />, bg: unreadMessagesCount > 0 ? "bg-red-50" : "bg-gray-50", alert: unreadMessagesCount > 0 },
+                        { title: "Solde SMS", val: smsBalance !== null ? `${smsBalance}` : "...", desc: "Crédits restants", trend: "PASSEINFO", icon: <MessageSquare className="w-5 h-5 text-orange-600" />, bg: "bg-orange-50" }
                     ].map((stat, i) => (
                       <div key={i} className={`p-6 rounded-none shadow-sm border border-gray-100 ${stat.bg} relative overflow-hidden group hover:shadow-md transition-all`}>
                         {stat.warning && <div className="absolute top-0 right-0 w-3 h-3 bg-amber-500 rounded-bl-lg"></div>}
