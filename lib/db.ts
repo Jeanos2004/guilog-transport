@@ -23,6 +23,7 @@ export interface FormationDetails {
   }[];
   duree?: string;                 // Ex: "2 mois", "80 heures"
   dateDebut?: string;             // Ex: "15 Juillet 2026"
+  dateFin?: string;               // Ex: "30 Août 2026"
   calendrier?: string;            // Ex: "Lundi, Mercredi, Vendredi"
   horaires?: string;              // Ex: "18h00 – 20h00"
   statutInscription?: "Ouverte" | "Fermée"; // Contrôle le bouton d'inscription

@@ -292,6 +292,8 @@ export const studentDb = {
 
       publicCategories.forEach(cat => {
         cat.modules.forEach(mod => {
+          if (mod.details?.statutInscription === "Fermée") return;
+          
           // Use mod.id if it exists, otherwise generate a slug
           const slug = (cat.categorie + "-" + mod.titre).toLowerCase().replace(/[^a-z0-9]/g, "-");
           const id = mod.id || slug;

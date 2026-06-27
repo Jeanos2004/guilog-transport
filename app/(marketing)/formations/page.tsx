@@ -127,9 +127,16 @@ export default function FormationsPage() {
                         alt={formation.titre}
                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                       />
-                      <span className="absolute top-0 left-0 bg-[var(--color-primary)] text-white text-[9px] font-bold px-3 py-1.5 uppercase tracking-wider">
-                        {formation.categorie}
-                      </span>
+                      <div className="absolute top-0 left-0 flex items-center">
+                        <span className="bg-[var(--color-primary)] text-white text-[9px] font-bold px-3 py-1.5 uppercase tracking-wider">
+                          {formation.categorie}
+                        </span>
+                        {formation.details?.statutInscription === "Fermée" && (
+                          <span className="bg-red-600 text-white text-[9px] font-bold px-3 py-1.5 uppercase tracking-wider">
+                            Fermée
+                          </span>
+                        )}
+                      </div>
                     </div>
 
                     {/* Body */}

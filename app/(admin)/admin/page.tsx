@@ -260,7 +260,17 @@ export default function AdminPage() {
   const [newModuleStatutInscription, setNewModuleStatutInscription] = useState<"Ouverte" | "Fermée">("Ouverte");
   // Onglet 2 — Fiche Technique
   const [newModuleDuree, setNewModuleDuree] = useState("");
-  const [newModuleDateDebut, setNewModuleDateDebut] = useState("");
+  
+  const [scheduleModalOpen, setScheduleModalOpen] = useState(false);
+  const [scheduleModuleId, setScheduleModuleId] = useState("");
+  const [scheduleModuleName, setScheduleModuleName] = useState("");
+  const [scheduleDate, setScheduleDate] = useState("");
+  const [scheduleTime, setScheduleTime] = useState("");
+  const [scheduleLocation, setScheduleLocation] = useState("");
+  const [isScheduling, setIsScheduling] = useState(false);
+
+const [newModuleDateDebut, setNewModuleDateDebut] = useState("");
+  const [newModuleDateFin, setNewModuleDateFin] = useState("");
   const [newModuleCalendrier, setNewModuleCalendrier] = useState("");
   const [newModuleHoraires, setNewModuleHoraires] = useState("");
   const [newModulePlanning, setNewModulePlanning] = useState<{ jour: string; horaire: string }[]>([]);
@@ -665,6 +675,42 @@ export default function AdminPage() {
     }
   };
 
+  
+  const handleScheduleSession = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!scheduleModuleId || !scheduleDate || !scheduleTime) return;
+    setIsScheduling(true);
+    try {
+      const allStudents = await db.getStudents();
+      const enrolledStudents = allStudents.filter(s => s.enrolledCourses.includes(scheduleModuleId));
+      
+      const promises = enrolledStudents.map(student => {
+        if (student.phone) {
+          return fetch('/api/sms/send', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              contact: student.phone,
+              message: `CFIG - Séance programmée pour le cours ${scheduleModuleName} le ${scheduleDate} à ${scheduleTime}. Soyez à l'heure ! ${scheduleLocation ? 'Lieu/Lien: ' + scheduleLocation : ''}`
+            })
+          });
+        }
+        return Promise.resolve();
+      });
+      await Promise.all(promises);
+      alert(`Séance programmée et SMS envoyés à ${enrolledStudents.length} étudiant(s) avec succès !`);
+      setScheduleModalOpen(false);
+      setScheduleDate("");
+      setScheduleTime("");
+      setScheduleLocation("");
+    } catch (e) {
+      console.error(e);
+      alert("Erreur lors de la programmation de la séance.");
+    } finally {
+      setIsScheduling(false);
+    }
+  };
+
   const handleConvertLead = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!leadToConvert || !leadPassword || !leadCourseId) return;
@@ -788,7 +834,8 @@ export default function AdminPage() {
     setNewModuleTitle(""); setNewModuleCategory(""); setNewModuleOutils("");
     setNewModulePrix(""); setNewModulePrixInscription(""); setNewModuleMethodePaiement("");
     setNewModuleImage(""); setNewModuleStatutInscription("Ouverte");
-    setNewModuleDuree(""); setNewModuleDateDebut(""); setNewModuleCalendrier(""); setNewModuleHoraires("");
+    setNewModuleDuree(""); setNewModuleDateDebut("");
+    setNewModuleDateFin(""); setNewModuleCalendrier(""); setNewModuleHoraires("");
     setNewModulePresentation(""); setNewModuleObjectifs(""); setNewModulePrerequis(""); setNewModulePublicCible("");
     setNewModuleDebouches("");
     setNewModulePlanning([]);
@@ -892,6 +939,7 @@ export default function AdminPage() {
     setNewModuleStatutInscription(d?.statutInscription ?? "Ouverte");
     setNewModuleDuree(d?.duree ?? "");
     setNewModuleDateDebut(d?.dateDebut ?? "");
+    setNewModuleDateFin(d?.dateFin ?? "");
     setNewModulePresentation(d?.presentation ?? "");
     const initialPlanning = d?.planning ?? (
       d?.calendrier 
