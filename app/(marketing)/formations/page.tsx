@@ -44,6 +44,7 @@ export default function FormationsPage() {
   const filteredFormations = formations.reduce((acc, cat) => {
     if (activeCategory === "Tous" || activeCategory === cat.categorie) {
       cat.modules.forEach((mod: any) => {
+        if (mod.details?.statutInscription === "Fermée") return;
         acc.push({
           ...mod,
           categorie: cat.categorie,

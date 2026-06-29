@@ -4,6 +4,8 @@ import { useState, useEffect } from "react";
 import { StudentCourse } from "@/lib/studentDb";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, CreditCard, Smartphone, CheckCircle, RefreshCw, ChevronRight } from "lucide-react";
+import { auth } from "@/lib/firebase";
+
 
 interface PaymentModalProps {
   course: StudentCourse;
@@ -22,6 +24,8 @@ export default function PaymentModal({ course, isOpen, onClose, onSuccess }: Pay
   const [otp, setOtp] = useState("");
   const [loading, setLoading] = useState(false);
   const [countdown, setCountdown] = useState(15);
+  const [transactionId, setTransactionId] = useState("");
+  const [polling, setPolling] = useState(false);
 
   useEffect(() => {
     if (step === "otp" && countdown > 0) {
@@ -30,31 +34,107 @@ export default function PaymentModal({ course, isOpen, onClose, onSuccess }: Pay
     }
   }, [step, countdown]);
 
+  useEffect(() => {
+    let interval: any;
+    if (polling && transactionId && step === "otp") {
+      interval = setInterval(async () => {
+        try {
+          const res = await fetch(`/api/djomy/status?transactionId=${transactionId}`);
+          const data = await res.json();
+          if (data.status === "SUCCESS") {
+            setPolling(false);
+            setStep("success");
+            onSuccess(); // Call success
+          } else if (data.status === "FAILED") {
+            setPolling(false);
+            alert("Le paiement a été refusé ou a échoué.");
+            setStep("method");
+          }
+        } catch (e) {
+          console.error(e);
+        }
+      }, 5000); // poll every 5s
+    }
+    return () => clearInterval(interval);
+  }, [polling, transactionId, step, onSuccess]);
+
+
   if (!isOpen) return null;
 
-  const handleNext = () => {
+  
+  const handleNext = async () => {
     if (step === "method") {
       setStep("details");
     } else if (step === "details") {
-      if (method === "card") {
-        setLoading(true);
-        setTimeout(() => {
-          setLoading(false);
-          setStep("success");
-        }, 2000);
-      } else {
-        if (!phone) return;
-        setStep("otp");
-        setCountdown(15);
+      setLoading(true);
+      try {
+        const currentUser = auth.currentUser;
+        if (!currentUser) throw new Error("Vous devez être connecté");
+
+        const res = await fetch('/api/djomy/init', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            paymentMethod: method,
+            amount: course.price,
+            phone: phone,
+            courseId: course.id,
+            userId: currentUser.uid
+          })
+        });
+
+        const data = await res.json();
+        
+        if (!res.ok) {
+          throw new Error(data.error || "Erreur de paiement");
+        }
+
+        if (method === "card") {
+          // Redirect for Card Gateway Payment
+          if (data.redirectUrl) {
+            window.location.href = data.redirectUrl;
+          } else {
+            throw new Error("Lien de paiement introuvable");
+          }
+        } else {
+          // Direct Payment for OM/MOMO
+          if (!phone) return;
+          setTransactionId(data.transactionId); // Assuming Djomy returns transactionId
+          setStep("otp");
+          setCountdown(120); // 2 minutes for mobile money
+          setPolling(true);
+        }
+      } catch (err: any) {
+        alert(err.message);
+      } finally {
+        setLoading(false);
       }
     } else if (step === "otp") {
       setLoading(true);
-      setTimeout(() => {
+      // Wait for webhook or polling to finish
+      // For now we just let the polling handle success, but we can manually check status
+      try {
+        const res = await fetch(`/api/djomy/status?transactionId=${transactionId}`);
+        const data = await res.json();
+        if (data.status === "SUCCESS") {
+          setPolling(false);
+          setLoading(false);
+          setStep("success");
+          onSuccess(); // call to enroll in UI
+        } else if (data.status === "FAILED") {
+          alert("Le paiement a échoué.");
+          setLoading(false);
+          setStep("method");
+        } else {
+          alert("Paiement toujours en attente...");
+          setLoading(false);
+        }
+      } catch (err) {
         setLoading(false);
-        setStep("success");
-      }, 2000);
+      }
     }
   };
+
 
   const handleFinish = () => {
     onSuccess();
@@ -255,20 +335,14 @@ export default function PaymentModal({ course, isOpen, onClose, onSuccess }: Pay
                   </p>
                 </div>
 
-                <div className="w-4/5 mx-auto bg-gray-50 border border-gray-200 p-4 rounded-none shadow-sm">
-                  <label className="block text-[10px] font-bold uppercase tracking-wider text-gray-400 mb-2">Entrez le code OTP reçu par SMS</label>
-                  <input
-                    type="text"
-                    maxLength={6}
-                    className="w-full bg-white border border-gray-300 px-4 py-2.5 text-center text-sm font-mono tracking-widest font-extrabold focus:outline-none focus:border-[var(--color-primary)] rounded-none shadow-sm"
-                    placeholder="000000"
-                    value={otp}
-                    onChange={(e) => setOtp(e.target.value)}
-                  />
+                
+                <div className="w-4/5 mx-auto p-4 rounded-none">
+                  <p className="text-xs text-gray-500 font-bold mb-2">En attente de confirmation sur votre téléphone...</p>
                   <div className="text-[10px] text-gray-405 mt-2">
-                    Le code expire dans <span className="font-bold text-red-500">{countdown}s</span>
+                    Expiration dans <span className="font-bold text-red-500">{countdown}s</span>
                   </div>
                 </div>
+
               </motion.div>
             )}
 
@@ -338,7 +412,7 @@ export default function PaymentModal({ course, isOpen, onClose, onSuccess }: Pay
                 {loading ? (
                   <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
                 ) : (
-                  <span>Valider le code</span>
+                  <span>Vérifier le statut</span>
                 )}
               </button>
             </>

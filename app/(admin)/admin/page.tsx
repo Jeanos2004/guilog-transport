@@ -611,21 +611,20 @@ const [newModuleDateDebut, setNewModuleDateDebut] = useState("");
           date: new Date().toISOString()
         });
         setPayments(await studentDb.getPayments());
+
+        // [Automated SMS for Payment]
+        if (student?.phone) {
+          fetch('/api/sms/send', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              contact: student.phone,
+              message: `CFIG - Nous avons bien reçu votre paiement de ${amount.toLocaleString()} GNF pour la formation ${courseName}. Merci !`
+            })
+          }).catch(e => console.error("SMS Payment Error:", e));
+        }
       }
 
-          // [Automated SMS for Payment]
-          if (student?.phone) {
-            fetch('/api/sms/send', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({
-                contact: student.phone,
-                message: `CFIG - Nous avons bien reçu votre paiement de ${amount.toLocaleString()} GNF pour la formation ${courseName}. Merci !`
-              })
-            }).catch(e => console.error("SMS Payment Error:", e));
-          }
-
-      
       const updatedStudents = await db.getStudents();
       setStudents(updatedStudents);
       const updatedSelectedStudent = updatedStudents.find(s => s.uid === studentUid);
@@ -1219,6 +1218,7 @@ const [newModuleDateDebut, setNewModuleDateDebut] = useState("");
 
     formations.forEach((cat, catIndex) => {
       cat.modules.forEach((mod, modIndex) => {
+          if (mod.details?.statutInscription === "Fermée") return;
         if (mod.details?.planning) {
           mod.details.planning.forEach((p: any) => {
             const isToday = p.jour.toLowerCase() === todayName.toLowerCase();
@@ -2639,7 +2639,12 @@ const [newModuleDateDebut, setNewModuleDateDebut] = useState("");
                                 </div>
                               )}
                               <div className="min-w-0">
-                                <h4 className="font-bold text-xs text-gray-800 leading-snug">{mod.titre}</h4>
+                                <div className="flex items-center gap-2 mb-1">
+                                  <h4 className="font-bold text-xs text-gray-800 leading-snug">{mod.titre}</h4>
+                                  <span className={`px-1.5 py-0.5 text-[8px] font-bold uppercase tracking-wider text-white ${mod.details?.statutInscription === 'Fermée' ? 'bg-red-500' : 'bg-green-500'}`}>
+                                    {mod.details?.statutInscription === 'Fermée' ? 'Fermée' : 'Ouverte'}
+                                  </span>
+                                </div>
                                 {mod.prix !== undefined && (
                                   <span className="inline-block mt-1 text-[9px] font-bold text-[var(--color-accent)] bg-orange-50 border border-orange-200 px-1.5 py-0.5">
                                     {mod.prix.toLocaleString('fr-GN')} GNF
@@ -3567,7 +3572,7 @@ const [newModuleDateDebut, setNewModuleDateDebut] = useState("");
                         <h4 className="text-xs font-bold text-gray-900 uppercase">Séances & Agenda</h4>
                         <p className="text-[10px] text-gray-500">Ajoutez les dates, heures, lieux et liens Zoom des séances.</p>
                       </div>
-                      <button type="button" onClick={() => setNewModuleSessions([...newModuleSessions, { id: 'session-'+Date.now(), title: 'Nouvelle séance', date: new Date().toISOString(), duration: '2 heures', location: 'Siège CFIG', meetUrl: '', resources: [] }])} className="flex items-center gap-1.5 px-3 py-1.5 bg-gray-900 text-white text-[10px] uppercase font-bold hover:bg-[var(--color-primary)] transition-colors">
+                      <button type="button" disabled={newModuleStatutInscription === 'Fermée'} onClick={() => setNewModuleSessions([...newModuleSessions, { id: 'session-'+Date.now(), title: 'Nouvelle séance', date: new Date().toISOString(), duration: '2 heures', location: 'Siège CFIG', meetUrl: '', resources: [] }])} className="flex items-center gap-1.5 px-3 py-1.5 bg-gray-900 text-white text-[10px] uppercase font-bold hover:bg-[var(--color-primary)] transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
                         <Plus className="w-3.5 h-3.5" /> Nouvelle Séance
                       </button>
                     </div>

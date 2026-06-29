@@ -106,7 +106,7 @@ export default function StudentCertificatesPage() {
                   {enrolledCourses.map(c => {
                     const completed = getCompletedCount(c.id);
                     const total = getTotalCount(c);
-                    const percent = Math.round((completed / total) * 100);
+                    const percent = total > 0 ? Math.round((completed / total) * 100) : 0;
                     return (
                       <div key={c.id} className="p-4 bg-slate-50/50 rounded-none flex items-center justify-between border border-slate-200 shadow-sm">
                         <div>
