@@ -1,9 +1,11 @@
 import crypto from 'crypto';
 
-const CLIENT_ID = process.env.DJOMY_CLIENT_ID || "";
-const CLIENT_SECRET = process.env.DJOMY_CLIENT_SECRET || "";
+const IS_SANDBOX = process.env.DJOMY_ENV === "sandbox";
+
+const CLIENT_ID = IS_SANDBOX ? process.env.DJOMY_SANDBOX_CLIENT_ID || "" : process.env.DJOMY_CLIENT_ID || "";
+const CLIENT_SECRET = IS_SANDBOX ? process.env.DJOMY_SANDBOX_CLIENT_SECRET || "" : process.env.DJOMY_CLIENT_SECRET || "";
 const PARTNER_DOMAIN = process.env.DJOMY_PARTNER_DOMAIN || "";
-const API_URL = process.env.DJOMY_API_URL || "https://api.djomy.africa";
+const API_URL = IS_SANDBOX ? "https://sandbox-api.djomy.africa" : (process.env.DJOMY_API_URL || "https://api.djomy.africa");
 
 /**
  * Generate HMAC-SHA256 signature
