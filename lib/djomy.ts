@@ -48,10 +48,9 @@ export async function getDjomyToken(): Promise<string> {
     throw new Error(`Failed to authenticate with Djomy: ${response.status}`);
   }
 
-  const data = await response.json();
-  // Assume the response returns a token in data.token or data.access_token
-  // Usually OAuth style endpoints return { access_token: "..." }
-  return data.access_token || data.token || "";
+  const responseData = await response.json();
+  // Djomy returns: { success: true, data: { accessToken: "..." } }
+  return responseData.data?.accessToken || responseData.access_token || responseData.token || "";
 }
 
 /**
@@ -107,7 +106,8 @@ export async function initiateDirectPayment(payload: {
  */
 export async function initiateGatewayPayment(payload: {
   amount: number,
-  payerNumber: string,
+  payerNumber?: string,
+  allowedPaymentMethods?: string[],
   description?: string,
   merchantPaymentReference: string,
   returnUrl: string,
@@ -121,7 +121,7 @@ export async function initiateGatewayPayment(payload: {
     amount: payload.amount,
     countryCode: "GN",
     payerNumber: payload.payerNumber || "0022400000000",
-    allowedPaymentMethods: ["CARD"],
+    allowedPaymentMethods: payload.allowedPaymentMethods || ["CARD", "OM", "MOMO"],
     description: payload.description || "Paiement de formation CFIG",
     merchantPaymentReference: payload.merchantPaymentReference,
     returnUrl: payload.returnUrl,

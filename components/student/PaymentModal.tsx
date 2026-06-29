@@ -41,11 +41,12 @@ export default function PaymentModal({ course, isOpen, onClose, onSuccess }: Pay
         try {
           const res = await fetch(`/api/djomy/status?transactionId=${transactionId}`);
           const data = await res.json();
-          if (data.status === "SUCCESS") {
+          const paymentStatus = data.data?.status || data.status;
+          if (paymentStatus === "SUCCESS") {
             setPolling(false);
             setStep("success");
             onSuccess(); // Call success
-          } else if (data.status === "FAILED") {
+          } else if (paymentStatus === "FAILED" || paymentStatus === "REFUSED") {
             setPolling(false);
             alert("Le paiement a été refusé ou a échoué.");
             setStep("method");
@@ -89,20 +90,12 @@ export default function PaymentModal({ course, isOpen, onClose, onSuccess }: Pay
           throw new Error(data.error || "Erreur de paiement");
         }
 
-        if (method === "card") {
-          // Redirect for Card Gateway Payment
-          if (data.redirectUrl) {
-            window.location.href = data.redirectUrl;
-          } else {
-            throw new Error("Lien de paiement introuvable");
-          }
+        // All methods now use the Djomy Gateway Payment Link
+        const redirectUrl = data.data?.redirectUrl || data.redirectUrl;
+        if (redirectUrl) {
+          window.location.href = redirectUrl;
         } else {
-          // Direct Payment for OM/MOMO
-          if (!phone) return;
-          setTransactionId(data.transactionId); // Assuming Djomy returns transactionId
-          setStep("otp");
-          setCountdown(120); // 2 minutes for mobile money
-          setPolling(true);
+          throw new Error("Lien de paiement introuvable");
         }
       } catch (err: any) {
         alert(err.message);
@@ -116,12 +109,13 @@ export default function PaymentModal({ course, isOpen, onClose, onSuccess }: Pay
       try {
         const res = await fetch(`/api/djomy/status?transactionId=${transactionId}`);
         const data = await res.json();
-        if (data.status === "SUCCESS") {
+        const paymentStatus = data.data?.status || data.status;
+        if (paymentStatus === "SUCCESS") {
           setPolling(false);
           setLoading(false);
           setStep("success");
           onSuccess(); // call to enroll in UI
-        } else if (data.status === "FAILED") {
+        } else if (paymentStatus === "FAILED" || paymentStatus === "REFUSED") {
           alert("Le paiement a échoué.");
           setLoading(false);
           setStep("method");
