@@ -170,8 +170,8 @@ export default function GaleriePage() {
                     onClick={() => setActiveCategory(cat)}
                     className={`flex items-center gap-2 px-5 py-2.5 text-xs font-bold uppercase tracking-wider transition-all duration-200 border ${
                       activeCategory === cat
-                        ? "bg-[var(--color-primary)] text-white border-[var(--color-primary)] shadow-md"
-                        : "bg-white text-gray-500 border-gray-200 hover:border-[var(--color-primary)] hover:text-[var(--color-primary)]"
+                        ? "bg-[var(--color-primary)] text-white border-[var(--color-primary)]"
+                        : "bg-white text-gray-500 border-gray-200 hover:text-gray-900"
                     }`}
                   >
                     {cat !== "Tous" && (
@@ -215,18 +215,18 @@ export default function GaleriePage() {
                   <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
                     <button
                       onClick={() => setSelectedAlbum(null)}
-                      className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-gray-500 hover:text-[var(--color-primary)] transition-colors self-start border border-gray-200 bg-white px-4 py-2 hover:border-gray-300 shadow-sm"
+                      className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-gray-500 hover:text-gray-900 transition-colors self-start border border-gray-200 bg-white px-4 py-2 hover:border-gray-300"
                     >
                       <ArrowLeft className="w-4 h-4" /> Retour aux dossiers
                     </button>
-                    <div className="flex items-center gap-2 bg-[var(--color-primary)]/10 text-[var(--color-primary)] px-3 py-1 rounded-sm text-[10px] font-bold uppercase tracking-widest self-start">
+                    <div className="flex items-center gap-2 bg-[var(--color-primary)]/10 text-gray-900 px-3 py-1 rounded-sm text-[10px] font-bold uppercase tracking-widest self-start">
                       {getCategoryIcon(currentAlbum.category)}
                       {currentAlbum.category}
                     </div>
                   </div>
 
                   <div className="mb-10 pb-6 border-b border-gray-100">
-                    <h2 className="text-3xl md:text-4xl font-heading font-bold text-[var(--color-primary)] mb-2">
+                    <h2 className="text-3xl md:text-4xl font-heading font-bold text-gray-900 mb-2">
                       {currentAlbum.title}
                     </h2>
                     <p className="text-xs text-gray-400 font-medium uppercase tracking-widest">
@@ -250,7 +250,7 @@ export default function GaleriePage() {
                 // Grid of Album Folder Cards
                 <div>
                   {filteredAlbums.length === 0 ? (
-                    <div className="py-24 text-center bg-white border border-gray-100 shadow-sm">
+                    <div className="py-24 text-center bg-white border border-gray-100">
                       <ImageIcon className="w-12 h-12 mx-auto text-gray-300 mb-4" />
                       <p className="text-gray-500 font-medium text-lg">Aucun dossier trouvé.</p>
                       <p className="text-sm text-gray-400 mt-1">Revenez bientôt pour découvrir nos médias !</p>
@@ -294,7 +294,7 @@ export default function GaleriePage() {
               onClick={(e) => e.stopPropagation()}
             >
               {/* Media */}
-              <div className="relative w-full rounded-xl overflow-hidden shadow-2xl bg-black" style={{ maxHeight: "75vh" }}>
+              <div className="relative w-full rounded-xl overflow-hidden bg-black" style={{ maxHeight: "75vh" }}>
                 {lightboxItem.mediaType === "video" ? (
                   <video src={lightboxItem.mediaUrl} controls autoPlay className="w-full max-h-[75vh] object-contain" />
                 ) : (
@@ -370,13 +370,13 @@ function GalleryTile({ item, index, onClick }: { item: GalleryItem; index: numbe
       viewport={{ once: true, margin: "-40px" }}
       transition={{ duration: 0.35, delay: Math.min(index * 0.06, 0.3) }}
       onClick={onClick}
-      className="group relative aspect-video overflow-hidden rounded-xl cursor-pointer bg-gray-200 shadow-sm hover:shadow-xl transition-shadow duration-300"
+      className="group relative aspect-video overflow-hidden rounded-xl cursor-pointer bg-gray-200 hover: transition-shadow duration-300"
     >
       {/* Media */}
       {isVideo ? (
         <video
           src={item.mediaUrl}
-          className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+          className="absolute inset-0 w-full h-full object-cover transition-transform duration-500"
           preload="metadata"
           muted
           loop
@@ -388,7 +388,7 @@ function GalleryTile({ item, index, onClick }: { item: GalleryItem; index: numbe
         <img
           src={item.mediaUrl}
           alt={item.title}
-          className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+          className="absolute inset-0 w-full h-full object-cover transition-transform duration-500"
           loading="lazy"
         />
       )}
@@ -412,7 +412,7 @@ function GalleryTile({ item, index, onClick }: { item: GalleryItem; index: numbe
       {/* Play button overlay for video on hover */}
       {isVideo && (
         <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none">
-          <div className="w-12 h-12 rounded-full bg-white/25 backdrop-blur-md flex items-center justify-center border-2 border-white/60 shadow-xl">
+          <div className="w-12 h-12 rounded-full bg-white/25 backdrop-blur-md flex items-center justify-center border-2 border-white/60">
             <Play className="w-5 h-5 text-white fill-white ml-0.5" />
           </div>
         </div>
@@ -442,11 +442,11 @@ function AlbumFolderCard({
       className="group relative cursor-pointer"
     >
       {/* Folder stacked papers effect */}
-      <div className="absolute inset-0 bg-white border border-gray-200 shadow-md rounded-none translate-x-2 translate-y-2 group-hover:translate-x-3 group-hover:translate-y-3 transition-transform duration-300 pointer-events-none" />
-      <div className="absolute inset-0 bg-white border border-gray-200 shadow-sm rounded-none translate-x-1 translate-y-1 group-hover:translate-x-1.5 group-hover:translate-y-1.5 transition-transform duration-300 pointer-events-none" />
+      <div className="absolute inset-0 bg-white border border-gray-200 rounded-none translate-x-2 translate-y-2 group-hover:translate-x-3 group-hover:translate-y-3 transition-transform duration-300 pointer-events-none" />
+      <div className="absolute inset-0 bg-white border border-gray-200 rounded-none translate-x-1 translate-y-1 group-hover:translate-x-1.5 group-hover:translate-y-1.5 transition-transform duration-300 pointer-events-none" />
 
       {/* Main folder card */}
-      <div className="relative bg-white border border-gray-200 shadow-sm rounded-none overflow-hidden transition-all duration-300 group-hover:-translate-y-1 group-hover:border-[var(--color-primary)]">
+      <div className="relative bg-white border border-gray-200 rounded-none overflow-hidden transition-all duration-300 group-">
         {/* Cover image area */}
         <div className="relative aspect-[4/3] bg-gray-100 overflow-hidden">
           {coverItem ? (
@@ -461,7 +461,7 @@ function AlbumFolderCard({
               <img
                 src={coverItem.mediaUrl}
                 alt={album.title}
-                className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                className="w-full h-full object-cover transition-transform duration-500"
                 loading="lazy"
               />
             )
@@ -475,7 +475,7 @@ function AlbumFolderCard({
           <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/35 to-transparent" />
 
           {/* Folder Category Tag (Top Right) */}
-          <div className="absolute top-3 right-3 bg-[var(--color-primary)] text-white text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 shadow-md flex items-center gap-1">
+          <div className="absolute top-3 right-3 bg-[var(--color-primary)] text-white text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 flex items-center gap-1">
             {getCategoryIcon(album.category)}
             {album.category}
           </div>
@@ -486,14 +486,14 @@ function AlbumFolderCard({
           </div>
 
           {/* Count badge (Bottom Right) */}
-          <div className="absolute bottom-3 right-3 bg-[var(--color-accent)] text-white text-[9px] font-bold uppercase tracking-wider px-2 py-1 flex items-center gap-1 shadow-sm">
+          <div className="absolute bottom-3 right-3 bg-[var(--color-accent)] text-white text-[9px] font-bold uppercase tracking-wider px-2 py-1 flex items-center gap-1">
             {totalCount} média{totalCount > 1 ? "s" : ""}
           </div>
         </div>
 
         {/* Text Area */}
         <div className="p-4 bg-white border-t border-gray-100">
-          <h3 className="text-sm font-bold text-[var(--color-primary)] group-hover:text-[var(--color-accent)] transition-colors line-clamp-1">
+          <h3 className="text-sm font-bold text-gray-900 group-hover:text-[var(--color-primary)] transition-colors line-clamp-1">
             {album.title}
           </h3>
           <div className="flex items-center gap-2 mt-1 text-[10px] text-gray-400 font-semibold uppercase tracking-wider">

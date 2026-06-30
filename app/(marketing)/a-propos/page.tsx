@@ -23,8 +23,9 @@ export default function AboutPage() {
           fill
           sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
           priority
-          className="object-cover opacity-20"
-        />
+          className="object-cover" />
+        <div className="absolute inset-0 bg-gradient-to-r from-[var(--color-primary)]/95 via-[var(--color-primary)]/70 to-transparent" />
+        <div className="absolute inset-0 bg-black/20" />
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <motion.div initial="hidden" animate="show" variants={fadeUp}>
             <h1 className="text-4xl md:text-5xl font-heading font-bold text-white mb-4">À Propos du Cabinet Guilogtrans</h1>
@@ -60,13 +61,13 @@ export default function AboutPage() {
               initial={{ opacity: 0, x: 30 }}
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true }}
-              className="bg-white border border-gray-200 rounded-none shadow-sm flex flex-col hover:shadow-md transition-all duration-300"
+              className="bg-white border border-gray-200 rounded-none flex flex-col hover: transition-all duration-300"
             >
               <div className="bg-blue-50/60 border-b border-blue-100 p-6 flex items-center gap-4">
                 <div className="w-12 h-12 rounded-none bg-blue-100 flex items-center justify-center text-[var(--color-accent)]">
                   <GraduationCap className="w-6 h-6" />
                 </div>
-                <h3 className="text-xl font-heading font-bold text-[var(--color-primary)]">Notre Approche</h3>
+                <h3 className="text-xl font-heading font-bold text-gray-900">Notre Approche</h3>
               </div>
               <div className="p-8 flex-grow">
                 <ul className="space-y-6">
@@ -75,7 +76,7 @@ export default function AboutPage() {
                       <Target className="w-5 h-5" />
                     </div>
                     <div>
-                      <h4 className="font-bold text-[var(--color-primary)] text-sm">Holistique</h4>
+                      <h4 className="font-bold text-gray-900 text-sm">Holistique</h4>
                       <p className="text-xs text-gray-550 mt-1">Une vision globale des défis de votre entreprise.</p>
                     </div>
                   </li>
@@ -84,7 +85,7 @@ export default function AboutPage() {
                       <Briefcase className="w-5 h-5" />
                     </div>
                     <div>
-                      <h4 className="font-bold text-[var(--color-primary)] text-sm">Pratique</h4>
+                      <h4 className="font-bold text-gray-900 text-sm">Pratique</h4>
                       <p className="text-xs text-gray-550 mt-1">Des formations axées sur la pratique et l'utilisation d'outils réels.</p>
                     </div>
                   </li>
@@ -93,7 +94,7 @@ export default function AboutPage() {
                       <LifeBuoy className="w-5 h-5" />
                     </div>
                     <div>
-                      <h4 className="font-bold text-[var(--color-primary)] text-sm">Personnalisée</h4>
+                      <h4 className="font-bold text-gray-900 text-sm">Personnalisée</h4>
                       <p className="text-xs text-gray-550 mt-1">Des solutions de consultation adaptées à votre contexte spécifique.</p>
                     </div>
                   </li>
@@ -112,13 +113,13 @@ export default function AboutPage() {
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              className="bg-white border border-gray-200 rounded-none shadow-sm flex flex-col hover:shadow-md transition-all duration-300"
+              className="bg-white border border-gray-200 rounded-none flex flex-col hover: transition-all duration-300"
             >
               <div className="bg-red-50/60 border-b border-red-100 p-6 flex items-center gap-4">
                 <div className="w-12 h-12 rounded-none bg-red-100 flex items-center justify-center text-[var(--color-secondary)]">
                   <Target className="w-6 h-6" />
                 </div>
-                <h3 className="text-xl font-heading font-bold text-[var(--color-primary)]">Notre Mission</h3>
+                <h3 className="text-xl font-heading font-bold text-gray-900">Notre Mission</h3>
               </div>
               <div className="p-8 flex-grow">
                 <p className="text-gray-600 leading-relaxed text-sm">
@@ -132,13 +133,13 @@ export default function AboutPage() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: 0.2 }}
-              className="bg-white border border-gray-200 rounded-none shadow-sm flex flex-col hover:shadow-md transition-all duration-300"
+              className="bg-white border border-gray-200 rounded-none flex flex-col hover: transition-all duration-300"
             >
               <div className="bg-blue-50/60 border-b border-blue-100 p-6 flex items-center gap-4">
                 <div className="w-12 h-12 rounded-none bg-blue-100 flex items-center justify-center text-[var(--color-accent)]">
                   <Eye className="w-6 h-6" />
                 </div>
-                <h3 className="text-xl font-heading font-bold text-[var(--color-primary)]">Notre Vision</h3>
+                <h3 className="text-xl font-heading font-bold text-gray-900">Notre Vision</h3>
               </div>
               <div className="p-8 flex-grow">
                 <p className="text-gray-600 leading-relaxed text-sm">
@@ -171,12 +172,12 @@ export default function AboutPage() {
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ delay: index * 0.1 }}
-                  className="bg-[var(--color-surface)] p-8 rounded-xl text-center hover:shadow-lg transition-shadow"
+                  className="bg-[var(--color-surface)] p-8 rounded-xl text-center hover: transition-shadow"
                 >
                   <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-[var(--color-primary)] text-white mb-6">
                     {icons[service.icon]}
                   </div>
-                  <h3 className="text-xl font-bold text-[var(--color-primary)] mb-3">{service.title}</h3>
+                  <h3 className="text-xl font-bold text-gray-900 mb-3">{service.title}</h3>
                   <p className="text-sm text-gray-600">{service.description}</p>
                 </motion.div>
               );
@@ -189,7 +190,7 @@ export default function AboutPage() {
       <section className="py-24 bg-[#f5f7fa]">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
-            <h2 className="text-4xl md:text-5xl font-heading font-bold text-[var(--color-primary)] mb-3">Notre équipe</h2>
+            <h2 className="text-4xl md:text-5xl font-heading font-bold text-gray-900 mb-3">Notre équipe</h2>
             <div className="w-16 h-1 bg-gradient-to-r from-[var(--color-secondary)] to-[var(--color-accent)] mx-auto mt-4 rounded-full" />
           </div>
 
@@ -207,7 +208,7 @@ export default function AboutPage() {
                 <div className="relative mb-5">
                   {/* Outer gradient border */}
                   <div
-                    className="w-40 h-40 rounded-full p-[3px] shadow-lg"
+                    className="w-40 h-40 rounded-full p-[3px]"
                     style={{
                       background: "linear-gradient(135deg, #0B5C2E 0%, #C8102E 50%, #0B5C2E 100%)"
                     }}
@@ -226,7 +227,7 @@ export default function AboutPage() {
                 </div>
 
                 {/* Info */}
-                <h3 className="text-lg font-heading font-bold text-[var(--color-primary)] leading-tight mb-1">
+                <h3 className="text-lg font-heading font-bold text-gray-900 leading-tight mb-1">
                   {member.name}
                 </h3>
                 <p className="text-xs text-gray-500 font-medium mb-4 max-w-[140px] leading-relaxed">
@@ -239,7 +240,7 @@ export default function AboutPage() {
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label={`LinkedIn de ${member.name}`}
-                  className="flex items-center justify-center w-8 h-8 rounded-sm bg-[#0077B5] hover:bg-[#005f91] transition-colors shadow-sm"
+                  className="flex items-center justify-center w-8 h-8 rounded-sm bg-[#0077B5] hover:bg-[#005f91] transition-colors"
                 >
                   <svg className="w-4 h-4 text-white fill-current" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                     <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 0 1-2.063-2.065 2.064 2.064 0 1 1 2.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>

@@ -92,7 +92,7 @@ function InscriptionForm() {
   };
 
   return (
-    <div className="bg-white rounded-2xl shadow-xl overflow-hidden border border-gray-100">
+    <div className="bg-white rounded-2xl overflow-hidden border border-gray-100">
       {isSubmitted ? (
         <motion.div 
           initial={{ opacity: 0, scale: 0.9 }} 
@@ -102,7 +102,7 @@ function InscriptionForm() {
           <div className="w-20 h-20 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto mb-6">
             <CheckCircle className="w-10 h-10" />
           </div>
-          <h2 className="text-3xl font-heading font-bold text-[var(--color-primary)] mb-4">Demande envoyée !</h2>
+          <h2 className="text-3xl font-heading font-bold text-gray-900 mb-4">Demande envoyée !</h2>
           <p className="text-gray-600 mb-8 text-lg">
             Merci pour votre intérêt. Notre équipe vous contactera dans les plus brefs délais pour finaliser votre démarche.
           </p>
@@ -116,7 +116,7 @@ function InscriptionForm() {
       ) : (
         <div className="p-8 md:p-12">
           <div className="mb-8">
-            <h2 className="text-2xl font-bold text-[var(--color-primary)] mb-2">Formulaire de demande</h2>
+            <h2 className="text-2xl font-bold text-gray-900 mb-2">Formulaire de demande</h2>
             <p className="text-gray-600">Remplissez ce formulaire pour vous inscrire à une formation ou demander un devis personnalisé.</p>
           </div>
 
@@ -131,7 +131,7 @@ function InscriptionForm() {
                       type="radio"
                       value={type}
                       {...register("requestType")}
-                      className="w-4 h-4 text-[var(--color-primary)] border-gray-300 focus:ring-[var(--color-primary)]"
+                      className="w-4 h-4 text-gray-900 border-gray-300 focus:ring-[var(--color-primary)]"
                     />
                     <span className="ml-2 text-sm text-gray-700">{type}</span>
                   </label>
@@ -218,7 +218,7 @@ function InscriptionForm() {
             <button
               type="submit"
               disabled={isSubmitting}
-              className="w-full flex justify-center items-center py-3 px-4 border border-transparent rounded-md shadow-sm text-lg font-medium text-white bg-[var(--color-accent)] hover:bg-[var(--color-primary)] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[var(--color-accent)] transition-colors disabled:opacity-70"
+              className="w-full flex justify-center items-center py-3 px-4 border border-transparent rounded-md text-lg font-medium text-white bg-[var(--color-accent)] hover:bg-[var(--color-primary)] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[var(--color-accent)] transition-colors disabled:opacity-70"
             >
               {isSubmitting ? "Envoi en cours..." : (
                 <>
@@ -267,11 +267,11 @@ export default function InscriptionPage() {
       <div className="w-full lg:w-7/12 flex flex-col items-center p-6 sm:p-12 lg:py-16 bg-gray-50 overflow-y-auto">
         <div className="w-full max-w-2xl">
           <div className="lg:hidden mb-8 text-center sm:text-left">
-            <h1 className="text-3xl font-heading font-extrabold text-[var(--color-primary)] mb-2">Inscription & Devis</h1>
+            <h1 className="text-3xl font-heading font-extrabold text-gray-900 mb-2">Inscription & Devis</h1>
           </div>
 
           <Suspense fallback={
-            <div className="bg-white border border-gray-200 p-12 text-center shadow-sm rounded-2xl">
+            <div className="bg-white border border-gray-200 p-12 text-center rounded-2xl">
               <div className="w-8 h-8 border-4 border-[var(--color-accent)] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
               <p className="text-gray-500 text-sm">Chargement du formulaire...</p>
             </div>
@@ -285,7 +285,7 @@ export default function InscriptionPage() {
               href="https://wa.me/224626625162" 
               target="_blank" 
               rel="noopener noreferrer"
-              className="inline-flex items-center px-4 py-2 bg-[#25D366] text-white rounded-md font-medium hover:bg-green-600 transition-colors shadow-sm"
+              className="inline-flex items-center px-4 py-2 bg-[#25D366] text-white rounded-md font-medium hover:bg-green-600 transition-colors"
             >
               <MessageCircle className="w-5 h-5 mr-2" />
               +224 626 62 51 62

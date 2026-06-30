@@ -45,7 +45,7 @@ export default function ArticleDetailPage() {
   if (!article) {
     return (
       <div className="min-h-screen bg-[var(--color-gray)] py-24 flex flex-col items-center justify-center px-4">
-        <h2 className="text-2xl font-heading font-bold text-[var(--color-primary)] mb-2">Article non trouvé</h2>
+        <h2 className="text-2xl font-heading font-bold text-gray-900 mb-2">Article non trouvé</h2>
         <p className="text-gray-500 mb-8 text-center max-w-md">L'article de blog que vous recherchez n'existe pas ou a été supprimé.</p>
         <Link 
           href="/actualites"
@@ -103,7 +103,7 @@ export default function ArticleDetailPage() {
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
             
             {/* Left Content Column (2 cols) */}
-            <div className="lg:col-span-2 bg-white border border-gray-200 p-6 sm:p-10 shadow-sm space-y-8">
+            <div className="lg:col-span-2 bg-white border border-gray-200 p-6 sm:p-10 space-y-8">
               
               {/* Main Image */}
               <div className="relative h-72 sm:h-96 w-full overflow-hidden bg-gray-100">
@@ -134,8 +134,8 @@ export default function ArticleDetailPage() {
             <div className="space-y-6 lg:sticky lg:top-28">
               
               {/* Suggestion list */}
-              <div className="bg-white border border-gray-200 p-6 shadow-sm">
-                <h3 className="text-sm font-bold uppercase tracking-wider text-[var(--color-primary)] mb-5 border-b border-gray-100 pb-3">
+              <div className="bg-white border border-gray-200 p-6">
+                <h3 className="text-sm font-bold uppercase tracking-wider text-gray-900 mb-5 border-b border-gray-100 pb-3">
                   Articles Récents
                 </h3>
                 
@@ -152,14 +152,14 @@ export default function ArticleDetailPage() {
                           alt={recent.title}
                           fill
                           sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"  
-                          className="object-cover group-hover:scale-105 transition-transform duration-300"
+                          className="object-cover transition-transform duration-300"
                         />
                       </div>
                       <div>
                         <span className="text-[10px] font-bold text-[var(--color-accent)] uppercase tracking-wider block mb-0.5">
                           {recent.category}
                         </span>
-                        <h4 className="text-xs font-heading font-bold text-[var(--color-primary)] leading-snug group-hover:text-[var(--color-accent)] transition-colors line-clamp-2">
+                        <h4 className="text-xs font-heading font-bold text-gray-900 leading-snug group-hover:text-[var(--color-primary)] transition-colors line-clamp-2">
                           {recent.title}
                         </h4>
                         <span className="text-[9px] text-gray-400 block mt-1">{recent.date}</span>
@@ -174,7 +174,7 @@ export default function ArticleDetailPage() {
               </div>
 
               {/* Marketing card calling to action */}
-              <div className="bg-[var(--color-primary)] text-white p-6 shadow-sm border-t-4 border-t-[var(--color-accent)] relative overflow-hidden">
+              <div className="bg-[var(--color-primary)] text-white p-6 border-t-4 border-t-[var(--color-accent)] relative overflow-hidden">
                 <div className="absolute top-0 right-0 w-32 h-32 bg-white opacity-5 rounded-full -translate-y-1/2 translate-x-1/3"></div>
                 
                 <h3 className="font-heading font-bold text-lg mb-3 relative z-10">Formez-vous avec des experts</h3>
@@ -184,7 +184,7 @@ export default function ArticleDetailPage() {
                 
                 <Link
                   href="/formations"
-                  className="inline-flex items-center gap-2 px-5 py-3 bg-[var(--color-accent)] hover:bg-white hover:text-[var(--color-primary)] text-white text-xs font-bold uppercase tracking-wider transition-all shadow-sm w-full justify-center relative z-10"
+                  className="inline-flex items-center gap-2 px-5 py-3 bg-[var(--color-accent)] hover:bg-white hover:text-gray-900 text-white text-xs font-bold uppercase tracking-wider transition-all w-full justify-center relative z-10"
                 >
                   Découvrir les formations
                   <ArrowRight className="w-3.5 h-3.5" />

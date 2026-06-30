@@ -381,7 +381,7 @@ export default function FormationDetailPage() {
     return (
       <div className="min-h-screen bg-[var(--color-gray)] py-24 flex flex-col items-center justify-center px-4">
         <HelpCircle className="w-16 h-16 text-gray-400 mb-4" />
-        <h2 className="text-2xl font-heading font-bold text-[var(--color-primary)] mb-2">Formation non trouvée</h2>
+        <h2 className="text-2xl font-heading font-bold text-gray-900 mb-2">Formation non trouvée</h2>
         <p className="text-gray-500 mb-8 text-center max-w-md">Le module de formation que vous recherchez n'existe pas ou a été déplacé.</p>
         <Link 
           href="/formations"
@@ -477,8 +477,8 @@ export default function FormationDetailPage() {
             <div className="lg:col-span-2 space-y-8">
               
               {/* Card 1: Overview */}
-              <div className="bg-white border border-gray-200 p-8 shadow-sm">
-                <h2 className="text-xl font-heading font-bold text-[var(--color-primary)] mb-4 border-b border-gray-100 pb-3 flex items-center gap-2.5">
+              <div className="bg-white border border-gray-200 p-8">
+                <h2 className="text-xl font-heading font-bold text-gray-900 mb-4 border-b border-gray-100 pb-3 flex items-center gap-2.5">
                   <BookOpen className="w-5 h-5 text-[var(--color-accent)]" />
                   Présentation du module
                 </h2>
@@ -505,8 +505,8 @@ export default function FormationDetailPage() {
               </div>
 
               {/* Card 2: Objectives */}
-              <div className="bg-white border border-gray-200 p-8 shadow-sm">
-                <h2 className="text-xl font-heading font-bold text-[var(--color-primary)] mb-4 border-b border-gray-100 pb-3 flex items-center gap-2.5">
+              <div className="bg-white border border-gray-200 p-8">
+                <h2 className="text-xl font-heading font-bold text-gray-900 mb-4 border-b border-gray-100 pb-3 flex items-center gap-2.5">
                   <CheckCircle2 className="w-5 h-5 text-[var(--color-accent)]" />
                   Objectifs pédagogiques
                 </h2>
@@ -522,8 +522,8 @@ export default function FormationDetailPage() {
               </div>
 
               {/* Card 3: Syllabus / Program */}
-              <div className="bg-white border border-gray-200 p-8 shadow-sm">
-                <h2 className="text-xl font-heading font-bold text-[var(--color-primary)] mb-6 border-b border-gray-100 pb-3 flex items-center gap-2.5">
+              <div className="bg-white border border-gray-200 p-8">
+                <h2 className="text-xl font-heading font-bold text-gray-900 mb-6 border-b border-gray-100 pb-3 flex items-center gap-2.5">
                   <Calendar className="w-5 h-5 text-[var(--color-accent)]" />
                   Programme de formation détaillé
                 </h2>
@@ -531,7 +531,7 @@ export default function FormationDetailPage() {
                 <div className="space-y-6">
                   {details.syllabus.map((chapter: { title: string; points: string[] }, cIndex: number) => (
                     <div key={cIndex} className="border border-gray-150 p-5 bg-gray-50 hover:bg-white transition-colors duration-200">
-                      <h3 className="font-heading font-bold text-sm text-[var(--color-primary)] mb-3 flex items-center gap-3">
+                      <h3 className="font-heading font-bold text-sm text-gray-900 mb-3 flex items-center gap-3">
                         <span className="w-6 h-6 rounded-none bg-[var(--color-accent)] text-white text-[10px] font-mono font-bold flex items-center justify-center">
                           0{cIndex + 1}
                         </span>
@@ -555,7 +555,7 @@ export default function FormationDetailPage() {
             <div className="space-y-6 lg:sticky lg:top-28">
               
               {/* Technical features Card */}
-              <div className="bg-white border border-gray-200 shadow-sm overflow-hidden">
+              <div className="bg-white border border-gray-200 overflow-hidden">
 
                 {/* Prix block — prominent, top of card */}
                 {(activeModule.prix !== undefined || activeModule.prixInscription !== undefined || activeModule.methodePaiement) && (
@@ -592,12 +592,12 @@ export default function FormationDetailPage() {
                 )}
 
                 <div className="p-6">
-                  <h3 className="text-sm font-bold uppercase tracking-wider text-[var(--color-primary)] mb-5 border-b border-gray-100 pb-3">Fiche technique</h3>
+                  <h3 className="text-sm font-bold uppercase tracking-wider text-gray-900 mb-5 border-b border-gray-100 pb-3">Fiche technique</h3>
                   
                   <div className="space-y-4 mb-8">
                     <div className="flex items-center justify-between text-xs py-2 border-b border-gray-50">
                       <span className="text-gray-400 font-medium">Durée</span>
-                      <span className="font-bold text-[var(--color-primary)]">{details.duration.split(" (")[0]}</span>
+                      <span className="font-bold text-gray-900">{details.duration.split(" (")[0]}</span>
                     </div>
                     {details.dateDebut && (
                       <div className="flex items-center justify-between text-xs py-2 border-b border-gray-50">
@@ -611,7 +611,7 @@ export default function FormationDetailPage() {
                         <div className="space-y-1 pl-2 border-l-2 border-[var(--color-accent)]">
                           {details.planning.map((p: { jour: string; horaire: string }, i: number) => (
                             <div key={i} className="flex justify-between text-[11px]">
-                              <span className="font-semibold text-[var(--color-primary)]">{p.jour}</span>
+                              <span className="font-semibold text-gray-900">{p.jour}</span>
                               <span className="text-gray-600">{p.horaire}</span>
                             </div>
                           ))}
@@ -622,24 +622,24 @@ export default function FormationDetailPage() {
                         {details.calendrier && (
                           <div className="flex items-center justify-between text-xs py-2 border-b border-gray-50">
                             <span className="text-gray-400 font-medium">Jours</span>
-                            <span className="font-bold text-[var(--color-primary)]">{details.calendrier}</span>
+                            <span className="font-bold text-gray-900">{details.calendrier}</span>
                           </div>
                         )}
                         {details.horaires && (
                           <div className="flex items-center justify-between text-xs py-2 border-b border-gray-50">
                             <span className="text-gray-400 font-medium">Horaires</span>
-                            <span className="font-bold text-[var(--color-primary)]">{details.horaires}</span>
+                            <span className="font-bold text-gray-900">{details.horaires}</span>
                           </div>
                         )}
                       </>
                     )}
                     <div className="flex items-center justify-between text-xs py-2 border-b border-gray-50">
                       <span className="text-gray-400 font-medium">Niveau requis</span>
-                      <span className="font-bold text-[var(--color-primary)]">{details.level}</span>
+                      <span className="font-bold text-gray-900">{details.level}</span>
                     </div>
                     <div className="flex items-center justify-between text-xs py-2 border-b border-gray-50">
                       <span className="text-gray-400 font-medium">Modalité</span>
-                      <span className="font-bold text-[var(--color-primary)]">100% Pratique</span>
+                      <span className="font-bold text-gray-900">100% Pratique</span>
                     </div>
                     <div className="flex items-center justify-between text-xs py-2">
                       <span className="text-gray-400 font-medium">Certification</span>
@@ -651,7 +651,7 @@ export default function FormationDetailPage() {
                     {details.statutInscription === "Ouverte" ? (
                       <Link 
                         href={inscriptionUrl}
-                        className="w-full flex items-center justify-center gap-2 px-6 py-4 bg-[#8B0000] hover:bg-[var(--color-primary)] text-white text-xs font-bold uppercase tracking-wider transition-colors shadow-sm"
+                        className="w-full flex items-center justify-center gap-2 px-6 py-4 bg-[#8B0000] hover:bg-[var(--color-primary)] text-white text-xs font-bold uppercase tracking-wider transition-colors"
                       >
                         S'inscrire à ce module
                         <Send className="w-3.5 h-3.5" />
@@ -680,8 +680,8 @@ export default function FormationDetailPage() {
 
 
               {/* Target Audience Card */}
-              <div className="bg-white border border-gray-200 p-6 shadow-sm">
-                <h3 className="text-sm font-bold uppercase tracking-wider text-[var(--color-primary)] mb-4 border-b border-gray-100 pb-3 flex items-center gap-2">
+              <div className="bg-white border border-gray-200 p-6">
+                <h3 className="text-sm font-bold uppercase tracking-wider text-gray-900 mb-4 border-b border-gray-100 pb-3 flex items-center gap-2">
                   <Users className="w-4 h-4 text-[var(--color-accent)]" />
                   Public Cible
                 </h3>
@@ -696,7 +696,7 @@ export default function FormationDetailPage() {
                 
                 {details.prerequis && details.prerequis.length > 0 && (
                   <>
-                    <h3 className="text-sm font-bold uppercase tracking-wider text-[var(--color-primary)] mt-6 mb-3 border-b border-gray-100 pb-3 flex items-center gap-2">
+                    <h3 className="text-sm font-bold uppercase tracking-wider text-gray-900 mt-6 mb-3 border-b border-gray-100 pb-3 flex items-center gap-2">
                       <HelpCircle className="w-4 h-4 text-[var(--color-accent)]" />
                       Prérequis
                     </h3>
@@ -712,7 +712,7 @@ export default function FormationDetailPage() {
 
                 {details.debouches && details.debouches.length > 0 && (
                   <>
-                    <h3 className="text-sm font-bold uppercase tracking-wider text-[var(--color-primary)] mt-6 mb-3 border-b border-gray-100 pb-3 flex items-center gap-2">
+                    <h3 className="text-sm font-bold uppercase tracking-wider text-gray-900 mt-6 mb-3 border-b border-gray-100 pb-3 flex items-center gap-2">
                       <Briefcase className="w-4 h-4 text-[var(--color-accent)]" />
                       Débouchés professionnels
                     </h3>

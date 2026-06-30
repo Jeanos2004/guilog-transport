@@ -44,7 +44,7 @@ function StandardCard({ t, index }: { t: Testimonial; index: number }) {
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
       transition={{ delay: index * 0.08, duration: 0.5 }}
-      className="relative overflow-hidden rounded-2xl shadow-lg group cursor-default h-full"
+      className="relative overflow-hidden rounded-2xl group cursor-default h-full"
       style={{ minHeight: 400 }}
     >
       {/* Background: photo or gradient */}
@@ -52,7 +52,7 @@ function StandardCard({ t, index }: { t: Testimonial; index: number }) {
         <img
           src={t.image}
           alt={t.name}
-          className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+          className="absolute inset-0 w-full h-full object-cover transition-transform duration-700"
         />
       ) : (
         <div
@@ -67,7 +67,7 @@ function StandardCard({ t, index }: { t: Testimonial; index: number }) {
       {/* Top badge */}
       {!hasPhoto && (
         <div className="absolute top-5 left-5 pointer-events-none">
-          <div className={`w-12 h-12 rounded-full flex items-center justify-center font-bold text-base shadow-lg ${t.color}`}>
+          <div className={`w-12 h-12 rounded-full flex items-center justify-center font-bold text-base ${t.color}`}>
             {t.initials}
           </div>
         </div>
@@ -115,20 +115,20 @@ function VideoThumbnailCard({ t, index, onClick }: { t: Testimonial; index: numb
       viewport={{ once: true }}
       transition={{ delay: index * 0.08, duration: 0.5 }}
       onClick={onClick}
-      className="relative overflow-hidden rounded-[2rem] shadow-lg group cursor-pointer transition-all duration-300 hover:shadow-2xl flex-shrink-0 w-[80vw] md:w-[80vw] lg:w-[970px] aspect-[1.6]"
+      className="relative overflow-hidden rounded-[2rem] group cursor-pointer transition-all duration-300 hover: flex-shrink-0 w-[80vw] md:w-[80vw] lg:w-[970px] aspect-[1.6]"
     >
       {/* Background (Image or Fallback) */}
       {t.image ? (
         <img
           src={t.image}
           alt={t.name}
-          className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+          className="absolute inset-0 w-full h-full object-cover transition-transform duration-700"
         />
       ) : ytId ? (
         <img
           src={`https://img.youtube.com/vi/${ytId}/maxresdefault.jpg`}
           alt={t.name}
-          className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+          className="absolute inset-0 w-full h-full object-cover transition-transform duration-700"
           onError={(e) => {
             (e.target as HTMLImageElement).src = `https://img.youtube.com/vi/${ytId}/hqdefault.jpg`;
           }}
@@ -136,7 +136,7 @@ function VideoThumbnailCard({ t, index, onClick }: { t: Testimonial; index: numb
       ) : isDirect ? (
         <video
           src={`${t.videoUrl}#t=1`}
-          className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+          className="absolute inset-0 w-full h-full object-cover transition-transform duration-700"
           preload="metadata"
           muted
           playsInline
@@ -152,7 +152,7 @@ function VideoThumbnailCard({ t, index, onClick }: { t: Testimonial; index: numb
 
       {/* Floating student info / role on the left */}
       <div className="absolute left-6 md:left-8 top-1/2 -translate-y-1/2 right-20 md:right-32 z-10 pointer-events-none">
-        <h3 className="text-xl md:text-3xl font-heading font-extrabold text-white leading-tight drop-shadow-sm line-clamp-3">
+        <h3 className="text-xl md:text-3xl font-heading font-extrabold text-white leading-tight drop- line-clamp-3">
           {t.role}
         </h3>
         <p className="text-xs md:text-sm font-semibold text-white/70 mt-2.5 flex items-center gap-1.5">
@@ -163,7 +163,7 @@ function VideoThumbnailCard({ t, index, onClick }: { t: Testimonial; index: numb
 
       {/* Play CTA at the bottom left (Watch case pill style) */}
       <div className="absolute bottom-5 left-6 md:left-8 z-10">
-        <div className="inline-flex items-center gap-2 bg-white text-gray-950 font-bold px-4 md:px-5 py-2 md:py-2.5 rounded-full text-xs md:text-sm shadow-lg transform transition-all duration-300 group-hover:bg-gray-100 group-hover:scale-105">
+        <div className="inline-flex items-center gap-2 bg-white text-gray-950 font-bold px-4 md:px-5 py-2 md:py-2.5 rounded-full text-xs md:text-sm transform transition-all duration-300 group-hover:bg-gray-100">
           <Play className="w-3 h-3 fill-gray-950 text-gray-950" />
           <span>Regarder</span>
         </div>
@@ -171,7 +171,7 @@ function VideoThumbnailCard({ t, index, onClick }: { t: Testimonial; index: numb
 
       {/* Subtle play indicator at bottom right */}
       <div className="absolute bottom-5 right-5 md:bottom-6 md:right-8 z-10">
-        <div className="w-8 h-8 md:w-10 md:h-10 rounded-full bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center text-white shadow-xl transition-all duration-300 group-hover:bg-white/25">
+        <div className="w-8 h-8 md:w-10 md:h-10 rounded-full bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center text-white transition-all duration-300 group-hover:bg-white/25">
           <Play className="w-3 h-3 md:w-4 md:h-4 fill-white ml-0.5" />
         </div>
       </div>
@@ -213,8 +213,9 @@ export default function TemoignagesPage() {
           src="/images/testimonials_hero.png"
           alt="Témoignages Cabinet Guilogtrans"
           fill priority sizes="100vw"
-          className="object-cover opacity-20"
-        />
+          className="object-cover" />
+        <div className="absolute inset-0 bg-gradient-to-r from-[var(--color-primary)]/95 via-[var(--color-primary)]/70 to-transparent" />
+        <div className="absolute inset-0 bg-black/20" />
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
             <h1 className="text-4xl md:text-5xl font-heading font-bold text-white mb-4">Témoignages</h1>
@@ -236,7 +237,7 @@ export default function TemoignagesPage() {
                 <span className="text-[var(--color-accent)] text-xs font-bold uppercase tracking-widest mb-3 block">
                   En Vidéo
                 </span>
-                <h2 className="text-3xl md:text-4xl font-heading font-bold text-[var(--color-primary)] leading-tight">
+                <h2 className="text-3xl md:text-4xl font-heading font-bold text-gray-900 leading-tight">
                   Ils témoignent <br />
                   <span className="text-[var(--color-accent)]">face caméra</span>
                 </h2>
@@ -248,13 +249,13 @@ export default function TemoignagesPage() {
               <div className="hidden md:flex items-center gap-3">
                 <button
                   onClick={() => scroll(scrollRefVid, "left")}
-                  className="w-11 h-11 rounded-full bg-white border border-gray-200 shadow-sm flex items-center justify-center text-gray-600 hover:bg-gray-50 transition-colors"
+                  className="w-11 h-11 rounded-full bg-white border border-gray-200 flex items-center justify-center text-gray-600 hover:bg-gray-50 transition-colors"
                 >
                   <ChevronLeft className="w-5 h-5" />
                 </button>
                 <button
                   onClick={() => scroll(scrollRefVid, "right")}
-                  className="w-11 h-11 rounded-full bg-[var(--color-primary)] flex items-center justify-center text-white shadow-md hover:bg-[var(--color-accent)] transition-colors"
+                  className="w-11 h-11 rounded-full bg-[var(--color-primary)] flex items-center justify-center text-white hover:bg-[var(--color-accent)] transition-colors"
                 >
                   <ChevronRightIcon className="w-5 h-5" />
                 </button>
@@ -289,7 +290,7 @@ export default function TemoignagesPage() {
                 <span className="text-[var(--color-accent)] text-xs font-bold uppercase tracking-widest mb-3 block">
                   Parcours &amp; Réussites
                 </span>
-                <h2 className="text-3xl md:text-4xl font-heading font-bold text-[var(--color-primary)] leading-tight">
+                <h2 className="text-3xl md:text-4xl font-heading font-bold text-gray-900 leading-tight">
                   Des histoires qui<br />
                   <span className="text-[var(--color-accent)]">nous rendent fiers</span>
                 </h2>
@@ -301,13 +302,13 @@ export default function TemoignagesPage() {
               <div className="hidden md:flex items-center gap-3">
                 <button
                   onClick={() => scroll(scrollRefStd, "left")}
-                  className="w-11 h-11 rounded-full bg-white border border-gray-200 shadow-sm flex items-center justify-center text-gray-600 hover:bg-gray-50 transition-colors"
+                  className="w-11 h-11 rounded-full bg-white border border-gray-200 flex items-center justify-center text-gray-600 hover:bg-gray-50 transition-colors"
                 >
                   <ChevronLeft className="w-5 h-5" />
                 </button>
                 <button
                   onClick={() => scroll(scrollRefStd, "right")}
-                  className="w-11 h-11 rounded-full bg-[var(--color-primary)] flex items-center justify-center text-white shadow-md hover:bg-[var(--color-accent)] transition-colors"
+                  className="w-11 h-11 rounded-full bg-[var(--color-primary)] flex items-center justify-center text-white hover:bg-[var(--color-accent)] transition-colors"
                 >
                   <ChevronRightIcon className="w-5 h-5" />
                 </button>
@@ -372,12 +373,12 @@ export default function TemoignagesPage() {
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="bg-[var(--color-surface)] p-14 rounded-3xl border border-gray-100 shadow-sm"
+            className="bg-[var(--color-surface)] p-14 rounded-3xl border border-gray-100"
           >
-            <div className="w-16 h-16 bg-[var(--color-primary)] rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg">
+            <div className="w-16 h-16 bg-[var(--color-primary)] rounded-2xl flex items-center justify-center mx-auto mb-6">
               <Award className="w-8 h-8 text-[var(--color-accent)]" />
             </div>
-            <h3 className="text-3xl font-heading font-bold text-[var(--color-primary)] mb-4">
+            <h3 className="text-3xl font-heading font-bold text-gray-900 mb-4">
               Prêt à écrire votre success story ?
             </h3>
             <p className="text-gray-500 mb-8 text-base leading-relaxed">
@@ -385,7 +386,7 @@ export default function TemoignagesPage() {
             </p>
             <Link
               href="/inscription"
-              className="inline-flex items-center gap-2 px-10 py-4 bg-[var(--color-accent)] text-white rounded-xl font-bold text-base hover:bg-[var(--color-primary)] transition-all shadow-lg hover:shadow-xl hover:-translate-y-0.5 transform"
+              className="inline-flex items-center gap-2 px-10 py-4 bg-[var(--color-accent)] text-white rounded-xl font-bold text-base hover:bg-[var(--color-primary)] transition-all hover: transform"
             >
               Commencer ma formation
             </Link>
@@ -415,7 +416,7 @@ export default function TemoignagesPage() {
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.95, opacity: 0 }}
               onClick={(e) => e.stopPropagation()}
-              className="relative w-full max-w-4xl bg-black rounded-2xl overflow-hidden shadow-2xl"
+              className="relative w-full max-w-4xl bg-black rounded-2xl overflow-hidden"
               style={{ maxHeight: "85vh" }}
             >
               {(() => {
@@ -445,7 +446,7 @@ export default function TemoignagesPage() {
                 } else {
                   return (
                     <div className="p-12 text-center flex flex-col items-center">
-                      <Play className="w-16 h-16 text-[var(--color-primary)] mb-6 opacity-80" />
+                      <Play className="w-16 h-16 text-gray-900 mb-6 opacity-80" />
                       <p className="text-white text-lg mb-6">Cette vidéo est hébergée sur une plateforme externe.</p>
                       <a href={activeVideo} target="_blank" rel="noreferrer" className="px-8 py-4 bg-[var(--color-primary)] text-white font-bold rounded-xl hover:bg-[var(--color-accent)] transition">
                         Voir la vidéo

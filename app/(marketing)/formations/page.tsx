@@ -65,8 +65,9 @@ export default function FormationsPage() {
           fill
           sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
           priority
-          className="object-cover opacity-20"
-        />
+          className="object-cover" />
+        <div className="absolute inset-0 bg-gradient-to-r from-[var(--color-primary)]/95 via-[var(--color-primary)]/70 to-transparent" />
+        <div className="absolute inset-0 bg-black/20" />
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }}>
             {/* Breadcrumb */}
@@ -97,8 +98,8 @@ export default function FormationsPage() {
                 onClick={() => setActiveCategory(cat)}
                 className={`px-4 py-3 text-xs font-bold uppercase tracking-wider transition-colors border-b-[3px] -mb-[1px] ${
                   activeCategory === cat
-                    ? "border-[var(--color-accent)] text-[var(--color-primary)]"
-                    : "border-transparent text-gray-500 hover:text-[var(--color-primary)] hover:border-gray-300"
+                    ? "border-[var(--color-accent)] text-gray-900"
+                    : "border-transparent text-gray-500 hover:text-gray-900 hover:border-gray-300"
                 }`}
               >
                 {cat}
@@ -119,14 +120,14 @@ export default function FormationsPage() {
                     animate={{ opacity: 1 }}
                     exit={{ opacity: 0 }}
                     transition={{ duration: 0.25 }}
-                    className="bg-white border border-gray-200 hover:border-[var(--color-accent)] hover:shadow-md transition-all duration-300 group flex flex-col"
+                    className="bg-white border border-gray-200 hover: transition-all duration-300 group flex flex-col"
                   >
                     {/* Image header */}
                     <div className="h-48 relative overflow-hidden">
                       <img
                         src={imageSrc}
                         alt={formation.titre}
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                        className="w-full h-full object-cover transition-transform duration-500"
                       />
                       <div className="absolute top-0 left-0 flex items-center">
                         <span className="bg-[var(--color-primary)] text-white text-[9px] font-bold px-3 py-1.5 uppercase tracking-wider">
@@ -147,7 +148,7 @@ export default function FormationsPage() {
                         Module certifiant
                       </div>
 
-                      <h3 className="text-lg font-heading font-bold text-[var(--color-primary)] mb-4 leading-snug group-hover:text-[var(--color-accent)] transition-colors line-clamp-2 min-h-[3.5rem]">
+                      <h3 className="text-lg font-heading font-bold text-gray-900 mb-4 leading-snug group-hover:text-[var(--color-primary)] transition-colors line-clamp-2 min-h-[3.5rem]">
                         {formation.titre}
                       </h3>
 
@@ -219,7 +220,7 @@ export default function FormationsPage() {
                       <div className="pt-4 border-t border-gray-100 flex items-center justify-between mt-auto">
                         <Link
                           href={`/formations/${formation.slug}`}
-                          className="text-[11px] font-bold uppercase tracking-widest text-[var(--color-primary)] hover:text-[#8B0000] transition-colors flex items-center gap-1"
+                          className="text-[11px] font-bold uppercase tracking-widest text-gray-900 hover:text-[#8B0000] transition-colors flex items-center gap-1"
                         >
                           En savoir plus <ArrowRight className="w-3 h-3" />
                         </Link>

@@ -39,8 +39,9 @@ export default function ContactPage() {
           fill
           sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
           priority
-          className="object-cover opacity-20"
-        />
+          className="object-cover" />
+        <div className="absolute inset-0 bg-gradient-to-r from-[var(--color-primary)]/95 via-[var(--color-primary)]/70 to-transparent" />
+        <div className="absolute inset-0 bg-black/20" />
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
             <h1 className="text-4xl md:text-5xl font-heading font-bold text-white mb-4">Contactez-nous</h1>
@@ -55,11 +56,11 @@ export default function ContactPage() {
 
       <section className="py-20 bg-[var(--color-surface)] relative">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="bg-white rounded-2xl shadow-xl overflow-hidden flex flex-col lg:flex-row border border-gray-100">
+          <div className="bg-white rounded-2xl overflow-hidden flex flex-col lg:flex-row border border-gray-100">
             
             {/* Form Column */}
             <div className="lg:w-3/5 p-8 md:p-12">
-              <h2 className="text-3xl font-heading font-bold text-[var(--color-primary)] mb-6">Envoyez-nous un message</h2>
+              <h2 className="text-3xl font-heading font-bold text-gray-900 mb-6">Envoyez-nous un message</h2>
               <p className="text-gray-600 mb-8">
                 Vous avez une question sur nos formations ou souhaitez un accompagnement sur mesure ? Remplissez le formulaire ci-dessous et notre équipe vous répondra rapidement.
               </p>
@@ -73,11 +74,11 @@ export default function ContactPage() {
                   <div className="w-16 h-16 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto mb-4">
                     <CheckCircle className="w-8 h-8" />
                   </div>
-                  <h3 className="text-xl font-heading font-bold text-[var(--color-primary)] mb-2">Message envoyé !</h3>
+                  <h3 className="text-xl font-heading font-bold text-gray-900 mb-2">Message envoyé !</h3>
                   <p className="text-gray-600 mb-6">Merci de nous avoir contacté. Notre équipe vous répondra très prochainement.</p>
                   <button
                     onClick={() => { setIsSubmitted(false); setFormData({ fullName: "", email: "", subject: "", message: "" }); }}
-                    className="px-6 py-2 border-2 border-[var(--color-primary)] text-[var(--color-primary)] text-sm font-bold uppercase tracking-wider hover:bg-[var(--color-primary)] hover:text-white transition-colors"
+                    className="px-6 py-2 border-2 border-[var(--color-primary)] text-gray-900 text-sm font-bold uppercase tracking-wider hover:bg-[var(--color-primary)] hover:text-white transition-colors"
                   >
                     Envoyer un autre message
                   </button>

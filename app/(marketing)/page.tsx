@@ -150,8 +150,9 @@ export default function Home() {
               priority
               className="object-cover"
             />
-            {/* Semi-transparent solid overlay — Schule uses a dark navy overlay, NO gradient */}
-            <div className="absolute inset-0 bg-[var(--color-primary)]/70" />
+            {/* Gradient overlay for better readability on the left while preserving the image on the right */}
+            <div className="absolute inset-0 bg-gradient-to-r from-[var(--color-primary)]/95 via-[var(--color-primary)]/70 to-transparent" />
+            <div className="absolute inset-0 bg-black/20" />
           </motion.div>
         </AnimatePresence>
 
@@ -183,17 +184,17 @@ export default function Home() {
                   {heroSlides[current].subtitle}
                 </p>
 
-                <div className="flex flex-col sm:flex-row gap-4">
+                <div className="flex flex-col sm:flex-row gap-4 mt-8">
                   <Link
                     href={heroSlides[current].cta.href}
-                    className="inline-flex items-center justify-center px-8 py-4 bg-[var(--color-accent)] hover:bg-[var(--color-light)] text-white font-sans font-bold text-sm uppercase tracking-wider transition-colors"
+                    className="inline-flex items-center justify-center px-8 py-4 bg-[var(--color-accent)] hover:bg-[var(--color-light)] text-white font-sans font-bold text-sm uppercase tracking-wider transition-all duration-300 rounded-md"
                   >
                     {heroSlides[current].cta.text}
                     <ArrowRight className="w-4 h-4 ml-2" />
                   </Link>
                   <Link
                     href={heroSlides[current].ctaSecondary.href}
-                    className="inline-flex items-center justify-center px-8 py-4 border-2 border-white text-white hover:bg-white hover:text-[var(--color-primary)] font-sans font-bold text-sm uppercase tracking-wider transition-colors"
+                    className="inline-flex items-center justify-center px-8 py-4 border-2 border-white/80 text-white hover:bg-white hover:text-gray-900 font-sans font-bold text-sm uppercase tracking-wider transition-all duration-300 rounded-md backdrop-blur-sm"
                   >
                     {heroSlides[current].ctaSecondary.text}
                   </Link>
@@ -286,13 +287,13 @@ export default function Home() {
                 <span className="w-6 h-[2px] bg-[var(--color-accent)] mr-2 inline-block" />
                 Ce que nous proposons
               </span>
-              <h2 className="text-3xl md:text-4xl font-heading font-bold text-[var(--color-primary)]">
+              <h2 className="text-3xl md:text-4xl font-heading font-bold text-gray-900">
                 Nos Programmes Phares
               </h2>
             </div>
             <Link
               href="/formations"
-              className="mt-6 md:mt-0 inline-flex items-center text-sm font-bold text-[var(--color-accent)] hover:text-[var(--color-primary)] uppercase tracking-wider transition-colors"
+              className="mt-6 md:mt-0 inline-flex items-center text-sm font-bold text-[var(--color-accent)] hover:text-gray-900 uppercase tracking-wider transition-colors"
             >
               Voir tout le catalogue <ArrowRight className="w-4 h-4 ml-1" />
             </Link>
@@ -310,7 +311,7 @@ export default function Home() {
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ delay: index * 0.08 }}
-                  className="bg-white border border-gray-200 hover:border-[var(--color-accent)] hover:shadow-lg transition-all duration-300 group flex flex-col"
+                  className="bg-white rounded-2xl border border-gray-100 transition-all duration-300 group flex flex-col overflow-hidden"
                 >
                   {/* Image header — Schule: full image top */}
                   <div className="relative h-52 overflow-hidden">
@@ -320,12 +321,12 @@ export default function Home() {
                       fill
                       sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                       priority
-                      className="object-cover group-hover:scale-105 transition-transform duration-500"
+                      className="object-cover transition-transform duration-500"
                       
                     />
                    
                     {/* Category badge */}
-                    <span className="absolute top-4 left-4 bg-[var(--color-primary)] text-white text-[10px] font-bold px-3 py-1 uppercase tracking-wider">
+                    <span className="absolute top-4 left-4 bg-white/90 backdrop-blur-sm text-gray-900 text-[10px] font-bold px-3 py-1.5 rounded-full uppercase tracking-wider">
                       {formation.categorie}
                     </span>
                   </div>
@@ -337,7 +338,7 @@ export default function Home() {
                       <span>{formation.modules.length} modules</span>
                     </div>
 
-                    <h3 className="text-lg font-heading font-bold text-[var(--color-primary)] mb-4 leading-snug group-hover:text-[var(--color-accent)] transition-colors">
+                    <h3 className="text-lg font-heading font-bold text-gray-900 mb-4 leading-snug group-hover:text-[var(--color-primary)] transition-colors">
                       {formation.categorie}
                     </h3>
 
@@ -359,13 +360,13 @@ export default function Home() {
                     <div className="pt-4 border-t border-gray-100 flex items-center justify-between mt-auto">
                       <Link
                         href="/formations"
-                        className="text-xs font-bold uppercase tracking-wider text-[var(--color-primary)] hover:text-[var(--color-accent)] transition-colors"
+                        className="text-xs font-bold uppercase tracking-wider text-gray-900 hover:text-[var(--color-primary)] transition-colors"
                       >
                         En savoir plus →
                       </Link>
                       <Link
                         href="/inscription"
-                        className="bg-[var(--color-accent)] hover:bg-[var(--color-primary)] text-white font-bold text-[10px] uppercase tracking-wider px-4 py-2 transition-colors"
+                        className="bg-[var(--color-accent)] hover:bg-[var(--color-primary)] text-white font-bold text-[10px] uppercase tracking-wider px-5 py-2.5 rounded-md transition-colors"
                       >
                         S'inscrire
                       </Link>
@@ -401,7 +402,7 @@ export default function Home() {
                 className="object-cover"
               />
               {/* Stats badge — Schule style floating box */}
-              <div className="absolute bottom-6 right-6 bg-[var(--color-primary)] text-white p-5 shadow-xl">
+              <div className="absolute bottom-6 right-6 bg-[var(--color-primary)] text-white p-5">
                 <div className="text-3xl font-heading font-bold">
                   +{settings ? roundDown(settings.apprenantsForme + validatedInscriptionsCount) : 500}
                 </div>
@@ -422,7 +423,7 @@ export default function Home() {
                 <span className="w-6 h-[2px] bg-[var(--color-accent)] mr-2 inline-block" />
                 À propos de nous
               </span>
-              <h2 className="text-3xl md:text-4xl font-heading font-bold text-[var(--color-primary)] mb-6 leading-tight">
+              <h2 className="text-3xl md:text-4xl font-heading font-bold text-gray-900 mb-6 leading-tight">
                 Cabinet de Référence en Logistique et Transport
               </h2>
 
@@ -487,7 +488,7 @@ export default function Home() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: index * 0.1 }}
-                className="bg-white rounded-xl shadow-lg border border-gray-100 p-8 hover:shadow-xl hover:border-[var(--color-accent)] transition-all duration-300"
+                className="bg-white rounded-xl border border-gray-100 p-8 hover: transition-all duration-300"
               >
                 {/* Video if exists */}
                 {testimonial.videoUrl ? (
@@ -527,7 +528,7 @@ export default function Home() {
                     </div>
                   )}
                   <div>
-                    <div className="font-bold text-[var(--color-primary)] text-sm">{testimonial.name}</div>
+                    <div className="font-bold text-gray-900 text-sm">{testimonial.name}</div>
                     <div className="text-gray-500 text-xs">{testimonial.role}</div>
                   </div>
                 </div>
@@ -552,7 +553,7 @@ export default function Home() {
               Prêt à commencer ?
               <span className="w-6 h-[2px] bg-[var(--color-accent)] ml-2 inline-block" />
             </span>
-            <h2 className="text-3xl md:text-4xl font-heading font-bold text-[var(--color-primary)] mb-5">
+            <h2 className="text-3xl md:text-4xl font-heading font-bold text-gray-900 mb-5">
               Rejoignez les professionnels qui font confiance au Cabinet Guilogtrans
             </h2>
             <p className="text-gray-600 mb-8 max-w-xl mx-auto font-sans">
@@ -561,14 +562,14 @@ export default function Home() {
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link
                 href="/inscription"
-                className="inline-flex items-center justify-center px-8 py-4 bg-[var(--color-primary)] hover:bg-[var(--color-accent)] text-white font-sans font-bold text-sm uppercase tracking-wider transition-colors"
+                className="inline-flex items-center justify-center px-8 py-4 bg-[var(--color-primary)] hover:bg-[var(--color-accent)] text-white font-sans font-bold text-sm uppercase tracking-wider transition-all duration-300 rounded-md"
               >
                 S'inscrire maintenant
                 <ArrowRight className="w-4 h-4 ml-2" />
               </Link>
               <Link
                 href="/contact"
-                className="inline-flex items-center justify-center px-8 py-4 border-2 border-[var(--color-primary)] text-[var(--color-primary)] hover:bg-[var(--color-primary)] hover:text-white font-sans font-bold text-sm uppercase tracking-wider transition-colors"
+                className="inline-flex items-center justify-center px-8 py-4 border-2 border-[var(--color-primary)] text-gray-900 hover:bg-[var(--color-primary)] hover:text-white font-sans font-bold text-sm uppercase tracking-wider transition-all duration-300 rounded-md"
               >
                 Nous contacter
               </Link>
