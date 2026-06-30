@@ -1,7 +1,7 @@
 import { Resend } from 'resend';
 
-// Initialize Resend with API Key from environment
-const resend = new Resend(process.env.RESEND_API_KEY);
+// Initialize Resend with API Key from environment (fallback to 're_dummy' for build time)
+const resend = new Resend(process.env.RESEND_API_KEY || "re_dummy");
 
 // Important: Resend requires a verified domain to send FROM.
 // For testing/development, you must use 'onboarding@resend.dev' or verify a domain in the Resend dashboard.
