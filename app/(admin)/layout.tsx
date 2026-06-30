@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Administration — CFIG Guinée",
-  description: "Espace d'administration sécurisé du Cabinet de Formation CFIG Guinée.",
+  title: "Administration — Cabinet Guilogtrans",
+  description: "Espace d'administration sécurisé du Cabinet de Formation Cabinet Guilogtrans.",
 };
 
 /**

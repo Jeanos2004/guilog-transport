@@ -619,7 +619,7 @@ const [newModuleDateDebut, setNewModuleDateDebut] = useState("");
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
               contact: student.phone,
-              message: `CFIG - Nous avons bien reçu votre paiement de ${amount.toLocaleString()} GNF pour la formation ${courseName}. Merci !`
+              message: `Guilogtrans - Nous avons bien reçu votre paiement de ${amount.toLocaleString()} GNF pour la formation ${courseName}. Merci !`
             })
           }).catch(e => console.error("SMS Payment Error:", e));
         }
@@ -690,7 +690,7 @@ const [newModuleDateDebut, setNewModuleDateDebut] = useState("");
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
               contact: student.phone,
-              message: `CFIG - Séance programmée pour le cours ${scheduleModuleName} le ${scheduleDate} à ${scheduleTime}. Soyez à l'heure ! ${scheduleLocation ? 'Lieu/Lien: ' + scheduleLocation : ''}`
+              message: `Guilogtrans - Séance programmée pour le cours ${scheduleModuleName} le ${scheduleDate} à ${scheduleTime}. Soyez à l'heure ! ${scheduleLocation ? 'Lieu/Lien: ' + scheduleLocation : ''}`
             })
           });
         }
@@ -767,7 +767,7 @@ const [newModuleDateDebut, setNewModuleDateDebut] = useState("");
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
               contact: leadToConvert.phone,
-              message: `Félicitations ${leadToConvert.fullName}, votre inscription est validée ! Consultez vos emails pour vos identifiants d'accès. - CFIG`
+              message: `Félicitations ${leadToConvert.fullName}, votre inscription est validée ! Consultez vos emails pour vos identifiants d'accès. - Guilogtrans`
             })
           }).catch(e => console.error("SMS Conversion Error:", e));
         }
@@ -1308,7 +1308,7 @@ const [newModuleDateDebut, setNewModuleDateDebut] = useState("");
             <div className="w-16 h-16 bg-[var(--color-accent)] mx-auto flex items-center justify-center font-heading font-black text-2xl tracking-wider text-white shadow-lg mb-4">
               CF
             </div>
-            <h1 className="text-2xl md:text-3xl font-heading font-bold">CFIG Guinée</h1>
+            <h1 className="text-2xl md:text-3xl font-heading font-bold">Cabinet Guilogtrans</h1>
             <p className="text-xs text-gray-300 mt-1 uppercase tracking-widest">Espace d'Administration</p>
           </div>
 
@@ -1319,7 +1319,7 @@ const [newModuleDateDebut, setNewModuleDateDebut] = useState("");
                 type="email"
                 required
                 className="w-full bg-white/5 border border-white/20 px-4 py-3 text-sm text-white focus:outline-none focus:border-[var(--color-accent)] focus:ring-1 focus:ring-[var(--color-accent)] transition-all rounded-none"
-                placeholder="Ex: admin@cfigguinee.com"
+                placeholder="Ex: admin@guilogtransguinee.com"
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
               />
@@ -1392,9 +1392,9 @@ const [newModuleDateDebut, setNewModuleDateDebut] = useState("");
               {/* Brand Header */}
               <div className="p-6 border-b border-white/10 flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <img src="/logo.jpeg" alt="CFIG Guinée Logo" className="h-10 w-auto object-contain bg-white rounded-none border border-white/20 shadow-sm" />
+                  <img src="/logo.png" alt="Cabinet Guilogtrans Logo" className="h-10 w-auto object-contain bg-white rounded-none border border-white/20 shadow-sm" />
                   <div>
-                    <h1 className="font-heading font-bold text-sm tracking-wide leading-none text-white">CFIG Guinée</h1>
+                    <h1 className="font-heading font-bold text-sm tracking-wide leading-none text-white">Cabinet Guilogtrans</h1>
                     <span className="text-[9px] text-[var(--color-light)] uppercase tracking-widest font-black mt-1.5 block">Console Admin</span>
                   </div>
                 </div>
@@ -1506,9 +1506,9 @@ const [newModuleDateDebut, setNewModuleDateDebut] = useState("");
       <aside className="hidden lg:flex w-64 h-full bg-[var(--color-primary)] text-white flex-col flex-shrink-0 z-25 sticky top-0">
         {/* Brand header */}
         <div className="p-6 border-b border-white/10 flex items-center gap-3">
-          <img src="/logo.jpeg" alt="CFIG Guinée Logo" className="h-10 w-auto object-contain bg-white rounded-none border border-white/20 shadow-sm" />
+          <img src="/logo.png" alt="Cabinet Guilogtrans Logo" className="h-10 w-auto object-contain bg-white rounded-none border border-white/20 shadow-sm" />
           <div>
-            <h1 className="font-heading font-bold text-sm tracking-wide leading-none text-white">CFIG Guinée</h1>
+            <h1 className="font-heading font-bold text-sm tracking-wide leading-none text-white">Cabinet Guilogtrans</h1>
             <span className="text-[9px] text-[var(--color-light)] uppercase tracking-widest font-black mt-1.5 block">Console Admin</span>
           </div>
         </div>
@@ -1630,7 +1630,7 @@ const [newModuleDateDebut, setNewModuleDateDebut] = useState("");
                 {activeTab === "users" && "Utilisateurs Admin"}
                 {activeTab === "settings" && "Paramètres du Site"}
               </h2>
-              <p className="hidden md:block text-xs text-gray-500 mt-0.5">Bienvenue dans l'interface de contrôle du cabinet CFIG Guinée.</p>
+              <p className="hidden md:block text-xs text-gray-500 mt-0.5">Bienvenue dans l'interface de contrôle du cabinet Cabinet Guilogtrans.</p>
             </div>
           </div>
           
@@ -3128,7 +3128,7 @@ const [newModuleDateDebut, setNewModuleDateDebut] = useState("");
                           type="email"
                           required
                           className="w-full bg-gray-50 border border-gray-300 px-4 py-2 text-xs focus:outline-none focus:border-[var(--color-primary)] rounded-none"
-                          placeholder="admin@cfigguinee.com"
+                          placeholder="admin@guilogtransguinee.com"
                           value={newAdminEmail}
                           onChange={(e) => setNewAdminEmail(e.target.value)}
                         />
@@ -3270,7 +3270,7 @@ const [newModuleDateDebut, setNewModuleDateDebut] = useState("");
                   value={leadPassword}
                   onChange={(e) => setLeadPassword(e.target.value)}
                   className="w-full px-4 py-2.5 rounded-none border border-gray-200 focus:ring-2 focus:ring-[var(--color-primary)]"
-                  placeholder="ex: cfig2026!"
+                  placeholder="ex: guilogtrans2026!"
                 />
               </div>
 
@@ -3572,7 +3572,7 @@ const [newModuleDateDebut, setNewModuleDateDebut] = useState("");
                         <h4 className="text-xs font-bold text-gray-900 uppercase">Séances & Agenda</h4>
                         <p className="text-[10px] text-gray-500">Ajoutez les dates, heures, lieux et liens Zoom des séances.</p>
                       </div>
-                      <button type="button" disabled={newModuleStatutInscription === 'Fermée'} onClick={() => setNewModuleSessions([...newModuleSessions, { id: 'session-'+Date.now(), title: 'Nouvelle séance', date: new Date().toISOString(), duration: '2 heures', location: 'Siège CFIG', meetUrl: '', resources: [] }])} className="flex items-center gap-1.5 px-3 py-1.5 bg-gray-900 text-white text-[10px] uppercase font-bold hover:bg-[var(--color-primary)] transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+                      <button type="button" disabled={newModuleStatutInscription === 'Fermée'} onClick={() => setNewModuleSessions([...newModuleSessions, { id: 'session-'+Date.now(), title: 'Nouvelle séance', date: new Date().toISOString(), duration: '2 heures', location: 'Siège Guilogtrans', meetUrl: '', resources: [] }])} className="flex items-center gap-1.5 px-3 py-1.5 bg-gray-900 text-white text-[10px] uppercase font-bold hover:bg-[var(--color-primary)] transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
                         <Plus className="w-3.5 h-3.5" /> Nouvelle Séance
                       </button>
                     </div>
@@ -3598,7 +3598,7 @@ const [newModuleDateDebut, setNewModuleDateDebut] = useState("");
                             </div>
                             <div>
                               <label className="block text-[10px] font-bold text-gray-500 uppercase mb-1">Lieu</label>
-                              <input type="text" value={session.location} onChange={e => { const list = [...newModuleSessions]; list[sIdx].location = e.target.value; setNewModuleSessions(list); }} className="w-full border border-gray-300 px-3 py-2 text-sm focus:border-[var(--color-primary)] outline-none bg-white" placeholder="Ex: Salle A, Siège CFIG" />
+                              <input type="text" value={session.location} onChange={e => { const list = [...newModuleSessions]; list[sIdx].location = e.target.value; setNewModuleSessions(list); }} className="w-full border border-gray-300 px-3 py-2 text-sm focus:border-[var(--color-primary)] outline-none bg-white" placeholder="Ex: Salle A, Siège Guilogtrans" />
                             </div>
                             <div className="md:col-span-2">
                               <label className="block text-[10px] font-bold text-gray-500 uppercase mb-1">Lien Zoom / Meet (Optionnel)</label>

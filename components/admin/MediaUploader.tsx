@@ -28,7 +28,7 @@ export function MediaUploader({ value, onChange, label = "Ajouter un média", ac
       ) : null}
 
       <CldUploadWidget
-        uploadPreset={process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET || "cfig-images"}
+        uploadPreset={process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET || "guilogtrans-images"}
         options={{
           maxFiles: 1,
           resourceType: resourceType,

@@ -1,70 +1,38 @@
 export const formationsData = [
   {
-    image: "/images/programmes/bureautique.jpg",
-    categorie: "Informatique Bureautique",
+    image: "/images/hero.png",
+    categorie: "logistique",
     modules: [
-      { titre: "Initiation Bureautique", outils: ["Windows", "Word", "Excel", "PowerPoint"] },
-      { titre: "Excel Avancé", outils: ["Microsoft Excel"] }
+      { titre: "Gestion des stocks et approvisionnement", outils: [] },
+      { titre: "Logistique internationale & Incoterms", outils: [] }
     ]
   },
   {
-    image: "/images/programmes/Gestion.jpg",
-    categorie: "Gestion",
+    image: "/images/about.png",
+    categorie: "transport",
     modules: [
-      { titre: "Gestion Comptable", outils: ["Sage Comptabilité", "Excel"] },
-      { titre: "Gestion Commerciale", outils: ["Sage Gestion Commerciale", "Excel"] },
-      { titre: "Gestion de la Paie", outils: ["Sage Paie et RH", "Excel"] },
-      { titre: "Management RH – Auditeur Social", outils: ["Sage Paie et RH", "Excel"] },
-      { titre: "Responsable Administratif et Financier", outils: ["Excel"] }
+      { titre: "Optimisation des routes de transport", outils: [] }
     ]
   },
   {
-    image: "/images/programmes/logistique.jpg",
-    categorie: "Logistique et Transport",
+    image: "/images/gallery.png",
+    categorie: "douane",
     modules: [
-      { titre: "Responsable Logistique", outils: ["Excel"] },
-      { titre: "Responsable Achat et Approvisionnement", outils: ["Excel"] },
-      { titre: "Gestionnaire de Stock", outils: ["Excel"] },
-      { titre: "Logistique Minière", outils: ["Excel"] }
+      { titre: "Réglementation douanière & transit", outils: [] }
     ]
   },
   {
-    image: "/images/programmes/qhse.jpg",
-    categorie: "QHSE",
+    image: "/images/hero.png",
+    categorie: "supply-chain",
     modules: [
-      { titre: "Superviseur HSE", outils: [] }
+      { titre: "Management de la supply chain", outils: [] }
     ]
   },
   {
-    image: "/images/programmes/analyse.jpg",
-    categorie: "Analyse des Données",
+    image: "/images/contact_hero.png",
+    categorie: "securite",
     modules: [
-      { titre: "Tableau de bord avec Excel", outils: ["Excel", "PowerPivot", "PowerQuery"] },
-      { titre: "Tableau de bord avec PowerBI", outils: ["PowerBI Desktop", "PowerBI Services", "PowerBI Mobile", "PowerPivot", "PowerQuery"] },
-      { titre: "Collecte et Analyse des Données", outils: ["KoboCollect", "KoboToolbox"] }
-    ]
-  },
-  {
-    image: "/images/programmes/communication.jpg",
-    categorie: "Communication Digitale",
-    modules: [
-      { titre: "Community Management", outils: ["Facebook", "WhatsApp Business", "Canva", "ChatGPT"] },
-      { titre: "Marketing Digital", outils: ["Facebook", "Instagram", "LinkedIn", "Wix", "Email Marketing", "Canva", "Filmora"] },
-      { titre: "Communication Institutionnelle", outils: [] }
-    ]
-  },
-  {
-    image: "/images/infographie.png",
-    categorie: "Infographie",
-    modules: [
-      { titre: "Conception de Visuels", outils: ["Adobe Photoshop", "Adobe Illustrator"] }
-    ]
-  },
-  {
-    image: "/images/suivi-evaluation.png",
-    categorie: "Suivi-Évaluation de Projets",
-    modules: [
-      { titre: "Montage Suivi et Évaluation des Projets", outils: ["MS Project", "KoboCollect", "SPSS"] }
+      { titre: "Sécurité routière et conduite professionnelle", outils: [] }
     ]
   }
 ];
@@ -87,10 +55,10 @@ export const testimonialsData = [
   },
   {
     name: "Fatoumata Camara",
-    role: "Comptable",
+    role: "Chef de Parc",
     initials: "FC",
     color: "bg-amber-100 text-amber-800",
-    text: "Excellente formation sur Sage Comptabilité. J'ai pu mettre en pratique immédiatement ce que j'ai appris.",
+    text: "Excellente formation sur la gestion des stocks. L'audit du cabinet Guilogtrans nous a fait économiser des millions.",
     rating: 5
   },
   {
@@ -98,7 +66,7 @@ export const testimonialsData = [
     role: "Entrepreneur",
     initials: "MB",
     color: "bg-green-100 text-green-800",
-    text: "L'accompagnement de CFIG pour notre transformation digitale a été un vrai succès.",
+    text: "L'accompagnement stratégique de Guilogtrans pour notre chaîne d'approvisionnement a été un vrai succès.",
     rating: 4
   }
 ];
@@ -139,23 +107,23 @@ export const teamData = [
 
 export const servicesData = [
   {
-    title: "Formation Professionnelle",
-    description: "Des programmes adaptés aux besoins réels des entreprises pour monter en compétences.",
-    icon: "GraduationCap"
-  },
-  {
-    title: "Consulting Stratégique",
-    description: "Accompagnement sur mesure pour optimiser vos processus et votre organisation.",
+    title: "Conseil Stratégique",
+    description: "Optimisation des flux, gestion des entrepôts, planification des transports, réduction des coûts.",
     icon: "Briefcase"
   },
   {
-    title: "Implémentation Logicielles",
-    description: "Déploiement et paramétrage de solutions comme Sage, PowerBI.",
+    title: "Études & Audit",
+    description: "Analyse des processus existants, diagnostic logistique, recommandations stratégiques.",
     icon: "Laptop"
   },
   {
-    title: "Support Continu",
-    description: "Un suivi post-formation ou post-déploiement pour garantir votre succès.",
+    title: "Formation Professionnelle",
+    description: "Gestion des stocks, réglementation du transport, gestion des risques.",
+    icon: "GraduationCap"
+  },
+  {
+    title: "Accompagnement Sur-mesure",
+    description: "Un suivi personnalisé pour implémenter les recommandations dans votre supply chain.",
     icon: "LifeBuoy"
   }
 ];

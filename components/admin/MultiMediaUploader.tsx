@@ -42,7 +42,7 @@ export function MultiMediaUploader({ values, onAdd, onRemove, label = "Ajouter d
 
       {values.length < maxFiles && (
         <CldUploadWidget
-          uploadPreset={process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET || "cfig-images"}
+          uploadPreset={process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET || "guilogtrans-images"}
           options={{
             multiple: true,
             maxFiles: maxFiles - values.length,

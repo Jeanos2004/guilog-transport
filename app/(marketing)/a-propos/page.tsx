@@ -19,7 +19,7 @@ export default function AboutPage() {
       <section className="bg-[var(--color-primary)] py-20 relative overflow-hidden">
         <Image
           src="/images/about.png"
-          alt="À Propos de CFIG Guinée"
+          alt="À Propos du Cabinet Guilogtrans"
           fill
           sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
           priority
@@ -27,7 +27,7 @@ export default function AboutPage() {
         />
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <motion.div initial="hidden" animate="show" variants={fadeUp}>
-            <h1 className="text-4xl md:text-5xl font-heading font-bold text-white mb-4">À Propos de CFIG Guinée</h1>
+            <h1 className="text-4xl md:text-5xl font-heading font-bold text-white mb-4">À Propos du Cabinet Guilogtrans</h1>
             <div className="flex items-center text-sm text-gray-300">
               <Link href="/" className="hover:text-white transition-colors">Accueil</Link>
               <ChevronRight className="w-4 h-4 mx-2" />
@@ -46,13 +46,13 @@ export default function AboutPage() {
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true }}
             >
-              <SectionTitle title="CFIG Guinée SARLU" subtitle="Votre partenaire de confiance en Guinée" />
+              <SectionTitle title="Cabinet Guilogtrans" subtitle="Votre partenaire de confiance en Guinée" />
               <div className="space-y-4 text-gray-600 leading-relaxed">
                 <p>
-                  Le Cabinet de Formation Informatique de Gestion (CFIG Guinée SARLU) est un cabinet de référence spécialisé dans la formation professionnelle continue et le consulting d'entreprise.
+                  Le Cabinet Guilogtrans est un cabinet de référence spécialisé dans la formation professionnelle continue et le consulting logistique d'entreprise.
                 </p>
                 <p>
-                  Nous intervenons dans plusieurs domaines stratégiques : gestion d'entreprise, analyse de données, ressources humaines, comptabilité, logistique et communication digitale. Notre objectif est de doter les professionnels et les organisations des compétences nécessaires pour exceller dans un environnement concurrentiel.
+                  Nous intervenons dans plusieurs domaines stratégiques : logistique, transport, gestion des stocks, réglementation douanière et supply chain. Notre objectif est de doter les professionnels et les organisations des compétences nécessaires pour exceller dans un environnement concurrentiel.
                 </p>
               </div>
             </motion.div>
@@ -209,7 +209,7 @@ export default function AboutPage() {
                   <div
                     className="w-40 h-40 rounded-full p-[3px] shadow-lg"
                     style={{
-                      background: "linear-gradient(135deg, #1A3A6E 0%, #8B0000 50%, #1A3A6E 100%)"
+                      background: "linear-gradient(135deg, #0B5C2E 0%, #C8102E 50%, #0B5C2E 100%)"
                     }}
                   >
                     <div className="w-full h-full rounded-full overflow-hidden bg-white">

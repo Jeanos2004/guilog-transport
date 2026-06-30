@@ -211,7 +211,7 @@ export default function TemoignagesPage() {
       <section className="bg-[var(--color-primary)] py-20 relative overflow-hidden">
         <Image
           src="/images/testimonials_hero.png"
-          alt="Témoignages CFIG Guinée"
+          alt="Témoignages Cabinet Guilogtrans"
           fill priority sizes="100vw"
           className="object-cover opacity-20"
         />
@@ -381,7 +381,7 @@ export default function TemoignagesPage() {
               Prêt à écrire votre success story ?
             </h3>
             <p className="text-gray-500 mb-8 text-base leading-relaxed">
-              Rejoignez plus de 1 200 apprenants qui ont transformé leur carrière grâce à CFIG Guinée.
+              Rejoignez plus de 1 200 apprenants qui ont transformé leur carrière grâce à Cabinet Guilogtrans.
             </p>
             <Link
               href="/inscription"

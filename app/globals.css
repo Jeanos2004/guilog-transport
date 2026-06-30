@@ -1,22 +1,32 @@
 @import "tailwindcss";
 
 @theme {
-  /* === CHARTE OFFICIELLE CFIG GUINÉE === */
-  --color-primary:    #1A3A6E;   /* bleu marine — navbar, hero, footer, titres */
-  --color-accent:     #2A8BC4;   /* bleu ciel — boutons CTA, badges, hover    */
-  --color-light:      #4B9FD5;   /* bleu clair — highlights, icônes, bordures  */
+  /* === CHARTE OFFICIELLE GUILOGTRANS === */
+  --color-primary:    #0B5C2E;   /* vert forêt — navbar, hero, footer, titres */
+  --color-accent:     #F5A623;   /* jaune-orangé — boutons CTA, badges, hover */
+  --color-light:      #4DC87A;   /* vert clair — highlights, icônes, bordures */
   --color-white:      #FFFFFF;
   --color-gray:       #F5F7FA;
   --color-foreground: #1A1A2E;
   --color-text-muted: #64748B;
 
+  /* Nouvelles variables ajoutées pour les accents Guilogtrans */
+  --color-vert-vif:   #009A44;
+  --color-vert-clair: #4DC87A;
+  --color-vert-pale:  #E6F7EE;
+  --color-rouge-fonce: #9B0E23;
+  --color-rouge-pale:  #FEE8EC;
+  --color-or:          #F5C518;
+  --color-or-fonce:    #B8900E;
+  --color-or-pale:     #FFFBEB;
+
   /* Legacy aliases (used in older components) */
-  --color-secondary:   #2A8BC4;
+  --color-secondary:   #F5A623; /* aligné avec accent (jaune-orangé) */
   --color-background:  #FFFFFF;
   --color-surface:     #F5F7FA;
 
   --font-sans:    var(--font-dm-sans), ui-sans-serif, system-ui, sans-serif;
-  --font-heading: var(--font-dm-sans), ui-sans-serif, system-ui, sans-serif; /* changed from serif to sans as requested */
+  --font-heading: var(--font-dm-sans), ui-sans-serif, system-ui, sans-serif;
   --font-mono:    var(--font-space), ui-monospace, SFMono-Regular, monospace;
 }
 

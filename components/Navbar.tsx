@@ -30,11 +30,11 @@ export function Navbar() {
           {/* Left: contact info */}
           <div className="flex items-center gap-6">
             <a
-              href="mailto:contact@cfig-guinee.com"
+              href="mailto:contact@guilogtrans-guinee.com"
               className="flex items-center gap-1.5 text-white/70 hover:text-white transition-colors"
             >
               <Mail className="w-3.5 h-3.5 text-[var(--color-light)]" />
-              contact@cfig-guinee.com
+              contact@guilogtrans-guinee.com
             </a>
             <a
               href="https://wa.me/224626625162"
@@ -53,7 +53,7 @@ export function Navbar() {
           <div className="flex items-center gap-4">
             <span className="text-white/40 text-xs">Suivez-nous</span>
             <a
-              href="https://www.facebook.com/cfigguinee"
+              href="https://www.facebook.com/guilogtransguinee"
               target="_blank"
               rel="noopener noreferrer"
               className="text-white/60 hover:text-[var(--color-light)] transition-colors"
@@ -64,7 +64,7 @@ export function Navbar() {
               </svg>
             </a>
             <a
-              href="https://www.linkedin.com/company/cabinet-cfig-guinee/"
+              href="https://www.linkedin.com/company/cabinet-guilogtrans-guinee/"
               target="_blank"
               rel="noopener noreferrer"
               className="text-white/60 hover:text-[var(--color-light)] transition-colors"
@@ -75,7 +75,7 @@ export function Navbar() {
               </svg>
             </a>
             <a
-              href="https://www.instagram.com/cfig_guinee?igsh=MWk5dWphdm4wOTl6YQ=="
+              href="https://www.instagram.com/guilogtrans_guinee?igsh=MWk5dWphdm4wOTl6YQ=="
               target="_blank"
               rel="noopener noreferrer"
               className="text-white/60 hover:text-[var(--color-light)] transition-colors"
@@ -107,10 +107,10 @@ export function Navbar() {
 
             {/* Logo */}
             <Link href="/" className="flex items-center gap-3 flex-shrink-0">
-              <img src="/logo.jpeg" alt="CFIG Guinée Logo" className="h-12 w-auto object-contain" />
+              <img src="/logo.png" alt="Cabinet Guilogtrans Logo" className="h-12 w-auto object-contain" />
               <div>
                 <span className="block text-[18px] font-heading font-extrabold text-[var(--color-primary)] leading-tight tracking-tight">
-                  CFIG Guinée
+                  Cabinet Guilogtrans
                 </span>
                 <span className="block text-[9px] font-sans font-bold text-gray-400 uppercase tracking-[0.15em]">
                   Cabinet de Formation
@@ -195,7 +195,7 @@ export function Navbar() {
                 </Link>
                 <div className="mt-3 text-center text-xs text-gray-400 space-y-1 font-sans">
                   <div>+224 626 62 51 62</div>
-                  <div>contact@cfig-guinee.com</div>
+                  <div>contact@guilogtrans-guinee.com</div>
                 </div>
               </div>
             </div>

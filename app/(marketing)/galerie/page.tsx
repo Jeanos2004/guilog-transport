@@ -126,7 +126,7 @@ export default function GaleriePage() {
       <section className="relative bg-[var(--color-primary)] py-24 overflow-hidden">
         <Image
           src="/images/gallery.png"
-          alt="Galerie CFIG Guinée"
+          alt="Galerie Cabinet Guilogtrans"
           fill
           priority
           className="object-cover opacity-15"

@@ -61,7 +61,7 @@ export default function FormationsPage() {
       <section className="bg-[var(--color-primary)] py-20 relative overflow-hidden">
         <Image
           src="/images/hero.png"
-          alt="Formations CFIG"
+          alt="Formations Guilogtrans"
           fill
           sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
           priority

@@ -89,7 +89,7 @@ export default function StudentCertificatesPage() {
               Certificats de Réussite
             </h1>
             <p className="text-xs text-gray-400 mt-1 uppercase tracking-wider font-semibold">
-              Obtenez vos certifications officielles CFIG après avoir complété l'intégralité de vos formations.
+              Obtenez vos certifications officielles Guilogtrans après avoir complété l'intégralité de vos formations.
             </p>
           </div>
 
@@ -189,16 +189,16 @@ export default function StudentCertificatesPage() {
 
               <div className="relative z-10 space-y-6">
                 <div className="flex justify-center mb-2">
-                  <img src="/logo.jpeg" alt="CFIG Guinée Logo" className="h-12 w-auto object-contain bg-white rounded-none border border-gray-200 shadow-sm" />
+                  <img src="/logo.png" alt="Cabinet Guilogtrans Logo" className="h-12 w-auto object-contain bg-white rounded-none border border-gray-200 shadow-sm" />
                 </div>
                 <span className="text-xs uppercase tracking-[0.25em] font-sans font-bold text-[var(--color-accent)] block">Certificat de Réussite</span>
                 
                 <h2 className="text-2xl md:text-3xl font-black text-[var(--color-primary)] font-heading">
-                  CFIG GUINÉE
+                  Guilogtrans GUINÉE
                 </h2>
                 
                 <p className="text-xs italic text-gray-500 font-sans">
-                  Le Cabinet de Formation Informatique de Gestion certifie que
+                  Le Cabinet Guilogtrans certifie que
                 </p>
 
                 <h3 className="text-xl md:text-2xl font-bold border-b-2 border-gray-100 pb-2 w-fit mx-auto text-gray-900 font-sans">
@@ -225,7 +225,7 @@ export default function StudentCertificatesPage() {
                   </div>
 
                   <div className="text-right">
-                    <p className="text-xs font-bold text-gray-850">Direction Générale CFIG</p>
+                    <p className="text-xs font-bold text-gray-850">Direction Générale Guilogtrans</p>
                     <div className="mt-2 h-10 w-24 border border-dashed border-gray-300 rounded-none flex items-center justify-center text-[8px] text-gray-400 italic select-none bg-slate-50">
                       Signature & Cachet
                     </div>

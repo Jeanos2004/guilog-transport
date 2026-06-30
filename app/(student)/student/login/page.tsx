@@ -91,9 +91,9 @@ export default function StudentLoginPage() {
         <div className="absolute inset-0 opacity-15 bg-[radial-gradient(circle_at_bottom_left,_var(--tw-gradient-stops))] from-[var(--color-accent)] via-transparent to-transparent pointer-events-none" />
         
         <div className="relative z-10 flex items-center gap-3">
-          <img src="/logo.jpeg" alt="CFIG Guinée Logo" className="h-10 w-auto object-contain bg-white rounded-none border border-white/20 shadow-sm" />
+          <img src="/logo.png" alt="Cabinet Guilogtrans Logo" className="h-10 w-auto object-contain bg-white rounded-none border border-white/20 shadow-sm" />
           <span className="text-xl font-heading font-black tracking-wider text-white">
-            CFIG GUINÉE
+            Guilogtrans GUINÉE
           </span>
         </div>
 
@@ -125,7 +125,7 @@ export default function StudentLoginPage() {
         </div>
 
         <div className="relative z-10 text-xs text-white/50 border-t border-white/10 pt-6">
-          &copy; {new Date().getFullYear()} CFIG Guinée. Tous droits réservés.
+          &copy; {new Date().getFullYear()} Cabinet Guilogtrans. Tous droits réservés.
         </div>
       </div>
 
@@ -140,9 +140,9 @@ export default function StudentLoginPage() {
         <div className="w-full max-w-md pt-8 lg:pt-0">
           <div className="mb-8 text-center lg:text-left">
             <div className="lg:hidden inline-flex items-center gap-3 mb-6">
-              <img src="/logo.jpeg" alt="CFIG Guinée Logo" className="h-10 w-auto object-contain bg-white rounded-none border border-gray-200 shadow-sm" />
+              <img src="/logo.png" alt="Cabinet Guilogtrans Logo" className="h-10 w-auto object-contain bg-white rounded-none border border-gray-200 shadow-sm" />
               <span className="text-xl font-heading font-black tracking-wider text-[var(--color-primary)]">
-                CFIG GUINÉE
+                Guilogtrans GUINÉE
               </span>
             </div>
             <h1 className="text-3xl font-heading font-extrabold text-[var(--color-primary)]">

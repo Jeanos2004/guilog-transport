@@ -22,7 +22,7 @@ export function formatGuineaPhone(phone: string): string {
 export async function sendSingleSms(contact: string, message: string) {
   const apiKey = process.env.PASSEINFO_API_KEY;
   const clientId = process.env.PASSEINFO_CLIENT_ID;
-  const senderName = process.env.PASSEINFO_SENDER_NAME || "CFIG-GUINEE";
+  const senderName = process.env.PASSEINFO_SENDER_NAME || "Guilogtrans-GUINEE";
 
   if (!apiKey || !clientId) {
     throw new Error("Clés API PASSEINFO manquantes.");

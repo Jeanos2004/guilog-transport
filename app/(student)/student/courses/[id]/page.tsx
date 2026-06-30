@@ -159,7 +159,7 @@ export default function StudentCoursePlayerPage() {
                     {activeSession?.title || course.title}
                   </h1>
                   <span className="bg-blue-50 text-blue-600 text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-none border border-blue-200">
-                    CFIG Guinée
+                    Cabinet Guilogtrans
                   </span>
                 </div>
                 <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">

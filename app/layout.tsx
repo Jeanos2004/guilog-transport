@@ -21,9 +21,18 @@ const spaceGrotesk = Space_Grotesk({
 });
 
 export const metadata: Metadata = {
-  title: "CFIG Guinée — Cabinet de Formation Informatique de Gestion",
-  description:
-    "Cabinet de référence en formation professionnelle à Conakry. Informatique, gestion, logistique, communication, analyse de données.",
+  title: {
+    default: 'Cabinet Guilogtrans — Conseil, Étude & Formation en Logistique et Transport | Conakry, Guinée',
+    template: '%s | Guilogtrans'
+  },
+  description: 'Cabinet de conseil, d\'étude et de formation spécialisé en logistique et transport à Conakry, Guinée. Disponibilité · Efficacité · Flexibilité.',
+  keywords: ['logistique Guinée', 'formation transport Conakry', 'cabinet logistique Guinée', 'supply chain Afrique de l\'Ouest', 'Guilogtrans'],
+  openGraph: {
+    type: 'website',
+    locale: 'fr_GN',
+    url: 'https://guilogtrans.com',
+    siteName: 'Cabinet Guilogtrans',
+  }
 };
 
 /**

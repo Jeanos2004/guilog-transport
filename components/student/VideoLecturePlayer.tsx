@@ -14,7 +14,7 @@ export default function VideoLecturePlayer({ videoUrl, title, onComplete, isComp
   const [dataSaver, setDataSaver] = useState(false);
 
   useEffect(() => {
-    const saved = localStorage.getItem("cfig-preferences");
+    const saved = localStorage.getItem("guilogtrans-preferences");
     if (saved) {
       try {
         const parsed = JSON.parse(saved);

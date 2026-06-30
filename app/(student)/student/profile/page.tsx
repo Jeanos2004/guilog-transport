@@ -64,7 +64,7 @@ export default function StudentProfilePage() {
   }, [router]);
 
   useEffect(() => {
-    const saved = localStorage.getItem("cfig-preferences");
+    const saved = localStorage.getItem("guilogtrans-preferences");
     if (saved) {
       try {
         const parsed = JSON.parse(saved);
@@ -79,7 +79,7 @@ export default function StudentProfilePage() {
   }, []);
 
   const savePreferences = () => {
-    localStorage.setItem("cfig-preferences", JSON.stringify({
+    localStorage.setItem("guilogtrans-preferences", JSON.stringify({
       emailAlerts,
       smsAlerts,
       lowDataMode,
@@ -205,7 +205,7 @@ export default function StudentProfilePage() {
                   >
                     <div>
                       <h3 className="text-sm font-black text-gray-900 uppercase tracking-wider">Informations Personnelles</h3>
-                      <p className="text-[11px] text-gray-450 mt-1">Vos coordonnées et statut d'étudiant pour vos certificats CFIG officiels.</p>
+                      <p className="text-[11px] text-gray-450 mt-1">Vos coordonnées et statut d'étudiant pour vos certificats Guilogtrans officiels.</p>
                     </div>
 
                     {success && (

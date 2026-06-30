@@ -14,27 +14,27 @@ const heroSlides = [
   {
     id: 1,
     image: "/images/hero.png",
-    label: "Formation Professionnelle",
-    title: "Bâtissez l'excellence de vos compétences avec CFIG Guinée",
-    subtitle: "Le cabinet de référence en formation professionnelle à Conakry. Des cursus 100% pratiques pour des résultats concrets.",
+    label: "Conseil & Formation",
+    title: "Disponibilité · Efficacité · Flexibilité",
+    subtitle: "Cabinet de conseil, d'étude et de formation spécialisé en logistique et transport, au service des entreprises et professionnels de Guinée et d'Afrique de l'Ouest.",
     cta: { text: "Découvrir nos formations", href: "/formations" },
-    ctaSecondary: { text: "S'inscrire", href: "/inscription" },
+    ctaSecondary: { text: "Demander un devis", href: "/contact" },
   },
   {
     id: 2,
     image: "/images/about.png",
-    label: "Experts & Formateurs",
-    title: "Des instructeurs chevronnés à votre service",
-    subtitle: "Apprenez des meilleurs professionnels de terrain en Gestion, Logistique, PowerBI, et Communication Digitale.",
-    cta: { text: "Notre équipe", href: "/a-propos" },
+    label: "Conseil Stratégique",
+    title: "Optimisation de votre chaîne logistique",
+    subtitle: "Gestion des entrepôts, planification des transports et réduction de vos coûts logistiques avec nos experts.",
+    cta: { text: "Nos services", href: "/a-propos" },
     ctaSecondary: { text: "Nous contacter", href: "/contact" },
   },
   {
     id: 3,
     image: "/images/gallery.png",
-    label: "Certifications & Attestations",
-    title: "Valorisez votre parcours avec une attestation officielle",
-    subtitle: "Chaque formation CFIG se conclut par une attestation reconnue, véritable atout pour votre carrière et votre CV.",
+    label: "Études & Audit",
+    title: "Analyse et diagnostic logistique",
+    subtitle: "Évaluation de vos processus existants et recommandations stratégiques pour une meilleure rentabilité.",
     cta: { text: "Voir le catalogue", href: "/formations" },
     ctaSecondary: { text: "En savoir plus", href: "/a-propos" },
   },
@@ -114,10 +114,10 @@ export default function Home() {
   }, [next, isAutoPlaying]);
 
   const dynamicStats = [
-    { value: settings ? `+${roundDown(settings.apprenantsForme + validatedInscriptionsCount)}` : "+500", label: "Apprenants formés" },
-    { value: formations.length > 0 ? `${formations.length}` : "8", label: "Domaines de formation" },
-    { value: settings ? `+${roundDown(settings.totalHeuresFormation)}` : "+1200", label: "Heures dispensées" },
-    { value: settings ? `${settings.tauxSatisfaction}%` : "95%", label: "De satisfaction" }
+    { value: "4+", label: "Années d'expérience" },
+    { value: "50+", label: "Formations dispensées" },
+    { value: "30+", label: "Entreprises accompagnées" },
+    { value: "+500", label: "Apprenants formés" }
   ];
 
   return (
@@ -395,7 +395,7 @@ export default function Home() {
             >
               <Image
                 src="/images/section-about.jpeg"
-                alt="Équipe CFIG Guinée"
+                alt="Équipe Cabinet Guilogtrans"
                 fill
                 sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                 className="object-cover"
@@ -423,24 +423,24 @@ export default function Home() {
                 À propos de nous
               </span>
               <h2 className="text-3xl md:text-4xl font-heading font-bold text-[var(--color-primary)] mb-6 leading-tight">
-                Cabinet de Formation de Référence à Conakry
+                Cabinet de Référence en Logistique et Transport
               </h2>
 
               <div className="w-12 h-1 bg-[var(--color-accent)] mb-6" />
 
               <p className="text-gray-600 text-base mb-5 leading-relaxed">
-                Le Cabinet de Formation Informatique de Gestion (CFIG Guinée) accompagne individus et entreprises dans leur montée en compétences. Nos programmes sont conçus par des experts de terrain pour garantir une application immédiate.
+                Le Cabinet Guilogtrans accompagne les entreprises, institutions et professionnels souhaitant optimiser leurs opérations logistiques et renforcer les compétences de leurs équipes.
               </p>
               <p className="text-gray-600 text-base mb-8 leading-relaxed">
-                Nous proposons des formations pratiques et certifiantes dans les domaines de la Gestion, de l'Informatique, de la Logistique, de l'Analyse de données et de la Communication digitale.
+                Nous intervenons sur trois piliers clés : le conseil stratégique, les études et l'audit logistique, ainsi que la formation professionnelle continue (gestion des stocks, réglementation douanière, etc.).
               </p>
 
               <div className="grid grid-cols-2 gap-4 mb-8">
                 {[
-                  "Formateurs experts de terrain",
-                  "Certification officielle CFIG",
-                  "Suivi post-formation",
-                  "Intra & Inter-entreprises",
+                  "Conseil stratégique",
+                  "Études & Audit",
+                  "Formation professionnelle",
+                  "Accompagnement sur-mesure",
                 ].map((item, i) => (
                   <div key={i} className="flex items-center gap-2 text-sm text-gray-700">
                     <CheckCircle2 className="w-4 h-4 text-[var(--color-accent)] flex-shrink-0" />
@@ -553,10 +553,10 @@ export default function Home() {
               <span className="w-6 h-[2px] bg-[var(--color-accent)] ml-2 inline-block" />
             </span>
             <h2 className="text-3xl md:text-4xl font-heading font-bold text-[var(--color-primary)] mb-5">
-              Rejoignez les professionnels qui font confiance à CFIG Guinée
+              Rejoignez les professionnels qui font confiance au Cabinet Guilogtrans
             </h2>
             <p className="text-gray-600 mb-8 max-w-xl mx-auto font-sans">
-              Des centaines de diplômés ont boosté leur carrière grâce à nos formations certifiantes. Commencez votre parcours dès aujourd'hui.
+              Des entreprises et des particuliers ont optimisé leurs flux et boosté leur carrière grâce à nos formations et notre expertise logistique.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link

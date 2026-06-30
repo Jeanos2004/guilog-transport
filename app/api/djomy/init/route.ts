@@ -10,7 +10,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
     }
 
-    const merchantPaymentReference = `CFIG-${userId.substring(0,5)}-${courseId.substring(0,5)}-${Date.now()}`;
+    const merchantPaymentReference = `Guilogtrans-${userId.substring(0,5)}-${courseId.substring(0,5)}-${Date.now()}`;
     const returnUrl = `${process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"}/student/payment-return`;
 
     // metadata to be returned in webhook

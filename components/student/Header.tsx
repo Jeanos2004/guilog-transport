@@ -107,8 +107,8 @@ export default function StudentHeader({
         {/* Mobile Logo */}
         <div className="md:hidden flex items-center shrink-0">
           <img 
-            src="/logo.jpeg" 
-            alt="CFIG Guinée Logo" 
+            src="/logo.png" 
+            alt="Cabinet Guilogtrans Logo" 
             className="h-8 w-auto object-contain bg-white rounded-none border border-gray-200 shadow-sm" 
           />
         </div>

@@ -4,13 +4,13 @@ import { getAuth } from "firebase/auth";
 import { getAnalytics, isSupported } from "firebase/analytics";
 
 const firebaseConfig = {
-  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY || "AIzaSyAvAOyYvP1ZDh3GO72Ts4rnshUuBJR1kk8",
-  authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN || "cfig-guinee.firebaseapp.com",
-  projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID || "cfig-guinee",
-  storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET || "cfig-guinee.firebasestorage.app",
-  messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID || "106387285538",
-  appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID || "1:106387285538:web:021c1ec87c76cd707e8c7b",
-  measurementId: process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID || "G-C73DNEJ8MM"
+  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY || "AIzaSyAbTJt6XW7mooL3aZ-lRoaRmwzmagyCge0",
+  authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN || "guilogtrans-6f925.firebaseapp.com",
+  projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID || "guilogtrans-6f925",
+  storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET || "guilogtrans-6f925.firebasestorage.app",
+  messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID || "609650242945",
+  appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID || "1:609650242945:web:568114f4c7454d38c6e480",
+  measurementId: process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID || "G-7C0W1SB36W"
 };
 
 // Initialize Firebase once

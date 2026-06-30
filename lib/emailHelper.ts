@@ -6,7 +6,7 @@ const resend = new Resend(process.env.RESEND_API_KEY);
 // Important: Resend requires a verified domain to send FROM.
 // For testing/development, you must use 'onboarding@resend.dev' or verify a domain in the Resend dashboard.
 const FROM_EMAIL = process.env.RESEND_FROM_EMAIL || 'onboarding@resend.dev';
-const BRAND_NAME = "CFIG Guinée";
+const BRAND_NAME = "Cabinet Guilogtrans";
 
 export interface SendEmailOptions {
   to: string;
@@ -53,7 +53,7 @@ export const emailHelper = {
         <p>Nous sommes ravis de vous compter parmi nos étudiants chez <strong>${BRAND_NAME}</strong>.</p>
         <p>Votre compte a été créé avec succès. Vous pouvez dès à présent vous connecter pour consulter notre catalogue de formations et suivre votre progression.</p>
         <div style="text-align: center; margin: 30px 0;">
-          <a href="https://cfig-guinee.com/student/login" style="background-color: #4F46E5; color: white; padding: 12px 24px; text-decoration: none; border-radius: 5px; font-weight: bold;">Accéder à mon espace</a>
+          <a href="https://guilogtrans-guinee.com/student/login" style="background-color: #4F46E5; color: white; padding: 12px 24px; text-decoration: none; border-radius: 5px; font-weight: bold;">Accéder à mon espace</a>
         </div>
         <p style="font-size: 14px; color: #666;">Si vous avez des questions, n'hésitez pas à nous contacter.</p>
         <p>L'équipe ${BRAND_NAME}</p>
@@ -99,7 +99,7 @@ export const emailHelper = {
         <p style="color: #DC2626; font-size: 13px;"><em>Veuillez modifier votre mot de passe dès votre première connexion pour des raisons de sécurité.</em></p>
         
         <div style="text-align: center; margin: 30px 0;">
-          <a href="https://cfig-guinee.com/student/login" style="background-color: #10B981; color: white; padding: 12px 24px; text-decoration: none; border-radius: 5px; font-weight: bold;">Se connecter</a>
+          <a href="https://guilogtrans-guinee.com/student/login" style="background-color: #10B981; color: white; padding: 12px 24px; text-decoration: none; border-radius: 5px; font-weight: bold;">Se connecter</a>
         </div>
         
         <p>L'équipe ${BRAND_NAME}</p>
@@ -151,7 +151,7 @@ export const emailHelper = {
         <p style="color: #DC2626; font-size: 13px;"><em>Veuillez modifier votre mot de passe dès que possible.</em></p>
         
         <div style="text-align: center; margin: 30px 0;">
-          <a href="https://cfig-guinee.com/admin" style="background-color: #4F46E5; color: white; padding: 12px 24px; text-decoration: none; border-radius: 5px; font-weight: bold;">Accéder au Tableau de Bord</a>
+          <a href="https://guilogtrans-guinee.com/admin" style="background-color: #4F46E5; color: white; padding: 12px 24px; text-decoration: none; border-radius: 5px; font-weight: bold;">Accéder au Tableau de Bord</a>
         </div>
         
         <p>L'équipe ${BRAND_NAME}</p>

@@ -74,10 +74,10 @@ export async function initiateDirectPayment(payload: {
     payerIdentifier: payload.payerIdentifier,
     amount: payload.amount,
     countryCode: "GN",
-    description: payload.description || "Paiement de formation CFIG",
+    description: payload.description || "Paiement de formation Guilogtrans",
     merchantPaymentReference: payload.merchantPaymentReference,
-    returnUrl: payload.returnUrl || "https://cfig-guinee.com/student/catalog",
-    cancelUrl: payload.cancelUrl || "https://cfig-guinee.com/student/catalog",
+    returnUrl: payload.returnUrl || "https://guilogtrans-guinee.com/student/catalog",
+    cancelUrl: payload.cancelUrl || "https://guilogtrans-guinee.com/student/catalog",
     metadata: payload.metadata || {}
   };
 
@@ -122,7 +122,7 @@ export async function initiateGatewayPayment(payload: {
     countryCode: "GN",
     payerNumber: payload.payerNumber || "0022400000000",
     allowedPaymentMethods: payload.allowedPaymentMethods || ["CARD", "OM", "MOMO"],
-    description: payload.description || "Paiement de formation CFIG",
+    description: payload.description || "Paiement de formation Guilogtrans",
     merchantPaymentReference: payload.merchantPaymentReference,
     returnUrl: payload.returnUrl,
     cancelUrl: payload.cancelUrl,

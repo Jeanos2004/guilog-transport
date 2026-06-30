@@ -24,7 +24,7 @@ export default function ActualitesPage() {
       <section className="bg-[var(--color-primary)] py-20 relative overflow-hidden">
         <Image
           src="/images/news_hero.png"
-          alt="Actualités & Blog CFIG"
+          alt="Actualités & Blog Guilogtrans"
           fill
           sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
           priority

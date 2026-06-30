@@ -35,7 +35,7 @@ export default function ContactPage() {
       <section className="bg-[var(--color-primary)] py-20 relative overflow-hidden">
         <Image
           src="/images/contact_hero.png"
-          alt="Contactez CFIG Guinée"
+          alt="Contactez Cabinet Guilogtrans"
           fill
           sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
           priority
@@ -146,7 +146,7 @@ export default function ContactPage() {
                   </div>
                   <div>
                     <h3 className="font-semibold text-lg mb-1">Email</h3>
-                    <p className="text-gray-300">contact@cfig-guinee.com</p>
+                    <p className="text-gray-300">contact@guilogtrans-guinee.com</p>
                   </div>
                 </div>
                 
@@ -176,7 +176,7 @@ export default function ContactPage() {
           allowFullScreen
           loading="lazy"
           referrerPolicy="no-referrer-when-downgrade"
-          title="Localisation de CFIG Guinée"
+          title="Localisation de Cabinet Guilogtrans"
           className="w-full h-full grayscale-[15%] contrast-[105%] opacity-95 hover:grayscale-0 hover:opacity-100 transition-all duration-300"
         />
       </section>

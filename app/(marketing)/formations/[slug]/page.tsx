@@ -289,7 +289,7 @@ const moduleDetailsRegistry: Record<string, ModuleDetail> = {
 // === FALLBACK GENERATOR FOR OTHERS ===
 const generateFallbackDetails = (title: string, category: string, outils: string[]): ModuleDetail => {
   return {
-    description: `Développez vos compétences en ${title} au sein du cabinet CFIG Guinée. Ce programme 100% pratique et encadré par des experts est conçu pour répondre précisément aux besoins opérationnels du marché du travail actuel.`,
+    description: `Développez vos compétences en ${title} au sein du cabinet Cabinet Guilogtrans. Ce programme 100% pratique et encadré par des experts est conçu pour répondre précisément aux besoins opérationnels du marché du travail actuel.`,
     duration: "30 heures (100% pratique)",
     level: "Débutant à Avancé",
     audience: ["Professionnels du secteur privé et public", "Diplômés souhaitant booster leur employabilité", "Entrepreneurs"],
@@ -319,7 +319,7 @@ const generateFallbackDetails = (title: string, category: string, outils: string
       },
       {
         title: "Chapitre 4 : Bilan, Recommandations et Perspectives",
-        points: ["Présentation des travaux pratiques et validation des acquis", "Conseils pour intégrer ces nouvelles compétences dans votre quotidien", "Procédures d'examen et attribution des attestations CFIG"]
+        points: ["Présentation des travaux pratiques et validation des acquis", "Conseils pour intégrer ces nouvelles compétences dans votre quotidien", "Procédures d'examen et attribution des attestations Guilogtrans"]
       }
     ]
   };
@@ -416,7 +416,7 @@ export default function FormationDetailPage() {
   // Prefilled links
   const inscriptionUrl = `/inscription?domain=${encodeURIComponent(activeCategory)}&module=${encodeURIComponent(activeModule.titre)}`;
   const whatsappUrl = `https://wa.me/224626625162?text=${encodeURIComponent(
-    `Bonjour CFIG Guinée, je souhaiterais obtenir des informations concernant la formation : "${activeModule.titre}" (Catégorie : ${activeCategory}).`
+    `Bonjour Cabinet Guilogtrans, je souhaiterais obtenir des informations concernant la formation : "${activeModule.titre}" (Catégorie : ${activeCategory}).`
   )}`;
 
   return (
@@ -462,7 +462,7 @@ export default function FormationDetailPage() {
             </div>
             <div className="flex items-center gap-1.5 bg-white/10 px-3 py-1.5 rounded-none border border-white/15">
               <Award className="w-4 h-4 text-[var(--color-accent)]" />
-              <span>Attestation officielle CFIG</span>
+              <span>Attestation officielle Guilogtrans</span>
             </div>
           </div>
         </div>

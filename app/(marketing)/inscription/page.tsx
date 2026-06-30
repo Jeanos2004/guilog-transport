@@ -240,7 +240,7 @@ export default function InscriptionPage() {
       <div className="hidden lg:flex lg:w-5/12 relative bg-[var(--color-primary)] overflow-hidden">
         <Image
           src="/images/inscription_hero.png"
-          alt="Inscription CFIG Guinée"
+          alt="Inscription Cabinet Guilogtrans"
           fill
           sizes="50vw"
           priority

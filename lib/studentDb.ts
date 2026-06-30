@@ -76,7 +76,7 @@ export const AVAILABLE_COURSES: StudentCourse[] = [
             title: "1.1 Bienvenue et installation de PowerBI Desktop",
             date: "2026-06-22T18:00:00Z", // Past
             duration: "2 heures",
-            location: "Salle B, Siège CFIG",
+            location: "Salle B, Siège Guilogtrans",
             resources: [{ name: "Support de cours PDF", url: "#" }]
           },
           {
@@ -84,7 +84,7 @@ export const AVAILABLE_COURSES: StudentCourse[] = [
             title: "1.2 Modélisation des Données et Bonnes Pratiques",
             date: "2026-06-24T18:00:00Z", // Today!
             duration: "2 heures",
-            location: "Salle B, Siège CFIG",
+            location: "Salle B, Siège Guilogtrans",
             meetUrl: "https://zoom.us/j/1234567890",
             resources: [{ name: "Fiche technique Modélisation PDF", url: "#" }]
           },
@@ -93,7 +93,7 @@ export const AVAILABLE_COURSES: StudentCourse[] = [
             title: "1.3 Connexion aux sources de données Excel",
             date: "2026-06-26T18:00:00Z", // Future
             duration: "2 heures",
-            location: "Salle B, Siège CFIG",
+            location: "Salle B, Siège Guilogtrans",
             resources: [{ name: "Fichier d'exercice Excel", url: "#" }]
           }
         ]
@@ -107,7 +107,7 @@ export const AVAILABLE_COURSES: StudentCourse[] = [
             title: "2.1 Nettoyage et transformation avec Power Query",
             date: "2026-06-29T18:00:00Z",
             duration: "2 heures",
-            location: "Salle B, Siège CFIG",
+            location: "Salle B, Siège Guilogtrans",
             resources: [{ name: "Guide des transformations", url: "#" }]
           },
           {
@@ -115,7 +115,7 @@ export const AVAILABLE_COURSES: StudentCourse[] = [
             title: "2.2 Introduction au DAX",
             date: "2026-07-01T18:00:00Z",
             duration: "2 heures",
-            location: "Salle B, Siège CFIG",
+            location: "Salle B, Siège Guilogtrans",
             meetUrl: "https://zoom.us/j/0987654321",
             resources: [{ name: "Cheat Sheet DAX PDF", url: "#" }]
           }
@@ -141,7 +141,7 @@ export const AVAILABLE_COURSES: StudentCourse[] = [
             title: "1.1 Création du fichier paie et constantes",
             date: "2026-06-20T09:00:00Z",
             duration: "3 heures",
-            location: "Salle A, Siège CFIG",
+            location: "Salle A, Siège Guilogtrans",
             meetUrl: "https://meet.google.com/abc-defg-hij"
           },
           {
@@ -149,7 +149,7 @@ export const AVAILABLE_COURSES: StudentCourse[] = [
             title: "1.2 Configuration des fiches de personnel",
             date: "2026-06-27T09:00:00Z",
             duration: "3 heures",
-            location: "Salle A, Siège CFIG",
+            location: "Salle A, Siège Guilogtrans",
             resources: [{ name: "Fiche salarié vierge", url: "#" }]
           }
         ]
@@ -174,14 +174,14 @@ export const AVAILABLE_COURSES: StudentCourse[] = [
             title: "1.1 Définir sa ligne éditoriale et son persona",
             date: "2026-07-05T14:00:00Z",
             duration: "2 heures",
-            location: "Salle C, Siège CFIG"
+            location: "Salle C, Siège Guilogtrans"
           },
           {
             id: "comm-s2",
             title: "1.2 Planifier son calendrier éditorial",
             date: "2026-07-07T14:00:00Z",
             duration: "2 heures",
-            location: "Salle C, Siège CFIG",
+            location: "Salle C, Siège Guilogtrans",
             resources: [{ name: "Modèle de calendrier éditorial", url: "#" }]
           }
         ]

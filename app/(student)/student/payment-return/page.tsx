@@ -85,7 +85,7 @@ export default function PaymentReturnPage() {
       {/* Fallback simple header for this specific page */}
       <div className="bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between">
         <div className="font-heading font-black text-xl tracking-tight text-[var(--color-primary)]">
-          CFIG<span className="text-[var(--color-accent)]">.</span>
+          Guilogtrans<span className="text-[var(--color-accent)]">.</span>
         </div>
       </div>
       <Suspense fallback={
