@@ -298,6 +298,14 @@ export const studentDb = {
   async getCourses(): Promise<StudentCourse[]> {
     try {
       const publicCategories = await db.getFormations();
+      
+      // Fetch saved courses from student_courses collection
+      const savedSnapshot = await getDocs(collection(firestore, "student_courses"));
+      const savedCourses = new Map<string, StudentCourse>();
+      savedSnapshot.forEach(doc => {
+        savedCourses.set(doc.id, doc.data() as StudentCourse);
+      });
+
       const studentCourses: StudentCourse[] = [];
 
       publicCategories.forEach(cat => {
@@ -308,6 +316,37 @@ export const studentDb = {
           const slug = (cat.categorie + "-" + mod.titre).toLowerCase().replace(/[^a-z0-9]/g, "-");
           const id = mod.id || slug;
           
+          const savedCourse = savedCourses.get(id);
+          
+          // If the user already saved course modules in Course Builder, use them.
+          // Otherwise, build initial modules from mod.details.programme
+          let initialModules: CourseModule[] = [];
+          if (savedCourse && savedCourse.modules && savedCourse.modules.length > 0) {
+            initialModules = savedCourse.modules;
+          } else if (mod.details?.programme && mod.details.programme.length > 0) {
+            initialModules = mod.details.programme.map((p, pIdx) => ({
+              id: id + "-m" + pIdx,
+              title: p.title,
+              sessions: p.points.map((pt, sIdx) => ({
+                id: id + "-s" + pIdx + "-" + sIdx,
+                title: pt,
+                type: "video",
+                orderIndex: sIdx,
+                duration: "0h",
+                date: "", // required by CourseSession
+                location: ""
+              }))
+            }));
+          } else {
+            initialModules = [
+              {
+                id: id + "-m1",
+                title: "Agenda de la formation",
+                sessions: mod.sessions || []
+              }
+            ];
+          }
+          
           studentCourses.push({
             id,
             title: mod.titre,
@@ -316,13 +355,7 @@ export const studentDb = {
             duration: mod.details?.duree || "Non définie",
             image: mod.image || cat.image || "/images/programmes/analyse.jpg",
             price: mod.prix || 0,
-            modules: [
-              {
-                id: id + "-m1",
-                title: "Agenda de la formation",
-                sessions: mod.sessions || []
-              }
-            ]
+            modules: initialModules
           });
         });
       });

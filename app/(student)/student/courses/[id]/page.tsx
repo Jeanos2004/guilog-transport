@@ -10,7 +10,8 @@ import StudentHeader from "@/components/student/Header";
 import { 
   ArrowLeft, BookOpen, Download, FileText, CheckCircle2, 
   ChevronRight, Play, Award, Clock, Star, Bookmark, Calendar,
-  User as UserIcon, Activity, ChevronDown, Video, MapPin
+  User as UserIcon, Activity, ChevronDown, Video, MapPin,
+  PlayCircle, Monitor, Users, Lock
 } from "lucide-react";
 import Link from "next/link";
 
@@ -171,62 +172,158 @@ export default function StudentCoursePlayerPage() {
 
           {/* Active Session Card Content */}
           {activeSession ? (
-            <div className="bg-slate-950 border border-gray-800 rounded-none shadow-sm p-8 md:p-12 text-white flex flex-col justify-between aspect-video min-h-[350px] shrink-0 relative overflow-hidden">
-              {/* Glowing decorative effect */}
-              <div className="absolute right-0 top-0 w-64 h-64 bg-[var(--color-primary)]/10 blur-[80px] pointer-events-none" />
-              
-              <div className="space-y-6 relative z-10">
-                <div className="flex flex-wrap items-center gap-4">
-                  {activeSession.meetUrl && (
-                    <span className="flex items-center gap-2 bg-red-500/20 text-red-400 border border-red-500/30 px-3 py-1 text-[10px] font-black uppercase tracking-widest rounded-none">
-                      <span className="relative flex h-2 w-2">
-                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
-                        <span className="relative inline-flex rounded-full h-2 w-2 bg-red-500"></span>
-                      </span>
-                      Hybride (En ligne disponible)
-                    </span>
+            <>
+              {/* ── VIDEO SESSION ───────────────────────────────── */}
+              {activeSession.type === "video" && (
+                <div className="bg-black rounded-none overflow-hidden shadow-lg shrink-0 aspect-video min-h-[300px] flex items-center justify-center relative group">
+                  {activeSession.videoUrl ? (
+                    <iframe
+                      key={activeSession.id}
+                      src={activeSession.videoUrl.includes("youtube.com/watch")
+                        ? activeSession.videoUrl.replace("watch?v=", "embed/")
+                        : activeSession.videoUrl.includes("youtu.be/")
+                          ? `https://www.youtube.com/embed/${activeSession.videoUrl.split("youtu.be/")[1]?.split("?")[0]}`
+                          : activeSession.videoUrl
+                      }
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                      allowFullScreen
+                      className="w-full h-full absolute inset-0"
+                    />
+                  ) : (
+                    <div className="flex flex-col items-center gap-4 text-white/40">
+                      <PlayCircle className="w-16 h-16" />
+                      <p className="text-xs font-bold uppercase tracking-widest">Vidéo non encore disponible</p>
+                      <p className="text-[10px]">L&apos;administrateur n&apos;a pas encore uploadé cette vidéo.</p>
+                    </div>
                   )}
-                  <span className="bg-white/10 border border-white/20 px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-gray-300">
-                    Séance du {new Date(activeSession.date).toLocaleDateString("fr-FR", { weekday: 'long', day: 'numeric', month: 'long' })}
-                  </span>
                 </div>
-                
-                <div>
-                  <h2 className="text-2xl md:text-3xl font-heading font-black leading-tight text-white mb-4">
-                    {activeSession.title}
-                  </h2>
-                  <div className="flex flex-col gap-2 text-sm text-slate-300">
-                    <span className="flex items-center gap-2"><Clock className="w-4 h-4 text-slate-400" /> Horaire : {new Date(activeSession.date).toLocaleTimeString("fr-FR", { hour: '2-digit', minute: '2-digit' })} ({activeSession.duration})</span>
-                    <span className="flex items-center gap-2"><MapPin className="w-4 h-4 text-slate-400" /> Lieu : {activeSession.location}</span>
+              )}
+
+              {/* ── TEXT / DOCUMENT SESSION ─────────────────────── */}
+              {(activeSession.type === "text" || activeSession.type === "document") && (
+                <div className="bg-white border border-gray-200 rounded-none shadow-sm p-8 shrink-0 min-h-[300px]">
+                  <div className="flex items-center gap-3 mb-6 pb-4 border-b border-gray-100">
+                    <div className="w-10 h-10 bg-[var(--color-primary)]/10 border border-[var(--color-primary)]/20 flex items-center justify-center">
+                      <FileText className="w-5 h-5 text-[var(--color-primary)]" />
+                    </div>
+                    <div>
+                      <h2 className="font-black text-gray-900 text-base font-heading">{activeSession.title}</h2>
+                      <span className="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Contenu de la séance</span>
+                    </div>
+                  </div>
+                  {activeSession.content ? (
+                    <div className="prose prose-sm max-w-none text-gray-700 leading-relaxed text-sm whitespace-pre-wrap">
+                      {activeSession.content}
+                    </div>
+                  ) : (
+                    <p className="text-xs text-gray-400 italic">Le contenu textuel de cette séance n&apos;est pas encore disponible.</p>
+                  )}
+                </div>
+              )}
+
+              {/* ── ZOOM / MEET / PHYSICAL SESSION ──────────────── */}
+              {(activeSession.type === "zoom" || (!activeSession.type && activeSession.date)) && (
+                <div className="bg-slate-950 border border-gray-800 rounded-none shadow-sm p-8 md:p-12 text-white flex flex-col justify-between aspect-video min-h-[350px] shrink-0 relative overflow-hidden">
+                  {/* Glowing decorative effect */}
+                  <div className="absolute right-0 top-0 w-64 h-64 bg-[var(--color-primary)]/10 blur-[80px] pointer-events-none" />
+                  
+                  <div className="space-y-6 relative z-10">
+                    <div className="flex flex-wrap items-center gap-4">
+                      {activeSession.meetUrl ? (
+                        <span className="flex items-center gap-2 bg-red-500/20 text-red-400 border border-red-500/30 px-3 py-1 text-[10px] font-black uppercase tracking-widest rounded-none">
+                          <span className="relative flex h-2 w-2">
+                            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+                            <span className="relative inline-flex rounded-full h-2 w-2 bg-red-500"></span>
+                          </span>
+                          Session Live / En ligne disponible
+                        </span>
+                      ) : (
+                        <span className="flex items-center gap-2 bg-violet-500/20 text-violet-300 border border-violet-500/30 px-3 py-1 text-[10px] font-black uppercase tracking-widest rounded-none">
+                          <Users className="w-3 h-3" />
+                          Session Présentielle
+                        </span>
+                      )}
+                      {activeSession.date && (
+                        <span className="bg-white/10 border border-white/20 px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-gray-300">
+                          {new Date(activeSession.date).toLocaleDateString("fr-FR", { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}
+                        </span>
+                      )}
+                    </div>
+                    
+                    <div>
+                      <h2 className="text-2xl md:text-3xl font-heading font-black leading-tight text-white mb-4">
+                        {activeSession.title}
+                      </h2>
+                      <div className="flex flex-col gap-2 text-sm text-slate-300">
+                        {activeSession.date && (
+                          <span className="flex items-center gap-2">
+                            <Clock className="w-4 h-4 text-slate-400" />
+                            Horaire : {new Date(activeSession.date).toLocaleTimeString("fr-FR", { hour: '2-digit', minute: '2-digit' })}
+                            {activeSession.duration && ` (${activeSession.duration})`}
+                          </span>
+                        )}
+                        {activeSession.location && (
+                          <span className="flex items-center gap-2">
+                            <MapPin className="w-4 h-4 text-slate-400" />
+                            Lieu : {activeSession.location}
+                          </span>
+                        )}
+                        {activeSession.capacity && (
+                          <span className="flex items-center gap-2">
+                            <Users className="w-4 h-4 text-slate-400" />
+                            Capacité : {activeSession.capacity} places
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div className="mt-8 flex flex-col sm:flex-row gap-4 items-center relative z-10">
+                    {activeSession.meetUrl && (
+                      <a
+                        href={activeSession.meetUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="w-full sm:w-auto px-8 py-3.5 bg-[var(--color-primary)] hover:bg-[var(--color-accent)] text-white text-[10px] font-bold uppercase tracking-widest rounded-none border border-[var(--color-primary)] transition-all text-center flex items-center justify-center gap-2 shadow-sm hover:shadow-md"
+                      >
+                        <Video className="w-4 h-4" />
+                        Rejoindre en ligne
+                      </a>
+                    )}
+                    
+                    <button
+                      onClick={handleToggleComplete}
+                      className={`w-full sm:w-auto px-6 py-3.5 text-[10px] font-bold uppercase tracking-widest rounded-none transition-all border text-center flex items-center justify-center gap-2 ${
+                        isSessionAttended(activeSession.id)
+                          ? "bg-green-500/20 border-green-500/40 text-green-400"
+                          : "bg-white/5 border-white/10 hover:bg-white/10 text-white"
+                      }`}
+                    >
+                      {isSessionAttended(activeSession.id) ? <><CheckCircle2 className="w-4 h-4" /> Présent(e) ✓</> : "Marquer comme Présent(e)"}
+                    </button>
                   </div>
                 </div>
-              </div>
-              
-              <div className="mt-8 flex flex-col sm:flex-row gap-4 items-center relative z-10">
-                {activeSession.meetUrl && (
-                  <a
-                    href={activeSession.meetUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="w-full sm:w-auto px-8 py-3.5 bg-[var(--color-primary)] hover:bg-[var(--color-accent)] text-white text-[10px] font-bold uppercase tracking-widest rounded-none border border-[var(--color-primary)] transition-all text-center flex items-center justify-center gap-2 shadow-sm hover:shadow-md"
+              )}
+
+              {/* ── Mark complete for video/text sessions ───────── */}
+              {(activeSession.type === "video" || activeSession.type === "text" || activeSession.type === "document") && (
+                <div className="bg-white border border-gray-200 p-4 flex items-center justify-between shrink-0">
+                  <div className="text-xs text-gray-500">
+                    {activeSession.duration && <span className="flex items-center gap-1.5"><Clock className="w-3.5 h-3.5" /> {activeSession.duration}</span>}
+                  </div>
+                  <button
+                    onClick={handleToggleComplete}
+                    className={`px-5 py-2.5 text-[10px] font-bold uppercase tracking-widest rounded-none transition-all border flex items-center gap-2 ${
+                      isSessionAttended(activeSession.id)
+                        ? "bg-green-50 border-green-200 text-green-600"
+                        : "bg-[var(--color-primary)] border-[var(--color-primary)] text-white hover:bg-[var(--color-accent)] hover:border-[var(--color-accent)]"
+                    }`}
                   >
-                    <Video className="w-4 h-4" />
-                    Rejoindre en ligne
-                  </a>
-                )}
-                
-                <button
-                  onClick={handleToggleComplete}
-                  className={`w-full sm:w-auto px-6 py-3.5 text-[10px] font-bold uppercase tracking-widest rounded-none transition-all border text-center flex items-center justify-center gap-2 ${
-                    isSessionAttended(activeSession.id)
-                      ? "bg-green-500/20 border-green-500/40 text-green-400"
-                      : "bg-white/5 border-white/10 hover:bg-white/10 text-white"
-                  }`}
-                >
-                  {isSessionAttended(activeSession.id) ? <><CheckCircle2 className="w-4 h-4" /> Présent(e) ✓</> : "Marquer comme Présent(e)"}
-                </button>
-              </div>
-            </div>
+                    {isSessionAttended(activeSession.id) ? <><CheckCircle2 className="w-4 h-4" /> Terminé ✓</> : <><Play className="w-4 h-4" /> Marquer comme terminé</>}
+                  </button>
+                </div>
+              )}
+            </>
           ) : (
             <div className="aspect-video bg-gray-950 border border-gray-800 rounded-none flex items-center justify-center text-white/50 text-xs shrink-0">
               Sélectionnez une séance dans le sommaire pour commencer.
@@ -437,6 +534,13 @@ export default function StudentCoursePlayerPage() {
                           const isDone = isSessionAttended(session.id);
                           const sessionDate = new Date(session.date);
                           
+                          // Pick icon based on session type
+                          const TypeIcon = session.type === "video" ? PlayCircle
+                            : session.type === "text" ? FileText
+                            : session.type === "document" ? Download
+                            : session.type === "zoom" ? Video
+                            : Calendar;
+                          
                           return (
                             <button
                               key={session.id}
@@ -451,11 +555,18 @@ export default function StudentCoursePlayerPage() {
                                 {isDone ? (
                                   <CheckCircle2 className="w-3.5 h-3.5 text-green-500 shrink-0" />
                                 ) : (
-                                  <Calendar className="w-3 h-3 text-gray-400 shrink-0" />
+                                  <TypeIcon className="w-3 h-3 text-gray-400 shrink-0" />
                                 )}
                                 <div className="flex flex-col">
                                   <span className="text-[11px] font-medium truncate leading-tight">{session.title}</span>
-                                  <span className="text-[9px] text-gray-400 mt-0.5">{sessionDate.toLocaleDateString("fr-FR", { day: 'numeric', month: 'short' })} à {sessionDate.toLocaleTimeString("fr-FR", { hour: '2-digit', minute: '2-digit' })}</span>
+                                  <span className="text-[9px] text-gray-400 mt-0.5">
+                                    {session.type === "video" || session.type === "text" || session.type === "document"
+                                      ? session.duration || "Durée non définie"
+                                      : session.date
+                                        ? `${sessionDate.toLocaleDateString("fr-FR", { day: 'numeric', month: 'short' })} à ${sessionDate.toLocaleTimeString("fr-FR", { hour: '2-digit', minute: '2-digit' })}`
+                                        : "Date non définie"
+                                    }
+                                  </span>
                                 </div>
                               </div>
                             </button>
