@@ -2373,7 +2373,11 @@ const [newModuleDateDebut, setNewModuleDateDebut] = useState("");
                             {selectedStudent.enrolledCourses && selectedStudent.enrolledCourses.length > 0 ? (
                               <div className="space-y-3">
                                 {selectedStudent.enrolledCourses.map((courseId) => {
-                                  const matchedCourse = formations.flatMap(f => f.modules.map(m => ({ id: m.id, title: m.titre, category: f.categorie, sessions: m.sessions, prix: m.prix }))).find(c => c.id === courseId);
+                                  const matchedCourse = formations.flatMap(f => f.modules.map(m => {
+                                    const slug = (f.categorie + "-" + m.titre).toLowerCase().replace(/[^a-z0-9]/g, "-");
+                                    const id = m.id || slug;
+                                    return { id, title: m.titre, category: f.categorie, sessions: m.sessions, prix: m.prix };
+                                  })).find(c => c.id === courseId);
                                   if (!matchedCourse) return null;
   
                                   // Calculate progress
@@ -2509,7 +2513,11 @@ const [newModuleDateDebut, setNewModuleDateDebut] = useState("");
                           <div className="pt-4 border-t border-gray-150 space-y-3">
                             <h4 className="text-[10px] font-extrabold uppercase tracking-wider text-gray-400">Inscrire manuellement à un cours & Ajouter un paiement</h4>
                             
-                            {formations.flatMap(f => f.modules.map(m => ({ id: m.id, title: m.titre, category: f.categorie, prix: m.prix }))).filter(c => !selectedStudent.enrolledCourses?.includes(c.id!)).length > 0 ? (
+                            {formations.flatMap(f => f.modules.map(m => {
+                                const slug = (f.categorie + "-" + m.titre).toLowerCase().replace(/[^a-z0-9]/g, "-");
+                                const id = m.id || slug;
+                                return { id, title: m.titre, category: f.categorie, prix: m.prix };
+                              })).filter(c => !selectedStudent.enrolledCourses?.includes(c.id)).length > 0 ? (
                               <form onSubmit={(e) => handleEnrollStudent(e, selectedStudent.uid)} className="space-y-3">
                                 <div>
                                   <label className="block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1">Sélectionner la formation *</label>
@@ -2521,10 +2529,14 @@ const [newModuleDateDebut, setNewModuleDateDebut] = useState("");
                                     defaultValue=""
                                   >
                                     <option value="" disabled>Sélectionner un cours du catalogue...</option>
-                                    {formations.flatMap(f => f.modules.map(m => ({ id: m.id, title: m.titre, category: f.categorie, prix: m.prix })))
-                                      .filter(c => !selectedStudent.enrolledCourses?.includes(c.id!))
+                                    {formations.flatMap(f => f.modules.map(m => {
+                                        const slug = (f.categorie + "-" + m.titre).toLowerCase().replace(/[^a-z0-9]/g, "-");
+                                        const id = m.id || slug;
+                                        return { id, title: m.titre, category: f.categorie };
+                                      }))
+                                      .filter(c => !selectedStudent.enrolledCourses?.includes(c.id))
                                       .map(c => (
-                                        <option key={`${c.category}-${c.id || c.title}`} value={c.id}>
+                                        <option key={c.id} value={c.id}>
                                           {c.title} ({c.category})
                                         </option>
                                       ))}
