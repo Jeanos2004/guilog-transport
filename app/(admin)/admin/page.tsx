@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useMemo, useCallback } from "react";
+import { useState, useEffect, useMemo, useCallback, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import {
@@ -169,7 +169,7 @@ function GalleryTitleFolder({
   );
 }
 
-export default function AdminPage() {
+function AdminPageContent() {
   const router = useRouter();
   
   // === AUTHENTICATION STATE ===
@@ -4190,3 +4190,10 @@ const [newModuleDateDebut, setNewModuleDateDebut] = useState("");
   );
 }
 
+export default function AdminPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-[var(--color-primary)] flex items-center justify-center"><div className="w-10 h-10 border-4 border-white/20 border-t-white rounded-full animate-spin" /></div>}>
+      <AdminPageContent />
+    </Suspense>
+  );
+}
