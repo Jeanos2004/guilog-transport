@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { auth } from "@/lib/firebase";
 import { signInWithEmailAndPassword, signOut } from "firebase/auth";
 import { db } from "@/lib/db";
-import { Sidebar } from "./Sidebar";
+import { Sidebar } from "@/components/admin/layout/Sidebar";
 import { Lock } from "lucide-react";
 import { motion } from "framer-motion";
 
