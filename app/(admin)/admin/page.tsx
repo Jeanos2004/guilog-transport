@@ -206,6 +206,7 @@ function AdminPageContent() {
 
   // === DATA STATES ===
   const [formations, setFormations] = useState<CategorieFormations[]>([]);
+  const [expandedModules, setExpandedModules] = useState<Record<string, boolean>>({});
   const [articles, setArticles] = useState<Article[]>([]);
     const [inscriptions, setInscriptions] = useState<InscriptionRequest[]>([]);
   const [smsBalance, setSmsBalance] = useState<number | null>(null);
@@ -2657,62 +2658,114 @@ const [newModuleDateDebut, setNewModuleDateDebut] = useState("");
 
                       <div className="p-4 flex-grow divide-y divide-gray-100">
                         {cat.modules.map((mod, modIdx) => (
-                          <div key={modIdx} className="py-3 flex items-start justify-between gap-4 group">
-                            <div className="flex items-start gap-3 min-w-0">
-                              {/* Miniature image */}
-                              {mod.image ? (
-                                <img
-                                  src={mod.image}
-                                  alt={mod.titre}
-                                  className="w-14 h-10 object-cover flex-shrink-0 border border-gray-200"
-                                  onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
-                                />
-                              ) : (
-                                <div className="w-14 h-10 flex-shrink-0 bg-gray-100 border border-gray-200 flex items-center justify-center">
-                                  <BookOpen className="w-4 h-4 text-gray-300" />
-                                </div>
-                              )}
-                              <div className="min-w-0">
-                                <div className="flex items-center gap-2 mb-1">
-                                  <h4 className="font-bold text-xs text-gray-800 leading-snug">{mod.titre}</h4>
-                                  <span className={`px-1.5 py-0.5 text-[8px] font-bold uppercase tracking-wider text-white ${mod.details?.statutInscription === 'Fermée' ? 'bg-red-500' : 'bg-green-500'}`}>
-                                    {mod.details?.statutInscription === 'Fermée' ? 'Fermée' : 'Ouverte'}
-                                  </span>
-                                </div>
-                                {mod.prix !== undefined && (
-                                  <span className="inline-block mt-1 text-[9px] font-bold text-[var(--color-accent)] bg-orange-50 border border-orange-200 px-1.5 py-0.5">
-                                    {mod.prix.toLocaleString('fr-GN')} GNF
-                                  </span>
+                          <div key={modIdx} className="py-3 flex flex-col group border-b border-gray-50 last:border-0">
+                            <div className="flex items-start justify-between gap-4 w-full">
+                              <div className="flex items-start gap-3 min-w-0">
+                                {/* Miniature image */}
+                                {mod.image ? (
+                                  <img
+                                    src={mod.image}
+                                    alt={mod.titre}
+                                    className="w-14 h-10 object-cover flex-shrink-0 border border-gray-200"
+                                    onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
+                                  />
+                                ) : (
+                                  <div className="w-14 h-10 flex-shrink-0 bg-gray-100 border border-gray-200 flex items-center justify-center">
+                                    <BookOpen className="w-4 h-4 text-gray-300" />
+                                  </div>
                                 )}
-                                <div className="flex flex-wrap gap-1 mt-1.5">
-                                  {mod.outils && mod.outils.length > 0 ? (
-                                    mod.outils.map((o, oi) => (
-                                      <span key={oi} className="px-1.5 py-0.5 bg-gray-100 text-gray-600 text-[8px] font-semibold border border-gray-200">
-                                        {o}
-                                      </span>
-                                    ))
-                                  ) : (
-                                    <span className="text-[9px] text-gray-400 italic">Concepts métiers</span>
+                                <div className="min-w-0">
+                                  <div className="flex items-center gap-2 mb-1">
+                                    <h4 className="font-bold text-xs text-gray-800 leading-snug">{mod.titre}</h4>
+                                    <span className={`px-1.5 py-0.5 text-[8px] font-bold uppercase tracking-wider text-white ${mod.details?.statutInscription === 'Fermée' ? 'bg-red-500' : 'bg-green-500'}`}>
+                                      {mod.details?.statutInscription === 'Fermée' ? 'Fermée' : 'Ouverte'}
+                                    </span>
+                                  </div>
+                                  {mod.prix !== undefined && (
+                                    <span className="inline-block mt-1 text-[9px] font-bold text-[var(--color-accent)] bg-orange-50 border border-orange-200 px-1.5 py-0.5">
+                                      {mod.prix.toLocaleString('fr-GN')} GNF
+                                    </span>
                                   )}
+                                  <div className="flex flex-wrap gap-1 mt-1.5">
+                                    {mod.outils && mod.outils.length > 0 ? (
+                                      mod.outils.map((o, oi) => (
+                                        <span key={oi} className="px-1.5 py-0.5 bg-gray-100 text-gray-600 text-[8px] font-semibold border border-gray-200">
+                                          {o}
+                                        </span>
+                                      ))
+                                    ) : (
+                                      <span className="text-[9px] text-gray-400 italic">Concepts métiers</span>
+                                    )}
+                                  </div>
                                 </div>
                               </div>
+                              <div className="flex items-center gap-1 opacity-60 group-hover:opacity-100 transition-opacity flex-shrink-0">
+                                <button
+                                  onClick={() => setExpandedModules(prev => ({ ...prev, [`${catIdx}-${modIdx}`]: !prev[`${catIdx}-${modIdx}`] }))}
+                                  className={`p-1 hover:text-[var(--color-accent)] ${expandedModules[`${catIdx}-${modIdx}`] ? 'text-[var(--color-accent)]' : 'text-gray-500'}`}
+                                  title={expandedModules[`${catIdx}-${modIdx}`] ? "Masquer le programme" : "Voir le programme"}
+                                >
+                                  <Eye className="w-3.5 h-3.5" />
+                                </button>
+                                <button
+                                  onClick={() => startEditModule(catIdx, modIdx)}
+                                  className="p-1 text-gray-500 hover:text-[var(--color-accent)]"
+                                  title="Modifier"
+                                >
+                                  <Edit3 className="w-3.5 h-3.5" />
+                                </button>
+                                <button
+                                  onClick={() => handleDeleteModule(catIdx, modIdx)}
+                                  className="p-1 text-gray-500 hover:text-red-500"
+                                  title="Supprimer"
+                                >
+                                  <Trash2 className="w-3.5 h-3.5" />
+                                </button>
+                              </div>
                             </div>
-                            <div className="flex items-center gap-1 opacity-60 group-hover:opacity-100 transition-opacity flex-shrink-0">
-                              <button
-                                onClick={() => startEditModule(catIdx, modIdx)}
-                                className="p-1 text-gray-500 hover:text-[var(--color-accent)]"
-                                title="Modifier"
-                              >
-                                <Edit3 className="w-3.5 h-3.5" />
-                              </button>
-                              <button
-                                onClick={() => handleDeleteModule(catIdx, modIdx)}
-                                className="p-1 text-gray-500 hover:text-red-500"
-                                title="Supprimer"
-                              >
-                                <Trash2 className="w-3.5 h-3.5" />
-                              </button>
-                            </div>
+                            
+                            {/* Expanded Programme View */}
+                            <AnimatePresence>
+                              {expandedModules[`${catIdx}-${modIdx}`] && (
+                                <motion.div
+                                  initial={{ height: 0, opacity: 0 }}
+                                  animate={{ height: "auto", opacity: 1 }}
+                                  exit={{ height: 0, opacity: 0 }}
+                                  className="overflow-hidden"
+                                >
+                                  <div className="pl-[4.25rem] pr-4 pb-2 pt-3">
+                                    {mod.details?.programme && mod.details.programme.length > 0 ? (
+                                      <div className="bg-gray-50 border border-gray-100 rounded-lg p-3">
+                                        <h5 className="text-[10px] font-bold text-[var(--color-accent)] uppercase tracking-wider mb-2 flex items-center gap-1.5">
+                                          <Layers className="w-3 h-3" /> Programme de la formation
+                                        </h5>
+                                        <div className="space-y-3">
+                                          {mod.details.programme.map((chap, cIdx) => (
+                                            <div key={cIdx} className="text-xs">
+                                              <span className="font-bold text-gray-800 flex items-start gap-1.5">
+                                                <span className="text-[9px] bg-white border border-gray-200 w-4 h-4 flex items-center justify-center rounded-full flex-shrink-0 mt-0.5 text-gray-500">{cIdx + 1}</span>
+                                                {chap.title}
+                                              </span>
+                                              {chap.points && chap.points.length > 0 && (
+                                                <ul className="list-disc pl-8 mt-1.5 text-gray-600 space-y-1 text-[11px]">
+                                                  {chap.points.map((pt, pIdx) => (
+                                                    <li key={pIdx}>{pt}</li>
+                                                  ))}
+                                                </ul>
+                                              )}
+                                            </div>
+                                          ))}
+                                        </div>
+                                      </div>
+                                    ) : (
+                                      <div className="text-[10px] text-gray-400 italic bg-gray-50 p-2 rounded border border-gray-100 text-center flex items-center justify-center gap-2">
+                                        <BookOpen className="w-3 h-3" /> Aucun programme défini pour cette formation.
+                                      </div>
+                                    )}
+                                  </div>
+                                </motion.div>
+                              )}
+                            </AnimatePresence>
                           </div>
                         ))}
                       </div>
