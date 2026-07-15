@@ -1,7 +1,7 @@
 "use client";
 
-import { useState, useEffect, useMemo } from "react";
-import { useRouter } from "next/navigation";
+import { useState, useEffect, useMemo, useCallback } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import {
   Menu,
@@ -34,7 +34,8 @@ import {
   ShieldCheck,
   TrendingUp,
   Clock,
-  Sparkles
+  Sparkles,
+  Clapperboard
 } from "lucide-react";
 import { MediaUploader } from "@/components/admin/MediaUploader";
 import { MultiMediaUploader, MediaItem } from "@/components/admin/MultiMediaUploader";
@@ -44,6 +45,7 @@ import { auth } from "@/lib/firebase";
 import { signInWithEmailAndPassword, signOut, onAuthStateChanged, createUserWithEmailAndPassword } from "firebase/auth";
 import { studentDb, StudentProfile, StudentCourse, CourseModule, CourseSession, PaymentRecord } from "@/lib/studentDb";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, Legend, ResponsiveContainer, LineChart, Line } from "recharts";
+import { CourseBuilderInline } from "@/components/admin/CourseBuilderInline";
 
 // ============================================================
 // GALLERY TITLE FOLDER — collapsible folder-style section by title
@@ -178,8 +180,28 @@ export default function AdminPage() {
   const [password, setPassword] = useState("");
   const [authError, setAuthError] = useState("");
   
-  // === ACTIVE TAB STATE ===
-  const [activeTab, setActiveTab] = useState<"overview" | "inscriptions" | "formations" | "actualites" | "testimonials" | "galerie" | "messages" | "settings" | "users" | "students" | "analytics">("overview");
+  // === ACTIVE TAB STATE (synced with URL ?tab=...) ===
+  type TabId = "overview" | "inscriptions" | "formations" | "actualites" | "testimonials" | "galerie" | "messages" | "settings" | "users" | "students" | "analytics" | "course-builder";
+  const VALID_TABS: TabId[] = ["overview", "inscriptions", "formations", "actualites", "testimonials", "galerie", "messages", "settings", "users", "students", "analytics", "course-builder"];
+  const searchParams = useSearchParams();
+  const tabFromUrl = searchParams.get("tab") as TabId | null;
+  const [activeTab, setActiveTabState] = useState<TabId>(VALID_TABS.includes(tabFromUrl as TabId) ? tabFromUrl! : "overview");
+
+  // Keep tab in sync with URL when navigating with browser back/forward
+  useEffect(() => {
+    const tab = searchParams.get("tab") as TabId | null;
+    if (tab && VALID_TABS.includes(tab)) {
+      setActiveTabState(tab);
+    }
+  }, [searchParams]);
+
+  // Wrapper that updates both state and URL
+  const setActiveTab = useCallback((tab: TabId) => {
+    setActiveTabState(tab);
+    const params = new URLSearchParams(window.location.search);
+    params.set("tab", tab);
+    router.replace(`/admin?${params.toString()}`, { scroll: false });
+  }, [router]);
   const [overviewFilter, setOverviewFilter] = useState<"all" | "month" | "quarter" | "year">("all");
 
   // === DATA STATES ===
@@ -1435,6 +1457,12 @@ const [newModuleDateDebut, setNewModuleDateDebut] = useState("");
                     ]
                   },
                   {
+                    title: "E-Learning",
+                    items: [
+                      { id: "course-builder", label: "Cours Builder", icon: <Clapperboard className="w-4 h-4" /> },
+                    ]
+                  },
+                  {
                     title: "Configuration",
                     items: [
                       { id: "users", label: "Utilisateurs Admin", icon: <ShieldCheck className="w-4 h-4" /> },
@@ -1453,7 +1481,7 @@ const [newModuleDateDebut, setNewModuleDateDebut] = useState("");
                           <button
                             key={tab.id}
                             onClick={() => {
-                              setActiveTab(tab.id as any);
+                              setActiveTab(tab.id as TabId);
                               setSearchQuery("");
                               setStatusFilter("Tous");
                               setMobileMenuOpen(false);
@@ -1542,6 +1570,12 @@ const [newModuleDateDebut, setNewModuleDateDebut] = useState("");
               ]
             },
             {
+              title: "E-Learning",
+              items: [
+                { id: "course-builder", label: "Cours Builder", icon: <Clapperboard className="w-4 h-4" /> },
+              ]
+            },
+            {
               title: "Configuration",
               items: [
                 { id: "users", label: "Utilisateurs Admin", icon: <ShieldCheck className="w-4 h-4" /> },
@@ -1560,7 +1594,7 @@ const [newModuleDateDebut, setNewModuleDateDebut] = useState("");
                     <button
                       key={tab.id}
                       onClick={() => {
-                        setActiveTab(tab.id as any);
+                        setActiveTab(tab.id as TabId);
                         setSearchQuery("");
                         setStatusFilter("Tous");
                       }}
@@ -1623,12 +1657,12 @@ const [newModuleDateDebut, setNewModuleDateDebut] = useState("");
                 {activeTab === "inscriptions" && "Suivi des Inscriptions & Devis"}
                 {activeTab === "students" && "Gestion des Comptes Étudiants"}
                 {activeTab === "formations" && "Gestion des Formations"}
-                {false && "Cours Espace Étudiant"}
                 {activeTab === "actualites" && "Éditeur du Blog & Actualités"}
                 {activeTab === "testimonials" && "Gestion des Témoignages"}
                 {activeTab === "messages" && "Messages clients"}
                 {activeTab === "users" && "Utilisateurs Admin"}
                 {activeTab === "settings" && "Paramètres du Site"}
+                {activeTab === "course-builder" && "Cours Builder"}
               </h2>
               <p className="hidden md:block text-xs text-gray-500 mt-0.5">Bienvenue dans l'interface de contrôle du cabinet Cabinet Guilogtrans.</p>
             </div>
@@ -3225,6 +3259,21 @@ const [newModuleDateDebut, setNewModuleDateDebut] = useState("");
               </motion.div>
             )}
 
+            {/* ====================================
+                TAB: COURSE BUILDER
+            ==================================== */}
+            {activeTab === "course-builder" && (
+              <motion.div
+                key="course-builder"
+                initial={{ opacity: 0, y: 15 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0 }}
+                className="space-y-6"
+              >
+                <CourseBuilderInline setActiveTab={(tab) => setActiveTab(tab as TabId)} />
+              </motion.div>
+            )}
+
           </AnimatePresence>
         </div>
       </main>
@@ -3352,11 +3401,11 @@ const [newModuleDateDebut, setNewModuleDateDebut] = useState("");
 
             {/* Tab Bar */}
             <div className="flex border-b border-gray-100 flex-shrink-0 bg-gray-50">
-              {(["Infos Générales", "Fiche Technique", "Pédagogie", "Programme", "Séances & Agenda"] as const).map((tab, i) => (
+              {(["Infos Générales", "Fiche Technique", "Pédagogie"] as const).map((tab, i) => (
                 <button
                   key={tab}
                   type="button"
-                  onClick={() => setModalTab((i + 1) as 1|2|3|4|5)}
+                  onClick={() => setModalTab((i + 1) as 1|2|3)}
                   className={`flex-1 text-[10px] font-bold uppercase tracking-wider py-3 px-2 border-b-2 transition-colors ${
                     modalTab === i + 1
                       ? "border-[var(--color-primary)] text-[var(--color-primary)] bg-white"
@@ -3563,108 +3612,14 @@ const [newModuleDateDebut, setNewModuleDateDebut] = useState("");
                   </div>
                 )}
 
-                {/* === ONGLET 4: Programme Détaillé === */}
-                
-                {modalTab === 5 && (
-                  <div className="space-y-6">
-                    <div className="flex justify-between items-center bg-gray-50 p-4 border border-gray-200">
-                      <div>
-                        <h4 className="text-xs font-bold text-gray-900 uppercase">Séances & Agenda</h4>
-                        <p className="text-[10px] text-gray-500">Ajoutez les dates, heures, lieux et liens Zoom des séances.</p>
-                      </div>
-                      <button type="button" disabled={newModuleStatutInscription === 'Fermée'} onClick={() => setNewModuleSessions([...newModuleSessions, { id: 'session-'+Date.now(), title: 'Nouvelle séance', date: new Date().toISOString(), duration: '2 heures', location: 'Siège Guilogtrans', meetUrl: '', resources: [] }])} className="flex items-center gap-1.5 px-3 py-1.5 bg-gray-900 text-white text-[10px] uppercase font-bold hover:bg-[var(--color-primary)] transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
-                        <Plus className="w-3.5 h-3.5" /> Nouvelle Séance
-                      </button>
-                    </div>
 
-                    <div className="space-y-4">
-                      {newModuleSessions.map((session, sIdx) => (
-                        <div key={session.id} className="border border-gray-200 p-4 relative bg-slate-50">
-                          <button type="button" onClick={() => setNewModuleSessions(newModuleSessions.filter((_, i) => i !== sIdx))} className="absolute top-4 right-4 text-gray-400 hover:text-red-600 transition-colors">
-                            <Trash2 className="w-4 h-4" />
-                          </button>
-                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div>
-                              <label className="block text-[10px] font-bold text-gray-500 uppercase mb-1">Titre de la séance</label>
-                              <input type="text" value={session.title} onChange={e => { const list = [...newModuleSessions]; list[sIdx].title = e.target.value; setNewModuleSessions(list); }} className="w-full border border-gray-300 px-3 py-2 text-sm focus:border-[var(--color-primary)] outline-none bg-white" placeholder="Ex: Introduction à Excel" />
-                            </div>
-                            <div>
-                              <label className="block text-[10px] font-bold text-gray-500 uppercase mb-1">Date et Heure (Format ISO)</label>
-                              <input type="datetime-local" value={session.date.slice(0,16)} onChange={e => { const list = [...newModuleSessions]; list[sIdx].date = new Date(e.target.value).toISOString(); setNewModuleSessions(list); }} className="w-full border border-gray-300 px-3 py-2 text-sm focus:border-[var(--color-primary)] outline-none bg-white" />
-                            </div>
-                            <div>
-                              <label className="block text-[10px] font-bold text-gray-500 uppercase mb-1">Durée</label>
-                              <input type="text" value={session.duration} onChange={e => { const list = [...newModuleSessions]; list[sIdx].duration = e.target.value; setNewModuleSessions(list); }} className="w-full border border-gray-300 px-3 py-2 text-sm focus:border-[var(--color-primary)] outline-none bg-white" placeholder="Ex: 2 heures" />
-                            </div>
-                            <div>
-                              <label className="block text-[10px] font-bold text-gray-500 uppercase mb-1">Lieu</label>
-                              <input type="text" value={session.location} onChange={e => { const list = [...newModuleSessions]; list[sIdx].location = e.target.value; setNewModuleSessions(list); }} className="w-full border border-gray-300 px-3 py-2 text-sm focus:border-[var(--color-primary)] outline-none bg-white" placeholder="Ex: Salle A, Siège Guilogtrans" />
-                            </div>
-                            <div className="md:col-span-2">
-                              <label className="block text-[10px] font-bold text-gray-500 uppercase mb-1">Lien Zoom / Meet (Optionnel)</label>
-                              <input type="url" value={session.meetUrl || ""} onChange={e => { const list = [...newModuleSessions]; list[sIdx].meetUrl = e.target.value; setNewModuleSessions(list); }} className="w-full border border-gray-300 px-3 py-2 text-sm focus:border-[var(--color-primary)] outline-none bg-white" placeholder="Ex: https://zoom.us/j/123456" />
-                            </div>
-                          </div>
-                        </div>
-                      ))}
-                      {newModuleSessions.length === 0 && (
-                        <p className="text-xs text-gray-400 text-center py-4 italic">Aucune séance définie. Les étudiants ne verront aucun agenda pour ce cours.</p>
-                      )}
-                    </div>
-                  </div>
-                )}
-
-                {modalTab === 4 && (
-                  <div className="space-y-4">
-                    <p className="text-[10px] text-gray-400">Ajoutez chaque module du programme. Les points de contenu sont séparés par des retours à  la ligne.</p>
-                    {newModuleProgramme.map((chapter, i) => (
-                      <div key={i} className="border border-gray-200 p-4 bg-gray-50 space-y-2">
-                        <div className="flex items-center gap-2">
-                          <span className="text-[10px] font-bold bg-[var(--color-primary)] text-white px-2 py-0.5">Module {i + 1}</span>
-                          {newModuleProgramme.length > 1 && (
-                            <button type="button" onClick={() => {
-                              const arr = [...newModuleProgramme];
-                              arr.splice(i, 1);
-                              setNewModuleProgramme(arr);
-                            }} className="ml-auto text-red-400 hover:text-red-600 text-[10px] font-bold">
-                               Supprimer
-                            </button>
-                          )}
-                        </div>
-                        <input type="text" disabled={isSavingModule}
-                          className="w-full bg-white border border-gray-300 px-3 py-2 text-xs focus:outline-none focus:border-[var(--color-primary)] rounded-none disabled:opacity-50"
-                          placeholder="Titre du module (ex: Introduction à  PowerBI)"
-                          value={chapter.title}
-                          onChange={e => {
-                            const arr = [...newModuleProgramme];
-                            arr[i] = { ...arr[i], title: e.target.value };
-                            setNewModuleProgramme(arr);
-                          }} />
-                        <textarea rows={3} disabled={isSavingModule}
-                          className="w-full bg-white border border-gray-300 px-3 py-2 text-xs focus:outline-none focus:border-[var(--color-primary)] rounded-none disabled:opacity-50 resize-none"
-                          placeholder="Contenu du module (1 point par ligne)..."
-                          value={chapter.points}
-                          onChange={e => {
-                            const arr = [...newModuleProgramme];
-                            arr[i] = { ...arr[i], points: e.target.value };
-                            setNewModuleProgramme(arr);
-                          }} />
-                      </div>
-                    ))}
-                    <button type="button"
-                      onClick={() => setNewModuleProgramme([...newModuleProgramme, { title: "", points: "" }])}
-                      className="w-full border-2 border-dashed border-gray-300 py-2.5 text-xs font-bold text-gray-400 hover:border-[var(--color-accent)] hover:text-[var(--color-accent)] transition-colors">
-                      + Ajouter un module
-                    </button>
-                  </div>
-                )}
 
               </div>
 
               {/* Sticky Footer buttons always visible */}
               <div className="flex-shrink-0 px-6 py-4 border-t border-gray-100 bg-white flex items-center justify-between">
                 <div className="flex gap-1">
-                  {([1,2,3,4] as const).map(n => (
+                  {([1,2,3] as const).map(n => (
                     <button key={n} type="button" onClick={() => setModalTab(n)}
                       className={`w-6 h-1.5 rounded-full transition-colors ${ modalTab === n ? "bg-[var(--color-primary)]" : "bg-gray-200 hover:bg-gray-300" }`}
                     />
@@ -3672,13 +3627,13 @@ const [newModuleDateDebut, setNewModuleDateDebut] = useState("");
                 </div>
                 <div className="flex gap-2">
                   {modalTab > 1 && (
-                    <button type="button" onClick={() => setModalTab((modalTab - 1) as 1|2|3|4|5)}
+                    <button type="button" onClick={() => setModalTab((modalTab - 1) as 1|2|3)}
                       className="px-4 py-2 border border-gray-300 text-xs font-bold uppercase tracking-wider hover:bg-gray-50 text-gray-600 rounded-none">
                       Précédent
                     </button>
                   )}
-                  {modalTab < 5 ? (
-                    <button type="button" onClick={() => setModalTab((modalTab + 1) as 1|2|3|4|5)}
+                  {modalTab < 3 ? (
+                    <button type="button" onClick={() => setModalTab((modalTab + 1) as 1|2|3)}
                       className="px-4 py-2 bg-[var(--color-accent)] text-white text-xs font-bold uppercase tracking-wider hover:bg-[var(--color-primary)] transition-colors rounded-none">
                       Suivant
                     </button>

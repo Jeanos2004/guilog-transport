@@ -31,12 +31,20 @@ export interface StudentProfile {
 export interface CourseSession {
   id: string;
   title: string;
+  type?: "video" | "text" | "quiz" | "zoom" | "document";
+  orderIndex?: number;
+  videoUrl?: string;
+  content?: string;
   date: string; // ISO date string e.g., "2026-06-25T18:00:00Z"
   duration: string;
   location: string;
   meetUrl?: string;
   resources?: { name: string; url: string }[];
 }
+
+export const sortSessionsByOrder = (sessions: CourseSession[]) => {
+  return [...sessions].sort((a, b) => (a.orderIndex ?? 0) - (b.orderIndex ?? 0));
+};
 
 export interface CourseModule {
   id: string;
