@@ -557,46 +557,68 @@ export function CourseBuilderInline({ setActiveTab }: Props) {
                                   {session.type === "document" && (
                                     <div>
                                       <label className="block text-[9px] font-bold uppercase text-gray-400 mb-1">URL du document PDF</label>
-                                      <input
-                                        type="url"
-                                        value={session.videoUrl || ""}
-                                        onChange={e => updateSession(mIdx, sIdx, { videoUrl: e.target.value })}
-                                        className="w-full border border-gray-200 px-2.5 py-1.5 text-xs focus:border-[var(--color-primary)] outline-none bg-white"
-                                        placeholder="https://..."
-                                      />
+                                      <div className="flex gap-2">
+                                        <input
+                                          type="url"
+                                          value={session.videoUrl || ""}
+                                          onChange={e => updateSession(mIdx, sIdx, { videoUrl: e.target.value })}
+                                          className="flex-1 border border-gray-200 px-2.5 py-1.5 text-xs focus:border-[var(--color-primary)] outline-none bg-white"
+                                          placeholder="https://..."
+                                        />
+                                      </div>
+                                      <div className="mt-2">
+                                        <MediaUploader
+                                          value={session.videoUrl || ""}
+                                          onChange={(url) => updateSession(mIdx, sIdx, { videoUrl: url })}
+                                          label="Uploader un document PDF"
+                                          accept="document"
+                                        />
+                                      </div>
                                     </div>
                                   )}
 
+                                  {/* Date, Duration, Location (Conditional based on type) */}
                                   <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-                                    <div>
-                                      <label className="block text-[9px] font-bold uppercase text-gray-400 mb-1">Date</label>
-                                      <input
-                                        type="datetime-local"
-                                        value={session.date ? session.date.slice(0, 16) : ""}
-                                        onChange={e => updateSession(mIdx, sIdx, { date: new Date(e.target.value).toISOString() })}
-                                        className="w-full border border-gray-200 px-2.5 py-1.5 text-xs focus:border-[var(--color-primary)] outline-none bg-white"
-                                      />
-                                    </div>
-                                    <div>
-                                      <label className="block text-[9px] font-bold uppercase text-gray-400 mb-1">Durée</label>
-                                      <input
-                                        type="text"
-                                        value={session.duration || ""}
-                                        onChange={e => updateSession(mIdx, sIdx, { duration: e.target.value })}
-                                        className="w-full border border-gray-200 px-2.5 py-1.5 text-xs focus:border-[var(--color-primary)] outline-none bg-white"
-                                        placeholder="Ex: 1h30"
-                                      />
-                                    </div>
-                                    <div>
-                                      <label className="block text-[9px] font-bold uppercase text-gray-400 mb-1">Lieu (optionnel)</label>
-                                      <input
-                                        type="text"
-                                        value={session.location || ""}
-                                        onChange={e => updateSession(mIdx, sIdx, { location: e.target.value })}
-                                        className="w-full border border-gray-200 px-2.5 py-1.5 text-xs focus:border-[var(--color-primary)] outline-none bg-white"
-                                        placeholder="Salle / En ligne"
-                                      />
-                                    </div>
+                                    {/* Date - Only needed for Zoom/Live sessions */}
+                                    {session.type === "zoom" && (
+                                      <div>
+                                        <label className="block text-[9px] font-bold uppercase text-gray-400 mb-1">Date</label>
+                                        <input
+                                          type="datetime-local"
+                                          value={session.date ? session.date.slice(0, 16) : ""}
+                                          onChange={e => updateSession(mIdx, sIdx, { date: new Date(e.target.value).toISOString() })}
+                                          className="w-full border border-gray-200 px-2.5 py-1.5 text-xs focus:border-[var(--color-primary)] outline-none bg-white"
+                                        />
+                                      </div>
+                                    )}
+                                    
+                                    {/* Duration - Useful for Video and Zoom */}
+                                    {(session.type === "zoom" || session.type === "video") && (
+                                      <div>
+                                        <label className="block text-[9px] font-bold uppercase text-gray-400 mb-1">Durée</label>
+                                        <input
+                                          type="text"
+                                          value={session.duration || ""}
+                                          onChange={e => updateSession(mIdx, sIdx, { duration: e.target.value })}
+                                          className="w-full border border-gray-200 px-2.5 py-1.5 text-xs focus:border-[var(--color-primary)] outline-none bg-white"
+                                          placeholder="Ex: 1h30"
+                                        />
+                                      </div>
+                                    )}
+
+                                    {/* Location - Only needed for Zoom/Live sessions */}
+                                    {session.type === "zoom" && (
+                                      <div>
+                                        <label className="block text-[9px] font-bold uppercase text-gray-400 mb-1">Lieu / Salle</label>
+                                        <input
+                                          type="text"
+                                          value={session.location || ""}
+                                          onChange={e => updateSession(mIdx, sIdx, { location: e.target.value })}
+                                          className="w-full border border-gray-200 px-2.5 py-1.5 text-xs focus:border-[var(--color-primary)] outline-none bg-white"
+                                          placeholder="Ex: Salle A / En ligne"
+                                        />
+                                      </div>
+                                    )}
                                   </div>
                                 </div>
                               )}
