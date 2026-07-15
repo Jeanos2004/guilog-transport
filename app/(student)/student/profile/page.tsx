@@ -11,6 +11,7 @@ import {
   User as UserIcon, Mail, Phone, Briefcase, CheckCircle, Save, 
   MessageSquare, Bell, Shield, Sliders, Globe, Wifi, Eye, EyeOff, Lock
 } from "lucide-react";
+import { toast } from "sonner";
 import { motion, AnimatePresence } from "framer-motion";
 
 export default function StudentProfilePage() {
@@ -103,7 +104,7 @@ export default function StudentProfilePage() {
       setTimeout(() => setSuccess(false), 3000);
     } catch (err) {
       console.error(err);
-      alert("Erreur lors de la sauvegarde du profil.");
+      toast.error("Erreur lors de la sauvegarde du profil.");
     } finally {
       setSaving(false);
     }

@@ -13,6 +13,7 @@ import {
   User as UserIcon, Activity, ChevronDown, Video, MapPin,
   PlayCircle, Monitor, Users, Lock
 } from "lucide-react";
+import { toast } from "sonner";
 import Link from "next/link";
 
 export default function StudentCoursePlayerPage() {
@@ -421,7 +422,7 @@ export default function StudentCoursePlayerPage() {
                           href={res.url}
                           onClick={(e) => {
                             e.preventDefault();
-                            alert(`Téléchargement de la ressource : ${res.name}`);
+                            toast.info(`Téléchargement de la ressource : ${res.name}`);
                           }}
                           className="flex items-center justify-between p-3.5 bg-slate-50 border border-gray-200 rounded-none shadow-sm hover:shadow-md transition-all"
                         >

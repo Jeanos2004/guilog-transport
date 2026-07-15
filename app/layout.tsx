@@ -35,6 +35,8 @@ export const metadata: Metadata = {
   }
 };
 
+import { Toaster } from 'sonner';
+
 /**
  * Root layout minimal — délègue tout aux layouts enfants.
  * Fournit uniquement le HTML shell, les polices et le CSS global.
@@ -47,7 +49,10 @@ export default function RootLayout({
       lang="fr"
       className={`${playfair.variable} ${dmSans.variable} ${spaceGrotesk.variable}`}
     >
-      <body>{children}</body>
+      <body>
+        {children}
+        <Toaster richColors position="top-right" />
+      </body>
     </html>
   );
 }

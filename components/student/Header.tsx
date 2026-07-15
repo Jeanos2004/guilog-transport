@@ -5,6 +5,7 @@ import {
   Bell, MessageSquare, Menu, Search, X, Check, 
   Play, Award, Calendar, ExternalLink 
 } from "lucide-react";
+import { toast } from "sonner";
 import { auth } from "@/lib/firebase";
 import { studentDb, StudentProfile } from "@/lib/studentDb";
 import { useRouter } from "next/navigation";
@@ -157,7 +158,7 @@ export default function StudentHeader({
               <div className="flex items-center justify-between border-b border-gray-50 pb-2">
                 <h3 className="text-xs font-black text-gray-900 uppercase tracking-wider">Notifications</h3>
                 <button 
-                  onClick={() => alert("Toutes les notifications marquées comme lues")}
+                  onClick={() => toast.success("Toutes les notifications marquées comme lues")}
                   className="text-[9px] font-bold text-gray-400 hover:text-blue-600 transition-colors flex items-center gap-1 rounded-none"
                 >
                   <Check className="w-3 h-3" />

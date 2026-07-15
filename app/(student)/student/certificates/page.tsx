@@ -8,6 +8,7 @@ import { studentDb, StudentProfile, StudentCourse } from "@/lib/studentDb";
 import StudentSidebar from "@/components/student/Sidebar";
 import StudentHeader from "@/components/student/Header";
 import { Award, Eye, Download, ShieldCheck, X, MessageSquare, Bell } from "lucide-react";
+import { toast } from "sonner";
 import { motion, AnimatePresence } from "framer-motion";
 
 export default function StudentCertificatesPage() {
@@ -145,7 +146,7 @@ export default function StudentCertificatesPage() {
                       href="#"
                       onClick={(e) => {
                         e.preventDefault();
-                        alert("Téléchargement du certificat PDF en cours...");
+                        toast.info("Téléchargement du certificat PDF en cours...");
                       }}
                       className="py-2.5 bg-[var(--color-primary)] hover:bg-[var(--color-accent)] text-white text-[10px] font-bold uppercase tracking-widest rounded-none transition-all flex items-center justify-center gap-1.5 shadow-sm"
                     >

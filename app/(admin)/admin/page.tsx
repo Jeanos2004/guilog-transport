@@ -35,8 +35,10 @@ import {
   TrendingUp,
   Clock,
   Sparkles,
-  Clapperboard
+  Clapperboard,
+  ChevronDown
 } from "lucide-react";
+import { toast } from "sonner";
 import { MediaUploader } from "@/components/admin/MediaUploader";
 import { MultiMediaUploader, MediaItem } from "@/components/admin/MultiMediaUploader";
 import { motion, AnimatePresence } from "framer-motion";
@@ -548,7 +550,7 @@ const [newModuleDateDebut, setNewModuleDateDebut] = useState("");
     if (!adminToUpdate) return;
     
     if (auth.currentUser && auth.currentUser.uid === uid) {
-      alert("Vous ne pouvez pas suspendre votre propre compte !");
+      toast.error("Vous ne pouvez pas suspendre votre propre compte !");
       return;
     }
 
@@ -566,7 +568,7 @@ const [newModuleDateDebut, setNewModuleDateDebut] = useState("");
 
   const handleDeleteAdmin = async (uid: string) => {
     if (auth.currentUser && auth.currentUser.uid === uid) {
-      alert("Vous ne pouvez pas supprimer votre propre compte !");
+      toast.error("Vous ne pouvez pas supprimer votre propre compte !");
       return;
     }
 
@@ -575,10 +577,10 @@ const [newModuleDateDebut, setNewModuleDateDebut] = useState("");
     try {
       await db.deleteAdmin(uid);
       setAdmins(await db.getAdmins());
-      alert("L'administrateur a été supprimé avec succès.");
+      toast.success("L'administrateur a été supprimé avec succès.");
     } catch (error: any) {
       console.error("Erreur suppression admin:", error);
-      alert("Erreur lors de la suppression de l'administrateur: " + error.message);
+      toast.error("Erreur lors de la suppression de l'administrateur: " + error.message);
     }
   };
 
@@ -589,10 +591,10 @@ const [newModuleDateDebut, setNewModuleDateDebut] = useState("");
       await studentDb.deleteStudent(uid);
       setStudents(await db.getStudents());
       if (selectedStudent?.uid === uid) setSelectedStudent(null);
-      alert("L'étudiant a été supprimé avec succès.");
+      toast.success("L'étudiant a été supprimé avec succès.");
     } catch (error: any) {
       console.error("Erreur suppression étudiant:", error);
-      alert("Erreur lors de la suppression de l'étudiant: " + error.message);
+      toast.error("Erreur lors de la suppression de l'étudiant: " + error.message);
     }
   };
 
@@ -656,11 +658,11 @@ const [newModuleDateDebut, setNewModuleDateDebut] = useState("");
         setSelectedStudent(updatedSelectedStudent);
       }
       
-      alert("Étudiant inscrit" + (amount > 0 ? " et paiement enregistré" : "") + " avec succès !");
+      toast.success("Étudiant inscrit" + (amount > 0 ? " et paiement enregistré" : "") + " avec succès !");
       (e.target as HTMLFormElement).reset();
     } catch (error) {
       console.error(error);
-      alert("Erreur lors de l'inscription de l'étudiant.");
+      toast.error("Erreur lors de l'inscription de l'étudiant.");
     }
   };
 
@@ -672,7 +674,7 @@ const [newModuleDateDebut, setNewModuleDateDebut] = useState("");
     const message = formData.get('message') as string;
     const contact = selectedStudent.phone;
     if (!message || !contact) {
-      alert("Message ou numéro de téléphone manquant (l'étudiant n'a peut-être pas fourni de numéro).");
+      toast.error("Message ou numéro de téléphone manquant (l'étudiant n'a peut-être pas fourni de numéro).");
       return;
     }
     const btn = e.currentTarget.querySelector('button[type="submit"]') as HTMLButtonElement;
@@ -688,10 +690,10 @@ const [newModuleDateDebut, setNewModuleDateDebut] = useState("");
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Erreur lors de l'envoi du SMS");
-      alert("SMS envoyé avec succès !");
+      toast.success("SMS envoyé avec succès !");
       (e.target as HTMLFormElement).reset();
     } catch(err: any) {
-      alert(err.message);
+      toast.info(err.message);
     } finally {
       btn.innerHTML = originalText;
       btn.disabled = false;
@@ -721,14 +723,14 @@ const [newModuleDateDebut, setNewModuleDateDebut] = useState("");
         return Promise.resolve();
       });
       await Promise.all(promises);
-      alert(`Séance programmée et SMS envoyés à ${enrolledStudents.length} étudiant(s) avec succès !`);
+      toast.success(`Séance programmée et SMS envoyés à ${enrolledStudents.length} étudiant(s) avec succès !`);
       setScheduleModalOpen(false);
       setScheduleDate("");
       setScheduleTime("");
       setScheduleLocation("");
     } catch (e) {
       console.error(e);
-      alert("Erreur lors de la programmation de la séance.");
+      toast.error("Erreur lors de la programmation de la séance.");
     } finally {
       setIsScheduling(false);
     }
@@ -830,7 +832,7 @@ const [newModuleDateDebut, setNewModuleDateDebut] = useState("");
       // 7. Refresh data
       await refreshAllData();
       
-      alert("Étudiant créé avec succès !\\nUID: " + uid);
+      toast.success("Étudiant créé avec succès !\\nUID: " + uid);
       setShowConvertModal(false);
       setLeadToConvert(null);
       setLeadPassword("");
@@ -838,7 +840,7 @@ const [newModuleDateDebut, setNewModuleDateDebut] = useState("");
       setLeadCashAmount("");
     } catch (error: any) {
       console.error(error);
-      alert("Erreur lors de la conversion : " + error.message);
+      toast.error("Erreur lors de la conversion : " + error.message);
     } finally {
       setIsConvertingLead(false);
     }
@@ -930,7 +932,7 @@ const [newModuleDateDebut, setNewModuleDateDebut] = useState("");
       setEditingModule(null);
     } catch (error) {
       console.error("Error saving module:", error);
-      alert("Une erreur est survenue lors de l'enregistrement.");
+      toast.error("Une erreur est survenue lors de l'enregistrement.");
     } finally {
       setIsSavingModule(false);
     }
@@ -1106,7 +1108,7 @@ const [newModuleDateDebut, setNewModuleDateDebut] = useState("");
       setGalleryTitle(""); setGalleryCategory(""); setGalleryMedia([]);
     } catch (error) {
       console.error("Error saving gallery:", error);
-      alert("Une erreur est survenue lors de l'enregistrement de la galerie.");
+      toast.error("Une erreur est survenue lors de l'enregistrement de la galerie.");
     } finally {
       setIsSavingGallery(false);
     }
@@ -1167,7 +1169,7 @@ const [newModuleDateDebut, setNewModuleDateDebut] = useState("");
       setEditingTestimonialIndex(null);
     } catch(err) {
       console.error(err);
-      alert("Erreur lors de l'enregistrement du témoignage.");
+      toast.error("Erreur lors de l'enregistrement du témoignage.");
     }
   };
 
@@ -2452,11 +2454,11 @@ const [newModuleDateDebut, setNewModuleDateDebut] = useState("");
                                               const newPayments = await studentDb.getPayments();
                                               setPayments(newPayments);
                                               
-                                              alert("Nouveau versement enregistré avec succès !");
+                                              toast.success("Nouveau versement enregistré avec succès !");
                                               form.reset();
                                             } catch (err) {
                                               console.error(err);
-                                              alert("Erreur lors de l'enregistrement du paiement.");
+                                              toast.error("Erreur lors de l'enregistrement du paiement.");
                                             }
                                           }
                                         }} className="flex flex-col sm:flex-row gap-2">
@@ -2521,26 +2523,30 @@ const [newModuleDateDebut, setNewModuleDateDebut] = useState("");
                               <form onSubmit={(e) => handleEnrollStudent(e, selectedStudent.uid)} className="space-y-3">
                                 <div>
                                   <label className="block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1">Sélectionner la formation *</label>
-                                  <select
-                                    name="courseId"
-                                    required
-                                    size={5}
-                                    className="w-full bg-slate-50 border border-gray-250 px-4 py-2.5 text-xs rounded-none focus:outline-none focus:border-[var(--color-primary)] focus:bg-white transition-all text-gray-800"
-                                    defaultValue=""
-                                  >
-                                    <option value="" disabled>Sélectionner un cours du catalogue...</option>
-                                    {formations.flatMap(f => f.modules.map(m => {
-                                        const slug = (f.categorie + "-" + m.titre).toLowerCase().replace(/[^a-z0-9]/g, "-");
-                                        const id = m.id || slug;
-                                        return { id, title: m.titre, category: f.categorie };
-                                      }))
-                                      .filter(c => !selectedStudent.enrolledCourses?.includes(c.id))
-                                      .map(c => (
-                                        <option key={c.id} value={c.id}>
-                                          {c.title} ({c.category})
-                                        </option>
-                                      ))}
-                                  </select>
+                                  <div className="relative">
+                                    <select
+                                      name="courseId"
+                                      required
+                                      className="w-full bg-white border border-gray-250 px-4 py-3 text-xs rounded-none focus:outline-none focus:border-[var(--color-primary)] focus:ring-1 focus:ring-[var(--color-primary)] transition-all text-gray-800 appearance-none shadow-sm cursor-pointer"
+                                      defaultValue=""
+                                    >
+                                      <option value="" disabled className="text-gray-400">Sélectionner un cours du catalogue...</option>
+                                      {formations.flatMap(f => f.modules.map(m => {
+                                          const slug = (f.categorie + "-" + m.titre).toLowerCase().replace(/[^a-z0-9]/g, "-");
+                                          const id = m.id || slug;
+                                          return { id, title: m.titre, category: f.categorie };
+                                        }))
+                                        .filter(c => !selectedStudent.enrolledCourses?.includes(c.id))
+                                        .map(c => (
+                                          <option key={c.id} value={c.id} className="py-2">
+                                            {c.title} • {c.category}
+                                          </option>
+                                        ))}
+                                    </select>
+                                    <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-gray-500">
+                                      <ChevronDown className="w-4 h-4" />
+                                    </div>
+                                  </div>
                                 </div>
                                 <div>
                                   <label className="block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1">Paiement Cash (GNF) - Optionnel</label>

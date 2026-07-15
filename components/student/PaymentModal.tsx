@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { StudentCourse } from "@/lib/studentDb";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, CreditCard, Smartphone, CheckCircle, RefreshCw, ChevronRight } from "lucide-react";
+import { toast } from "sonner";
 import { auth } from "@/lib/firebase";
 
 
@@ -48,7 +49,7 @@ export default function PaymentModal({ course, isOpen, onClose, onSuccess }: Pay
             onSuccess(); // Call success
           } else if (paymentStatus === "FAILED" || paymentStatus === "REFUSED") {
             setPolling(false);
-            alert("Le paiement a été refusé ou a échoué.");
+            toast.error("Le paiement a été refusé ou a échoué.");
             setStep("method");
           }
         } catch (e) {
@@ -98,7 +99,7 @@ export default function PaymentModal({ course, isOpen, onClose, onSuccess }: Pay
           throw new Error("Lien de paiement introuvable");
         }
       } catch (err: any) {
-        alert(err.message);
+        toast.info(err.message);
       } finally {
         setLoading(false);
       }
@@ -116,11 +117,11 @@ export default function PaymentModal({ course, isOpen, onClose, onSuccess }: Pay
           setStep("success");
           onSuccess(); // call to enroll in UI
         } else if (paymentStatus === "FAILED" || paymentStatus === "REFUSED") {
-          alert("Le paiement a échoué.");
+          toast.error("Le paiement a échoué.");
           setLoading(false);
           setStep("method");
         } else {
-          alert("Paiement toujours en attente...");
+          toast.info("Paiement toujours en attente...");
           setLoading(false);
         }
       } catch (err) {
