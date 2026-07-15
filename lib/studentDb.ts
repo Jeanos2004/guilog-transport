@@ -40,6 +40,8 @@ export interface CourseSession {
   location: string;
   meetUrl?: string;
   resources?: { name: string; url: string }[];
+  capacity?: number; // Capacité maximale pour les sessions physiques
+  registeredStudents?: string[]; // IDs des étudiants inscrits
 }
 
 export const sortSessionsByOrder = (sessions: CourseSession[]) => {

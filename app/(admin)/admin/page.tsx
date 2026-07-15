@@ -281,6 +281,7 @@ function AdminPageContent() {
   const [newModuleMethodePaiement, setNewModuleMethodePaiement] = useState("");
   const [newModuleImage, setNewModuleImage] = useState("");
   const [newModuleStatutInscription, setNewModuleStatutInscription] = useState<"Ouverte" | "Fermée">("Ouverte");
+  const [newModuleModalite, setNewModuleModalite] = useState<"En ligne" | "Présentiel" | "Hybride">("En ligne");
   // Onglet 2 — Fiche Technique
   const [newModuleDuree, setNewModuleDuree] = useState("");
   
@@ -856,6 +857,7 @@ const [newModuleDateDebut, setNewModuleDateDebut] = useState("");
     setNewModuleTitle(""); setNewModuleCategory(""); setNewModuleOutils("");
     setNewModulePrix(""); setNewModulePrixInscription(""); setNewModuleMethodePaiement("");
     setNewModuleImage(""); setNewModuleStatutInscription("Ouverte");
+    setNewModuleModalite("En ligne");
     setNewModuleDuree(""); setNewModuleDateDebut("");
     setNewModuleDateFin(""); setNewModuleCalendrier(""); setNewModuleHoraires("");
     setNewModulePresentation(""); setNewModuleObjectifs(""); setNewModulePrerequis(""); setNewModulePublicCible("");
@@ -884,6 +886,7 @@ const [newModuleDateDebut, setNewModuleDateDebut] = useState("");
 
       const details = {
         statutInscription: newModuleStatutInscription,
+        modalite: newModuleModalite,
         ...(newModuleDuree.trim() && { duree: newModuleDuree.trim() }),
         ...(newModuleDateDebut.trim() && { dateDebut: newModuleDateDebut.trim() }),
         ...(newModulePresentation.trim() && { presentation: newModulePresentation.trim() }),
@@ -959,6 +962,7 @@ const [newModuleDateDebut, setNewModuleDateDebut] = useState("");
     setNewModuleMethodePaiement(mod.methodePaiement ?? "");
     setNewModuleImage(mod.image ?? "");
     setNewModuleStatutInscription(d?.statutInscription ?? "Ouverte");
+    setNewModuleModalite(d?.modalite ?? "En ligne");
     setNewModuleDuree(d?.duree ?? "");
     setNewModuleDateDebut(d?.dateDebut ?? "");
     setNewModuleDateFin(d?.dateFin ?? "");
@@ -2680,6 +2684,11 @@ const [newModuleDateDebut, setNewModuleDateDebut] = useState("");
                                     <span className={`px-1.5 py-0.5 text-[8px] font-bold uppercase tracking-wider text-white ${mod.details?.statutInscription === 'Fermée' ? 'bg-red-500' : 'bg-green-500'}`}>
                                       {mod.details?.statutInscription === 'Fermée' ? 'Fermée' : 'Ouverte'}
                                     </span>
+                                    {mod.details?.modalite && (
+                                      <span className={`px-1.5 py-0.5 text-[8px] font-bold uppercase tracking-wider text-white ${mod.details.modalite === 'En ligne' ? 'bg-blue-500' : mod.details.modalite === 'Présentiel' ? 'bg-purple-500' : 'bg-indigo-500'}`}>
+                                        {mod.details.modalite}
+                                      </span>
+                                    )}
                                   </div>
                                   {mod.prix !== undefined && (
                                     <span className="inline-block mt-1 text-[9px] font-bold text-[var(--color-accent)] bg-orange-50 border border-orange-200 px-1.5 py-0.5">
@@ -3508,6 +3517,16 @@ const [newModuleDateDebut, setNewModuleDateDebut] = useState("");
                           <option value="Fermée">Fermée</option>
                         </select>
                       </div>
+                      <div>
+                        <label className="block text-xs font-bold uppercase tracking-wider text-gray-500 mb-1.5">Modalité d'apprentissage</label>
+                        <select disabled={isSavingModule}
+                          className="w-full bg-gray-50 border border-gray-300 px-3 py-2 text-xs focus:outline-none focus:border-[var(--color-primary)] rounded-none disabled:opacity-50"
+                          value={newModuleModalite} onChange={e => setNewModuleModalite(e.target.value as "En ligne" | "Présentiel" | "Hybride")}>
+                          <option value="En ligne">En ligne</option>
+                          <option value="Présentiel">Présentiel</option>
+                          <option value="Hybride">Hybride</option>
+                        </select>
+                      </div>
                       <div className="col-span-2">
                         <label className="block text-xs font-bold uppercase tracking-wider text-gray-500 mb-1.5">Image de la formation</label>
                         <MediaUploader
@@ -3620,6 +3639,47 @@ const [newModuleDateDebut, setNewModuleDateDebut] = useState("");
                           })}
                         </div>
                       </div>
+                      {newModuleModalite !== "En ligne" && (
+                        <div className="col-span-2 mt-4 border-t border-gray-100 pt-4">
+                          <label className="block text-xs font-bold uppercase tracking-wider text-[var(--color-primary)] mb-3">
+                            Sessions Physiques Programmées
+                          </label>
+                          {newModuleSessions.map((session, index) => (
+                            <div key={session.id} className="grid grid-cols-4 gap-2 mb-2 items-end">
+                              <div>
+                                <label className="block text-[10px] text-gray-500 mb-1">Date & Heure</label>
+                                <input type="text" className="w-full bg-white border border-gray-300 px-2 py-1.5 text-xs focus:outline-none focus:border-[var(--color-primary)] rounded-none" value={session.date} onChange={e => {
+                                  const updated = [...newModuleSessions];
+                                  updated[index].date = e.target.value;
+                                  setNewModuleSessions(updated);
+                                }} placeholder="Ex: 20/08/2026 14:00" />
+                              </div>
+                              <div>
+                                <label className="block text-[10px] text-gray-500 mb-1">Lieu</label>
+                                <input type="text" className="w-full bg-white border border-gray-300 px-2 py-1.5 text-xs focus:outline-none focus:border-[var(--color-primary)] rounded-none" value={session.location} onChange={e => {
+                                  const updated = [...newModuleSessions];
+                                  updated[index].location = e.target.value;
+                                  setNewModuleSessions(updated);
+                                }} placeholder="Ex: Salle A" />
+                              </div>
+                              <div>
+                                <label className="block text-[10px] text-gray-500 mb-1">Capacité (places)</label>
+                                <input type="number" className="w-full bg-white border border-gray-300 px-2 py-1.5 text-xs focus:outline-none focus:border-[var(--color-primary)] rounded-none" value={session.capacity || ""} onChange={e => {
+                                  const updated = [...newModuleSessions];
+                                  updated[index].capacity = parseInt(e.target.value) || 0;
+                                  setNewModuleSessions(updated);
+                                }} placeholder="Ex: 20" />
+                              </div>
+                              <div>
+                                <button type="button" onClick={() => setNewModuleSessions(newModuleSessions.filter((_, i) => i !== index))} className="w-full bg-red-50 text-red-500 font-bold text-xs py-1.5 px-2 hover:bg-red-100 transition-colors">Supprimer</button>
+                              </div>
+                            </div>
+                          ))}
+                          <button type="button" onClick={() => setNewModuleSessions([...newModuleSessions, { id: Math.random().toString(36).substr(2, 9), title: "Session physique", type: "zoom", duration: "1h", date: "", location: "", capacity: 20 }])} className="mt-2 text-xs text-[var(--color-primary)] font-bold hover:underline flex items-center gap-1">
+                            + Ajouter une session
+                          </button>
+                        </div>
+                      )}
                     </div>
                   </div>
                 )}

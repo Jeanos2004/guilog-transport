@@ -13,6 +13,7 @@ import { StudentProfile, CourseSession } from "./studentDb";
 // === TYPES ===
 
 export interface FormationDetails {
+  modalite?: "En ligne" | "Présentiel" | "Hybride"; // Format d'apprentissage
   presentation?: string;          // Description libre de la formation
   objectifs?: string[];           // Objectifs pédagogiques (liste)
   prerequis?: string[];           // Prérequis (liste)
