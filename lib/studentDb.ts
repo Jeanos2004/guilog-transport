@@ -349,12 +349,12 @@ export const studentDb = {
           
           studentCourses.push({
             id,
-            title: mod.titre,
-            category: cat.categorie,
-            description: mod.details?.presentation || mod.titre,
-            duration: mod.details?.duree || "Non définie",
-            image: mod.image || cat.image || "/images/programmes/analyse.jpg",
-            price: mod.prix || 0,
+            title: savedCourse?.title || mod.titre,
+            category: savedCourse?.category || cat.categorie,
+            description: savedCourse?.description || mod.details?.presentation || mod.titre,
+            duration: savedCourse?.duration || mod.details?.duree || "Non définie",
+            image: savedCourse?.image || mod.image || cat.image || "/images/programmes/analyse.jpg",
+            price: savedCourse?.price !== undefined ? savedCourse.price : (mod.prix || 0),
             modules: initialModules
           });
         });
