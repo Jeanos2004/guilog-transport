@@ -6,8 +6,13 @@ export async function POST(req: Request) {
     const body = await req.json();
     const { paymentMethod, amount, phone, courseId, userId } = body;
 
-    if (!amount || !courseId || !userId) {
-      return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
+    if (amount === undefined || amount === null || !courseId || !userId) {
+      return NextResponse.json({ error: `Missing required fields. amount: ${amount}, courseId: ${courseId}, userId: ${userId}` }, { status: 400 });
+    }
+
+    const numericAmount = Number(amount);
+    if (isNaN(numericAmount) || numericAmount <= 0) {
+      return NextResponse.json({ error: "Le montant doit être supérieur à 0." }, { status: 400 });
     }
 
     const merchantPaymentReference = `Guilogtrans-${userId.substring(0,5)}-${courseId.substring(0,5)}-${Date.now()}`;
@@ -35,7 +40,7 @@ export async function POST(req: Request) {
     }
 
     const result = await initiateGatewayPayment({
-      amount,
+      amount: numericAmount,
       payerNumber: formattedPhone,
       allowedPaymentMethods,
       description: `Inscription au module ${courseId}`,

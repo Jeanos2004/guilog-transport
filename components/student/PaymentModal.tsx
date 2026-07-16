@@ -99,7 +99,7 @@ export default function PaymentModal({ course, isOpen, onClose, onSuccess }: Pay
           throw new Error("Lien de paiement introuvable");
         }
       } catch (err: any) {
-        toast.info(err.message);
+        toast.error(err.message);
       } finally {
         setLoading(false);
       }
